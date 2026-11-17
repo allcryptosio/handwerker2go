@@ -1,26 +1,58 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* handwerker2go Designsystem (Design G "Zuhause") */
+@theme {
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  --color-brand: #12704f;        /* Hauptfarbe, Buttons, Links */
+  --color-brand-dark: #0b2e1f;   /* Überschriften, dunkle Flächen */
+  --color-brand-deep: #14402c;   /* Karten auf dunklem Grund */
+  --color-brand-light: #8fd3ad;  /* Akzent auf dunklem Grund */
+  --color-mint: #eaf5ee;         /* Hero- und Hinweisflächen */
+  --color-mint-strong: #c6dfcf;
+  --color-mint-soft: #dbe9e0;
+  --color-ink: #1a1e1d;          /* Fließtext */
+  --color-ink-soft: #3f4442;
+  --color-muted: #565958;        /* Nebentext, 7:1 auf Weiß */
+  --color-line: #e3e6e4;
+  --color-line-strong: #c9d3cd;
+  --color-soft: #f5f7f6;
+  --color-star: #e0a800;
+
+  /* Pastellflächen für Kategorien */
+  --color-tone-montage: #e7dcc9;
+  --color-tone-wand: #dfe4ea;
+  --color-tone-elektro: #f2e6b8;
+  --color-tone-sanitaer: #d7e6ee;
+  --color-tone-maler: #efd9cf;
+  --color-tone-umzug: #e3e0d6;
+  --color-tone-garten: #d9e6cf;
+  --color-tone-entruempelung: #e9ddd0;
+  --color-tone-neutral: #e6e2da;
+
+  --radius-card: 1rem;
+  --radius-panel: 1.25rem;
+  --radius-banner: 1.5rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color: var(--color-ink);
+  background: #ffffff;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
