@@ -1,11 +1,14 @@
 // Legt ein Admin-Konto an oder macht ein bestehendes Konto zum Admin.
-// Nutzung: pnpm admin:create <email> "<Name>"
+// Nutzung: pnpm admin:create <email> "<Name>"   oder   pnpm admin:create "<Name>" (nimmt ADMIN_EMAIL)
 // Das Passwort wird zufällig erzeugt, in /root/.handwerker2go/admin-password gespeichert und einmal angezeigt.
 import { randomBytes } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import pg from "pg";
 
-const [email, name = "Admin"] = process.argv.slice(2);
+const args = process.argv.slice(2);
+// Ohne Angabe wird ADMIN_EMAIL aus .env.local verwendet
+const email = args[0]?.includes("@") ? args[0] : process.env.ADMIN_EMAIL;
+const name = (args[0]?.includes("@") ? args[1] : args[0]) ?? "Admin";
 if (!email || !email.includes("@")) { console.error('Nutzung: pnpm admin:create <email> "<Name>"'); process.exit(1); }
 const db = new pg.Client({ connectionString: process.env.DATABASE_URL_MIGRATIONS });
 await db.connect();
