@@ -12,15 +12,17 @@ export default function Page() {
         <br />
         Einzelunternehmer (Sole Trader)
         <br />
-        [Straße, Hausnummer]
+        Republic Street 266
         <br />
-        [Postleitzahl, Ort], Malta
+        VLT 1112 Valletta
+        <br />
+        Malta
       </p>
       <h2>Kontakt</h2>
       <p>
-        E-Mail: [kontakt@handwerker2go.com]
+        E-Mail: [folgt in Kürze]
         <br />
-        Telefon: [Telefonnummer]
+        Telefon: <a href="tel:+35677818522" className="underline">+356 7781 8522</a>
       </p>
       <h2>Umsatzsteuer-Identifikationsnummer</h2>
       <p>MT33258727</p>
