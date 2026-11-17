@@ -24,7 +24,7 @@ function render(m: Mail) {
     : "";
   const html = `<!doctype html><html lang="de"><body style="margin:0;background:#eaf5ee;font-family:Inter,Arial,sans-serif;color:#1a1e1d">
 <div style="max-width:560px;margin:0 auto;padding:32px 20px">
-<div style="font-size:24px;font-weight:800;color:#12704f;letter-spacing:-0.5px">handwerker<span style="background:#12704f;color:#fff;border-radius:6px;padding:0 6px;margin-left:2px">2go</span></div>
+<div style="font-size:24px;font-weight:800;color:#12704f;letter-spacing:-0.5px"><img src="${site.url}/logo-mail.png" width="36" height="36" alt="" style="vertical-align:middle;border-radius:8px;margin-right:8px">handwerker<span style="background:#12704f;color:#fff;border-radius:6px;padding:0 6px;margin-left:2px">2go</span></div>
 <div style="background:#ffffff;border-radius:16px;padding:32px;margin-top:20px">
 <h1 style="font-size:22px;margin:0 0 16px;color:#0b2e1f">${esc(m.heading)}</h1>
 ${m.paragraphs.map((p) => `<p style="font-size:16px;line-height:1.6;margin:0 0 14px">${esc(p)}</p>`).join("")}

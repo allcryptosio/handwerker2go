@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { activeCities, categories } from "@/lib/catalog";
 import { site } from "@/lib/site";
+import { Logo } from "@/components/ui/logo";
 
 export function Footer() {
   const city = activeCities()[0];
@@ -9,7 +10,7 @@ export function Footer() {
       <div className="mx-auto flex max-w-[1240px] flex-col gap-9 px-5 pb-8 pt-14 sm:px-7">
         <div className="grid grid-cols-1 gap-7 text-sm sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="text-[22px] font-extrabold tracking-[-0.04em] text-brand">{site.name}</div>
+            <Logo />
             <p className="mt-2.5 leading-relaxed text-muted">Geprüfte Handwerker in deiner Nähe. Gestartet in {city?.name}.</p>
           </div>
           {city && (
