@@ -159,8 +159,8 @@ prüfen, ob sie über Stripe oder eine eigene Rechnungsstellung laufen. DAC7-Mel
 | Phase | Inhalt | Status |
 | --- | --- | --- |
 | 1 | Analyse, Architektur, Designsystem, Startseite, Navigation, SEO-Grundgerüst, Rechtstext-Entwürfe | erledigt |
-| 2 | Supabase-Projekt, Migrationen, RLS, Auth mit E-Mail-Verifizierung, Kunden- und Betriebsregistrierung, Profile, Admin-Freigabe | als Nächstes |
-| 3 | Mapbox-Geocoding, Umkreissuche, Suchergebnisse, Leistungen, Kalender, Festpreis-Buchung | |
+| 2 | PostgreSQL + PostGIS (Supabase-kompatibel), Migrationen, RLS, Better Auth mit E-Mail-Bestätigung, Kunden- und Betriebsregistrierung mit Nachweis, Dashboards, Admin-Freigabe, Audit-Log | erledigt |
+| 3 | Mapbox-Geocoding, Umkreissuche, Suchergebnisse, Leistungen, Kalender, Festpreis-Buchung | als Nächstes |
 | 4 | Kunden-, Betriebs- und Admin-Dashboard, Bewertungen, Angebotsanfragen | |
 | 5 | Stripe Connect, Billing, Provisionen, Abos, Rechnungen, Resend-E-Mails, Steuerregeln | |
 | 6 | SEO-Feinschliff, Performance, Sicherheit, Datenschutz, Tests, Deployment mit Domain | |

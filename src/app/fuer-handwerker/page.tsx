@@ -59,7 +59,9 @@ export default function ProviderLandingPage() {
             Kunden geben ihre Adresse ein und finden deinen Betrieb, wenn er in ihrem Gebiet arbeitet. Du verwaltest Leistungen,
             Termine und Einnahmen in einem Dashboard. Die ersten {p.introMonths} Monate ohne Grundgebühr.
           </p>
-          <p className="text-[15px] text-[#cfe3d7]">Die Registrierung für Betriebe öffnet in Kürze.</p>
+          <Link href="/fuer-handwerker/registrieren" className="self-start rounded-full bg-white px-7 py-4 font-bold text-brand-dark hover:bg-mint">
+            Jetzt Betrieb registrieren
+          </Link>
         </Container>
       </section>
 
@@ -110,8 +112,8 @@ export default function ProviderLandingPage() {
             <li>Wir erinnern dich rechtzeitig vor Ende der Einführungsphase. Kündigen geht jederzeit im Dashboard.</li>
             <li>Alle Preise zuzüglich gesetzlicher Umsatzsteuer, sofern anfallend. [Steuerliche Angabe prüfen lassen]</li>
           </ul>
-          <Link href="/anmelden" className="mt-8 inline-block rounded-full bg-brand px-7 py-4 font-bold text-white hover:bg-brand-dark">
-            Zum Login für Betriebe
+          <Link href="/fuer-handwerker/registrieren" className="mt-8 inline-block rounded-full bg-brand px-7 py-4 font-bold text-white hover:bg-brand-dark">
+            Jetzt Betrieb registrieren
           </Link>
         </Container>
       </section>

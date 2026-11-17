@@ -1,22 +1,26 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { LoginForm } from "@/components/forms/login-form";
 import { Container } from "@/components/ui/container";
+import { currentUser } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "Anmelden", alternates: { canonical: "/anmelden" }, robots: { index: false } };
 
-/** Phase 2 ersetzt diese Seite durch die Anmeldung mit Supabase Auth. */
+async function RedirectIfSignedIn() {
+  const u = await currentUser();
+  if (u) redirect(u.role === "admin" ? "/admin" : u.role === "provider" ? "/dashboard" : "/konto");
+  return null;
+}
+
 export default function LoginPage() {
   return (
-    <Container className="flex max-w-[560px] flex-col gap-5 py-20">
+    <Container className="flex max-w-[520px] flex-col gap-6 py-16">
+      <Suspense fallback={null}>
+        <RedirectIfSignedIn />
+      </Suspense>
       <h1 className="text-[clamp(32px,4vw,44px)] font-extrabold tracking-[-0.03em] text-brand-dark">Anmelden</h1>
-      <p className="text-[17px] leading-relaxed text-ink-soft">
-        Kundenkonten und das Dashboard für Betriebe gehen in Kürze an den Start. Bis dahin kannst du dich über die Leistungen
-        in Hamburg informieren.
-      </p>
-      <div className="flex flex-wrap gap-3">
-        <Link href="/hamburg" className="rounded-full bg-brand px-6 py-3.5 font-bold text-white hover:bg-brand-dark">Leistungen ansehen</Link>
-        <Link href="/fuer-handwerker" className="rounded-full border-[1.5px] border-ink px-6 py-3.5 font-bold hover:bg-ink hover:text-white">Für Handwerker</Link>
-      </div>
+      <LoginForm />
     </Container>
   );
 }
