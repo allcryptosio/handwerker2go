@@ -23,7 +23,7 @@ export function ProviderRegisterForm({ categories }: { categories: { slug: strin
           <Field name="postal_code" label="PLZ" inputMode="numeric" autoComplete="postal-code" error={e.postal_code} />
           <Field name="city" label="Ort" autoComplete="address-level2" error={e.city} />
         </div>
-        <Field name="vat_id" label="USt-IdNr." required={false} error={e.vat_id} hint="Wichtig für die korrekte Rechnung unserer Provision" />
+        <Field name="vat_id" label="USt-IdNr." required={false} error={e.vat_id} hint="Wir rechnen Provision und Abo netto im Reverse-Charge-Verfahren ab. Bitte angeben, falls vorhanden." />
       </fieldset>
 
       <fieldset className={section}>

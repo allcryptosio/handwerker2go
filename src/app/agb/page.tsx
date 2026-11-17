@@ -11,7 +11,7 @@ export default function Page() {
       <h2>2. Nutzung für Kundinnen und Kunden</h2>
       <p>[Registrierung, Buchung, Angebotsanfrage, Zahlung, Stornierung, Bewertungen]</p>
       <h2>3. Bedingungen für Handwerksbetriebe</h2>
-      <p>[Einführungsphase drei Monate ohne Grundgebühr mit 10 % Provision ab Freischaltung. Danach Mitgliedschaft nur nach ausdrücklicher Zustimmung: monatlich 29,99 € oder jährlich 299,88 €, jeweils 15 % Provision. Laufzeiten, Kündigungsfristen, Kündigungsbutton nach § 312k BGB prüfen lassen.]</p>
+      <p>[Einführungsphase drei Monate ohne Grundgebühr mit 10 % Provision ab Freischaltung. Danach Mitgliedschaft nur nach ausdrücklicher Zustimmung: monatlich 29,99 € oder jährlich 299,88 €, jeweils 15 % Provision. Alle Preise für Betriebe sind Nettopreise; die Umsatzsteuer schuldet der Betrieb als Leistungsempfänger (Reverse-Charge-Verfahren), Rechnungen ergehen netto mit dem Hinweis „Reverse charge“. Laufzeiten, Kündigungsfristen, Kündigungsbutton nach § 312k BGB prüfen lassen.]</p>
       <h2>4. Haftung, Schlussbestimmungen</h2>
       <p>[prüfen lassen]</p>
     </LegalPage>

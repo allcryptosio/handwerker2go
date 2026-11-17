@@ -6,6 +6,7 @@ import {
   formatCents,
   formatPercent,
   providerPricing as p,
+  providerVatNote,
   yearlyPerMonthCents,
   yearlySavingsPercent,
 } from "@/lib/pricing";
@@ -110,7 +111,7 @@ export default function ProviderLandingPage() {
             <li>Provision fällt nur auf erfolgreich abgeschlossene Buchungen an.</li>
             <li>Nach der Einführungsphase wird nichts automatisch kostenpflichtig. Du entscheidest dich aktiv für monatlich oder jährlich.</li>
             <li>Wir erinnern dich rechtzeitig vor Ende der Einführungsphase. Kündigen geht jederzeit im Dashboard.</li>
-            <li>Alle Preise zuzüglich gesetzlicher Umsatzsteuer, sofern anfallend. [Steuerliche Angabe prüfen lassen]</li>
+            <li>{providerVatNote} Deine Rechnungen von uns sind Nettorechnungen mit dem Hinweis „Reverse charge“.</li>
           </ul>
           <Link href="/fuer-handwerker/registrieren" className="mt-8 inline-block rounded-full bg-brand px-7 py-4 font-bold text-white hover:bg-brand-dark">
             Jetzt Betrieb registrieren

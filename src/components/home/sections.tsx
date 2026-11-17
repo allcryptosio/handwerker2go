@@ -5,6 +5,7 @@ import {
   formatCents,
   formatPercent,
   providerPricing as p,
+  providerVatNote,
   yearlyPerMonthCents,
   yearlySavingsPercent,
 } from "@/lib/pricing";
@@ -181,6 +182,7 @@ export function ProviderCta() {
             </div>
           ))}
         </dl>
+        <p className="w-full text-[13px] text-[#cfe3d7]">{providerVatNote}</p>
       </Container>
     </section>
   );

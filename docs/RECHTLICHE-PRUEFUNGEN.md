@@ -23,9 +23,8 @@ müssen folgende Punkte von Rechtsanwalt bzw. Steuerberatung geprüft und schrif
 ## Steuern
 
 - [ ] Umsatzsteuerliche Registrierung: MT33258727 vorhanden, Art der Registrierung (Artikel 10 oder Artikel 11 in Malta) prüfen, ggf. Registrierung in Deutschland
-- [ ] Behandlung der Provision an deutsche Betriebe (B2B, Ort der Leistung, Reverse Charge)
-- [ ] Behandlung gegenüber Kleinunternehmern ohne USt-IdNr.
-- [ ] Behandlung der Abo-Gebühren
+- [x] Provision und Abo an deutsche Betriebe: Nettorechnung, Reverse charge, keine maltesische MwSt. (Entscheidung des Betreibers, gleiche Regelung wie deinminijob.com)
+- [ ] Kleinunternehmer-Betriebe (§ 19 UStG): schulden die USt nach § 13b ebenfalls, können sie aber nicht als Vorsteuer abziehen; Hinweis in AGB/Registrierung prüfen
 - [ ] Ob die Plattform in irgendeiner Konstellation als Leistungserbringer der Handwerkerleistung gilt (darf nicht ungeprüft angenommen werden)
 - [ ] Rechnungsstellung im Namen der Betriebe (Gutschriftverfahren oder Rechnung durch den Betrieb)
 - [ ] Erstattungen und Gutschriften

@@ -135,8 +135,8 @@ Grundregel im Code: Es wird nie automatisch eine Steuerbefreiung angewendet. Jed
 | Leistung | Leistender | Empfänger | Zu klärende Behandlung |
 | --- | --- | --- | --- |
 | Handwerkerleistung | Betrieb | Kunde | Rechnung im Namen des Betriebs, deutsche USt des Betriebs oder Kleinunternehmer-Hinweis |
-| Vermittlungsprovision | Plattform (Einzelunternehmer, Malta) | Betrieb | B2B: Ort der Leistung beim Empfänger, Reverse Charge, wenn USt-IdNr. des Betriebs gültig; Kleinunternehmer-Betriebe ohne USt-IdNr. gesondert prüfen |
-| Abo-Gebühr | Plattform (Einzelunternehmer, Malta) | Betrieb | wie Provision; elektronische Dienstleistung, Einordnung prüfen |
+| Vermittlungsprovision | Plattform (Einzelunternehmer, Malta) | Betrieb | **Festgelegt (wie deinminijob.com):** Nettorechnung mit Hinweis „Reverse charge“, keine maltesische MwSt.; der Betrieb schuldet die deutsche USt (§ 13b UStG) |
+| Abo-Gebühr | Plattform (Einzelunternehmer, Malta) | Betrieb | **Festgelegt:** wie Provision, Nettorechnung, Reverse charge |
 | Erstattung, Gutschrift | jeweils wie Ursprung | | Korrektur der ursprünglichen Rechnung |
 
 Stripe Tax eignet sich für die Abo-Rechnungen der Plattform. Für die Handwerkerrechnungen im Namen der Betriebe ist zu
