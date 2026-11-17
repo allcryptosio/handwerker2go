@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { ProviderRegisterForm } from "@/components/forms/provider-register-form";
 import { Container } from "@/components/ui/container";
+import { RegistrationClosed } from "@/components/forms/registration-closed";
+import { mailReady } from "@/lib/mail";
 import { categories } from "@/lib/catalog";
 import { providerPricing as p } from "@/lib/pricing";
 
@@ -19,7 +21,11 @@ export default function Page() {
           Etwa fünf Minuten. Halte deinen Gewerbenachweis als PDF oder Foto bereit. Die ersten {p.introMonths} Monate zahlst du keine
           Grundgebühr.
         </p>
-        <ProviderRegisterForm categories={categories.map((c) => ({ slug: c.slug, label: c.label }))} />
+        {mailReady() ? (
+          <ProviderRegisterForm categories={categories.map((c) => ({ slug: c.slug, label: c.label }))} />
+        ) : (
+          <RegistrationClosed who="betrieb" />
+        )}
       </Container>
     </div>
   );

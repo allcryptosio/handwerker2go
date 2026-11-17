@@ -62,3 +62,6 @@ export async function sendMail(m: Mail) {
     await asSystem((db) => db.query("update email_outbox set status='failed', error=$2, attempts=attempts+1 where id=$1", [id, String(e).slice(0, 500)]));
   }
 }
+
+/** True, sobald E-Mails wirklich verschickt werden (sonst ist eine Registrierung nicht abschließbar). */
+export const mailReady = () => process.env.MAIL_DRIVER === "resend" && Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);

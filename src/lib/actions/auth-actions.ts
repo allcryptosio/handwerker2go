@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { auth, currentUser } from "@/lib/auth";
 import { asSystem, audit, withDb } from "@/lib/db";
-import { sendMail } from "@/lib/mail";
+import { mailReady, sendMail } from "@/lib/mail";
 import { detectDocumentType, storage } from "@/lib/storage";
 
 export type FormState = { ok?: boolean; error?: string; fieldErrors?: Record<string, string>; message?: string };
@@ -64,6 +64,7 @@ const customerSchema = z.object({
 });
 
 export async function registerCustomer(_: FormState, form: FormData): Promise<FormState> {
+  if (!mailReady()) return { error: "Die Registrierung startet in Kürze." };
   const parsed = customerSchema.safeParse(Object.fromEntries(form));
   if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) };
   const d = parsed.data;
@@ -101,6 +102,7 @@ const providerSchema = z.object({
 });
 
 export async function registerProvider(_: FormState, form: FormData): Promise<FormState> {
+  if (!mailReady()) return { error: "Die Registrierung startet in Kürze." };
   const parsed = providerSchema.safeParse(Object.fromEntries(form));
   const categories = form.getAll("categories").map(String);
   const file = form.get("document");
