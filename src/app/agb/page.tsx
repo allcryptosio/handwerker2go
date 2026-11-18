@@ -82,8 +82,9 @@ export default function Page() {
         Umsatzsteuer berechnet.
       </p>
       <p>
-        (2) Du bezahlst online über den Zahlungsdienstleister Stripe (Stripe Payments Europe, Ltd., Irland). Der Betrag geht über
-        Stripe direkt an den Betrieb. Wir nehmen zu keinem Zeitpunkt Zahlungen auf eigene Konten entgegen. Die Rechnung über die
+        (2) Du bezahlst online über den Zahlungsdienstleister Stripe (Stripe Payments Europe, Ltd., Irland) auf einer
+        Bezahlseite von Stripe. Der Betrag geht über Stripe direkt an den Betrieb; auf deinem Kontoauszug erscheint der Name des
+        Betriebs. Wir nehmen zu keinem Zeitpunkt Zahlungen auf eigene Konten entgegen. Die Rechnung über die
         Handwerkerleistung stellt dir der Betrieb aus.
       </p>
       <p>

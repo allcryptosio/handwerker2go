@@ -44,8 +44,9 @@ export default function Page() {
         Angaben und entscheiden über die Freischaltung. Ein Anspruch auf Freischaltung besteht nicht.
       </p>
       <p>
-        (2) Für den Empfang von Zahlungen richtet der Betrieb ein Konto beim Zahlungsdienstleister Stripe ein (Stripe Connect
-        Express). Stripe prüft dabei die Identität, das Unternehmen und die Bankverbindung (KYC).
+        (2) Für den Empfang von Zahlungen richtet der Betrieb über den Link im Dashboard ein eigenes Konto beim
+        Zahlungsdienstleister Stripe ein. Stripe prüft dabei die Identität, das Unternehmen und die Bankverbindung (KYC). Für
+        dieses Konto gelten zusätzlich die Bedingungen von Stripe, denen der Betrieb bei der Einrichtung zustimmt.
       </p>
       <p>
         (3) Buchbar ist ein Betrieb erst, wenn wir ihn freigeschaltet haben und Stripe sein Konto für Zahlungen und Auszahlungen
@@ -89,8 +90,9 @@ export default function Page() {
 
       <h2>§ 5 Zahlungsabwicklung und Provision</h2>
       <p>
-        (1) Kunden bezahlen Buchungen online über Stripe. Die Zahlung geht über Stripe auf das Stripe-Konto des Betriebs. Wir
-        nehmen zu keinem Zeitpunkt Kundengelder auf eigene Konten entgegen.
+        (1) Kunden bezahlen Buchungen online über Stripe. Die Zahlung geht direkt auf das Stripe-Konto des Betriebs; der Betrieb
+        ist Empfänger der Zahlung, sein Name erscheint auf dem Kontoauszug des Kunden. Wir nehmen zu keinem Zeitpunkt
+        Kundengelder auf eigene Konten entgegen.
       </p>
       <p>
         (2) Unsere Provision wird bei der Zahlung des Kunden automatisch einbehalten (Plattformgebühr). Maßgeblich ist der zum
@@ -99,17 +101,23 @@ export default function Page() {
         an.
       </p>
       <p>
-        (3) Nachdem der Betrieb den Auftrag im Dashboard als erledigt gemeldet hat, wird der Betrag abzüglich Provision über
-        Stripe auf das hinterlegte Bankkonto des Betriebs ausgezahlt. Die Gutschrift dauert in der Regel wenige Bankarbeitstage.
+        (3) Stripe zahlt das Guthaben des Betriebs nach dem Auszahlungsplan seines Stripe-Kontos auf sein Bankkonto aus. Den
+        Auszahlungsplan legt der Betrieb in seinem Stripe-Konto fest; wir haben darauf keinen Einfluss.
       </p>
       <p>
         (4) Storniert ein Kunde innerhalb der kostenlosen Frist von {legal.freeCancellationHours} Stunden vor dem Termin oder
-        widerruft er wirksam, wird ihm der volle Betrag über Stripe erstattet; die Provision entfällt dann ebenfalls. Bei späterer
+        widerruft er wirksam, wird ihm der volle Betrag über Stripe aus dem Stripe-Konto des Betriebs erstattet; die Provision
+        entfällt dann ebenfalls. Bei späterer
         Stornierung oder Nichterscheinen des Kunden behält der Betrieb die Pauschale nach den AGB für Kunden (
         {legal.lateCancellationPercent} % des Festpreises, höchstens die Anfahrtskosten); die Provision wird anteilig berechnet.
       </p>
       <p>
-        (5) Die Rechnung über die Handwerkerleistung stellt der Betrieb an den Kunden. Wir rechnen gegenüber dem Betrieb nur unsere
+        (5) Die Gebühren von Stripe für die Zahlungsabwicklung trägt der Betrieb. Stripe verrechnet sie direkt mit seinem
+        Stripe-Konto. Rückbuchungen (zum Beispiel bei Kreditkarten-Reklamationen) betreffen ebenfalls das Stripe-Konto des
+        Betriebs; Stripe trägt das Ausfallrisiko nach seinen Bedingungen.
+      </p>
+      <p>
+        (6) Die Rechnung über die Handwerkerleistung stellt der Betrieb an den Kunden. Wir rechnen gegenüber dem Betrieb nur unsere
         Provision und die Mitgliedschaft ab.
       </p>
 

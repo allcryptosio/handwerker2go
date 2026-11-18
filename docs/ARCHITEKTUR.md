@@ -116,16 +116,16 @@ registriert ──► pending (Prüfung) ──► approved = Beginn Einführung
 
 ## 5. Zahlungen mit Stripe (Code vorbereitet, nur Testmodus)
 
-- Betriebe: Stripe Connect **Express** (`src/lib/stripe/connect.ts`). Stripe übernimmt KYC und Bankverbindung. Konto wird mit
-  Auszahlungsplan `manual` angelegt; Onboarding über `accountLinks` aus dem Dashboard.
+- Betriebe: Stripe **Accounts v2** mit Managed Risk (`fees_collector`/`losses_collector = stripe`, `dashboard: full`),
+  `src/lib/stripe/connect.ts`. Stripe übernimmt KYC, Bankverbindung, Auszahlungen und das Ausfallrisiko.
 - **Buchbar** erst, wenn `status = approved` und Stripe `charges_enabled` und `payouts_enabled` meldet (`isBookable`,
   Datenbankfunktion `app.provider_bookable`). Stripe-Felder kann nur Admin/System ändern (Trigger `app.provider_guard`).
-- Zahlung: Destination Charge mit `on_behalf_of` und `transfer_data.destination`; Provision als `application_fee_amount`
-  (`src/lib/stripe/payments.ts`). Satz aus `src/lib/pricing.ts` über `commissionBpsAt` (Einführungsphase ab Freischaltung).
-  Die Plattform nimmt keine Kundengelder auf eigene Konten.
-- Auszahlung an den Betrieb nach Abschluss des Auftrags (`releasePayout`, Payout auf dem verbundenen Konto).
-- Erstattung (Stornierung in der Frist, Widerruf, Restbetrag nach Pauschale): `refundBookingPayment` mit
-  `refund_application_fee` und `reverse_transfer`.
+- Zahlung: **Direct Charge** über Stripe Checkout auf dem Konto des Betriebs, Provision als `application_fee_amount`
+  (`createBookingCheckout` in `src/lib/stripe/payments.ts`). Satz aus `src/lib/pricing.ts` über `commissionBpsAt`.
+  Der Betrieb ist Händler; die Plattform nimmt keine Kundengelder auf eigene Konten. Stripe-Gebühren trägt der Betrieb.
+- Auszahlung nach dem Auszahlungsplan des Betriebskontos (Stripe).
+- Erstattung (Stornierung in der Frist, Widerruf, Restbetrag nach Pauschale): `refundBookingPayment` auf dem Konto des
+  Betriebs mit `refund_application_fee`.
 - Webhook `/api/stripe/webhook`: Signaturprüfung, Idempotenz über Tabelle `stripe_events`; `account.updated` synchronisiert
   den Kontostatus. Buchungsereignisse folgen mit Phase 3.
 - Sicherheitssperre: `sk_live_…` wird abgelehnt, solange `STRIPE_ALLOW_LIVE` nicht `1` ist.

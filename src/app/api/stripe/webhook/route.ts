@@ -32,10 +32,11 @@ export async function POST(request: Request) {
   try {
     switch (event.type) {
       case "account.updated":
-        await syncConnectAccount((event.data.object as { id: string }).id);
+        // Status eines Betriebskontos hat sich geändert (Connect-Ereignis, event.account = Konto des Betriebs)
+        await syncConnectAccount(event.account ?? (event.data.object as { id: string }).id);
         break;
       default:
-        // payment_intent.*, charge.refunded, charge.dispute.*, payout.* folgen mit den Buchungen (Phase 3)
+        // checkout.session.completed (Connect), charge.refunded, charge.dispute.* folgen mit den Buchungen (Phase 3)
         break;
     }
     await asSystem((db) => db.query("update stripe_events set processed_at = now() where id = $1", [event.id]));

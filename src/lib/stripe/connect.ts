@@ -3,31 +3,41 @@ import { asSystem, audit } from "@/lib/db";
 import { getStripe } from "@/lib/stripe/client";
 
 /**
- * Stripe Connect Express für Betriebe. Stripe übernimmt KYC, Bankverbindung und Auszahlungen.
- * Auszahlungen stehen auf "manual": Wir lösen sie nach Abschluss des Auftrags aus (releasePayout).
+ * Betriebskonten über Stripe Accounts v2 mit Managed Risk:
+ * Stripe trägt Gebühren- und Verlustrisiko (fees_collector/losses_collector = stripe),
+ * der Betrieb ist Händler seiner Zahlungen (Direct Charges) und nutzt das Stripe-Dashboard.
+ * Stripe übernimmt KYC, Bankverbindung und Auszahlungen.
  */
 export async function ensureConnectAccount(providerId: string): Promise<string> {
   const stripe = getStripe();
   if (!stripe) throw new Error("Stripe ist nicht konfiguriert");
   const p = await asSystem(async (db) =>
     (await db.query(
-      `select p.id, p.stripe_account_id, p.company_name, u.email from provider_profiles p join "user" u on u.id = p.user_id where p.id = $1`,
+      `select p.id, p.stripe_account_id, p.company_name, p.legal_form, u.email from provider_profiles p join "user" u on u.id = p.user_id where p.id = $1`,
       [providerId],
     )).rows[0],
   );
   if (!p) throw new Error("Betrieb nicht gefunden");
   if (p.stripe_account_id) return p.stripe_account_id as string;
-  const account = await stripe.accounts.create(
+  const account = await stripe.v2.core.accounts.create(
     {
-      type: "express",
-      country: "DE",
-      email: p.email,
-      business_profile: { name: p.company_name, url: "https://handwerker2go.com" },
-      capabilities: { card_payments: { requested: true }, transfers: { requested: true } },
-      settings: { payouts: { schedule: { interval: "manual" } } },
+      contact_email: p.email,
+      display_name: p.company_name,
+      dashboard: "full",
+      identity: { country: "de", business_details: { registered_name: p.company_name } },
+      defaults: {
+        currency: "eur",
+        locales: ["de-DE"],
+        responsibilities: { fees_collector: "stripe", losses_collector: "stripe" },
+      },
+      configuration: {
+        merchant: {
+          capabilities: { card_payments: { requested: true } },
+        },
+      },
       metadata: { provider_id: providerId },
     },
-    { idempotencyKey: `connect-account-${providerId}` },
+    { idempotencyKey: `connect-account-v2-${providerId}` },
   );
   await asSystem(async (db) => {
     await db.query("update provider_profiles set stripe_account_id = $2 where id = $1", [providerId, account.id]);
@@ -41,21 +51,31 @@ export async function createOnboardingLink(accountId: string): Promise<string> {
   const stripe = getStripe();
   if (!stripe) throw new Error("Stripe ist nicht konfiguriert");
   const base = process.env.BETTER_AUTH_URL ?? "https://handwerker2go.com";
-  const link = await stripe.accountLinks.create({
+  const link = await stripe.v2.core.accountLinks.create({
     account: accountId,
-    type: "account_onboarding",
-    refresh_url: `${base}/dashboard?stripe=erneut`,
-    return_url: `${base}/dashboard?stripe=zurueck`,
+    use_case: {
+      type: "account_onboarding",
+      account_onboarding: {
+        collection_options: { fields: "eventually_due" },
+        refresh_url: `${base}/dashboard?stripe=erneut`,
+        return_url: `${base}/dashboard?stripe=zurueck`,
+      },
+    },
   });
   return link.url;
 }
 
-/** Status von Stripe übernehmen. Wird vom Webhook (account.updated) und beim Laden des Dashboards aufgerufen. */
+/** Status von Stripe übernehmen: Zahlungen (card_payments) und Auszahlungen (stripe_balance.payouts) */
 export async function syncConnectAccount(accountId: string) {
   const stripe = getStripe();
   if (!stripe) return null;
-  const a = await stripe.accounts.retrieve(accountId);
-  const flags = { charges: Boolean(a.charges_enabled), payouts: Boolean(a.payouts_enabled), details: Boolean(a.details_submitted) };
+  const a = await stripe.v2.core.accounts.retrieve(accountId, { include: ["configuration.merchant", "requirements"] });
+  const caps = a.configuration?.merchant?.capabilities;
+  const flags = {
+    charges: caps?.card_payments?.status === "active",
+    payouts: caps?.stripe_balance?.payouts?.status === "active",
+    details: !(a.requirements?.entries ?? []).some((e) => e.minimum_deadline?.status === "currently_due"),
+  };
   await asSystem((db) =>
     db.query(
       `update provider_profiles set stripe_charges_enabled = $2, stripe_payouts_enabled = $3, stripe_details_submitted = $4,

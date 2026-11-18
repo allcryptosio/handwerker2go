@@ -109,6 +109,7 @@ export default function ProviderLandingPage() {
           </ul>
           <ul className="mt-8 flex max-w-[820px] flex-col gap-2 text-[15px] leading-relaxed text-ink-soft">
             <li>Provision fällt nur auf erfolgreich abgeschlossene Buchungen an und wird bei der Zahlung über Stripe automatisch einbehalten.</li>
+            <li>Kunden zahlen direkt auf dein eigenes Stripe-Konto. Die Gebühren von Stripe für die Zahlungsabwicklung verrechnet Stripe direkt mit deinem Konto; die Auszahlung auf dein Bankkonto steuerst du selbst in Stripe.</li>
             <li>Alle Bedingungen stehen in den <Link href="/agb-betriebe" className="underline">AGB für Betriebe</Link>. Wie Suchergebnisse sortiert werden, erklären wir <Link href="/ranking" className="underline">hier</Link>; Abo und Provision haben darauf keinen Einfluss.</li>
             <li>Nach der Einführungsphase wird nichts automatisch kostenpflichtig. Du entscheidest dich aktiv für monatlich oder jährlich.</li>
             <li>Wir erinnern dich rechtzeitig vor Ende der Einführungsphase. Kündigen geht jederzeit im Dashboard.</li>

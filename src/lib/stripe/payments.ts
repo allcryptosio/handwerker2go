@@ -3,64 +3,53 @@ import { getStripe } from "@/lib/stripe/client";
 import { applicationFeeCents, commissionBpsAt } from "@/lib/stripe/commission";
 
 /**
- * Zahlungen für Buchungen (Destination Charge im Namen des Betriebs).
- * Das Geld geht über Stripe auf das Konto des Betriebs, die Provision wird als application_fee_amount einbehalten.
- * Die Plattform nimmt keine Kundengelder auf eigene Konten. Wird ab Phase 3 vom Buchungsablauf genutzt.
+ * Zahlung einer Buchung als Direct Charge auf dem Stripe-Konto des Betriebs (Variante A, Managed Risk).
+ * Der Betrieb ist Händler; die Provision wird als application_fee_amount einbehalten.
+ * Die Plattform nimmt keine Kundengelder auf eigene Konten. Bezahlseite: Stripe Checkout (gehostet).
  */
-export async function createBookingPayment(input: {
+export async function createBookingCheckout(input: {
   bookingRef: string;
   amountCents: number;
+  serviceName: string;
   providerAccountId: string;
   providerApprovedAt: Date;
   customerEmail: string;
-  description: string;
+  successUrl: string;
+  cancelUrl: string;
 }) {
   const stripe = getStripe();
   if (!stripe) throw new Error("Stripe ist nicht konfiguriert");
   const bps = commissionBpsAt(input.providerApprovedAt);
   const fee = applicationFeeCents(input.amountCents, bps);
-  const intent = await stripe.paymentIntents.create(
+  const session = await stripe.checkout.sessions.create(
     {
-      amount: input.amountCents,
-      currency: "eur",
-      automatic_payment_methods: { enabled: true },
-      application_fee_amount: fee,
-      on_behalf_of: input.providerAccountId,
-      transfer_data: { destination: input.providerAccountId },
-      receipt_email: input.customerEmail,
-      description: input.description,
-      metadata: { booking_ref: input.bookingRef, commission_bps: String(bps) },
+      mode: "payment",
+      locale: "de",
+      customer_email: input.customerEmail,
+      line_items: [{ quantity: 1, price_data: { currency: "eur", unit_amount: input.amountCents, product_data: { name: input.serviceName } } }],
+      payment_intent_data: {
+        application_fee_amount: fee,
+        description: input.serviceName,
+        metadata: { booking_ref: input.bookingRef, commission_bps: String(bps) },
+      },
+      metadata: { booking_ref: input.bookingRef },
+      success_url: input.successUrl,
+      cancel_url: input.cancelUrl,
     },
-    { idempotencyKey: `booking-payment-${input.bookingRef}` },
+    { stripeAccount: input.providerAccountId, idempotencyKey: `booking-checkout-${input.bookingRef}` },
   );
-  return { clientSecret: intent.client_secret, paymentIntentId: intent.id, commissionBps: bps, applicationFeeCents: fee };
+  return { url: session.url, sessionId: session.id, commissionBps: bps, applicationFeeCents: fee };
 }
 
 /**
- * Erstattung, z. B. bei Stornierung in der kostenlosen Frist (voller Betrag) oder abzüglich Pauschale.
- * Provision wird anteilig zurückgegeben, der Betrag vom Konto des Betriebs zurückgeholt.
+ * Erstattung auf dem Konto des Betriebs, z. B. Stornierung in der kostenlosen Frist (voller Betrag)
+ * oder Restbetrag nach Pauschale. Die Provision wird anteilig mit erstattet.
  */
-export async function refundBookingPayment(input: { paymentIntentId: string; amountCents?: number; reason: string }) {
+export async function refundBookingPayment(input: { providerAccountId: string; paymentIntentId: string; amountCents?: number; reason: string }) {
   const stripe = getStripe();
   if (!stripe) throw new Error("Stripe ist nicht konfiguriert");
   return stripe.refunds.create(
-    {
-      payment_intent: input.paymentIntentId,
-      amount: input.amountCents,
-      refund_application_fee: true,
-      reverse_transfer: true,
-      metadata: { reason: input.reason },
-    },
-    { idempotencyKey: `refund-${input.paymentIntentId}-${input.amountCents ?? "voll"}` },
-  );
-}
-
-/** Auszahlung an den Betrieb nach Abschluss des Auftrags (Auszahlungen stehen auf "manual") */
-export async function releasePayout(input: { providerAccountId: string; amountCents: number; bookingRef: string }) {
-  const stripe = getStripe();
-  if (!stripe) throw new Error("Stripe ist nicht konfiguriert");
-  return stripe.payouts.create(
-    { amount: input.amountCents, currency: "eur", metadata: { booking_ref: input.bookingRef } },
-    { stripeAccount: input.providerAccountId, idempotencyKey: `payout-${input.bookingRef}` },
+    { payment_intent: input.paymentIntentId, amount: input.amountCents, refund_application_fee: true, metadata: { reason: input.reason } },
+    { stripeAccount: input.providerAccountId, idempotencyKey: `refund-${input.paymentIntentId}-${input.amountCents ?? "voll"}` },
   );
 }

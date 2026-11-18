@@ -16,11 +16,11 @@ Connect aktiv, Stripe Tax aktiv mit Ursprung MT, noch keine Steuer-Registrierung
 4. Das Plattform-Konto hat `charges_enabled = false`. Vor dem Livegang müssen die Unternehmensdaten im Dashboard
    vervollständigt werden.
 
-## Empfohlenes Modell (Entscheidung offen, siehe unten)
+## Gewähltes Modell: Variante A (Entscheidung des Betreibers am 18.11.2026)
 
 | Baustein | Umsetzung |
 | --- | --- |
-| Betriebe | Accounts v2, `dashboard: express`, Konfiguration `merchant`, Stripe trägt Gebühren und Verluste, gehostetes Onboarding über Account Links |
+| Betriebe | Accounts v2, `dashboard: full` (GA; Express mit Managed Risk ist nur Vorschau), Konfiguration `merchant`, Stripe trägt Gebühren und Verluste, gehostetes Onboarding über Account Links. Der Betrieb legt dabei ein eigenes Stripe-Login an |
 | Buchbar | erst bei aktiver Fähigkeit `card_payments` und Auszahlungen (v2: `merchant` aktiv, `stripe_balance.payouts` aktiv) |
 | Kundenzahlung | **Direct Charge** auf dem Konto des Betriebs über **Stripe Checkout** (gehostete Seite, Apple Pay und Google Pay automatisch), Provision als `payment_intent_data.application_fee_amount` aus `pricing.ts` |
 | Vertragspartner | Betrieb ist Händler der Zahlung (passt zu AGB: Vertrag zwischen Kunde und Betrieb) |
@@ -70,9 +70,9 @@ Risikomanagement. Für einen Einzelbetreiber mit wenig Erfahrung in Zahlungsrisi
 
 ## Reihenfolge der Umsetzung
 
-1. Entscheidung Direct Charges mit Managed Risk (empfohlen) oder Destination Charges.
-2. `connect.ts` auf Accounts v2 umstellen, Onboarding-Link v2, Status-Abgleich über v2-Ereignisse.
-3. AGB für Betriebe und Kunden an das gewählte Modell anpassen (Auszahlungszeitpunkt, Rückbuchungen).
+1. ~~Entscheidung~~: Variante A gewählt.
+2. ~~`connect.ts` auf Accounts v2 umstellen, Onboarding-Link v2~~ (erledigt; Status-Abgleich über Dashboard-Aufruf und `account.updated`, v2-Thin-Events noch offen).
+3. ~~AGB anpassen~~ (erledigt: Auszahlung nach Stripe-Plan, Stripe-Gebühren und Rückbuchungen beim Betrieb).
 4. Checkout für Buchungen (zusammen mit dem Buchungsablauf in Phase 3).
 5. Billing für die Mitgliedschaft, Kundenportal.
 6. Stripe Tax mit maltesischer Registrierung, monatliche Provisionsrechnungen.
