@@ -1,0 +1,79 @@
+# Stripe-Integrationsplan für handwerker2go
+
+Stand 18.11.2026. Erstellt aus der Stripe-Dokumentation und Tests in der Sandbox (Plattform-Konto Malta, EUR,
+Connect aktiv, Stripe Tax aktiv mit Ursprung MT, noch keine Steuer-Registrierung). Der Stripe-Planer
+(stripe_implementation_planner) war in dieser Sitzung nicht verfügbar.
+
+## Sandbox-Befunde
+
+1. Stripe lehnt für diese Plattform neue Konten mit `type: "express"` (Accounts v1) ab. Verlangt wird **Accounts v2**
+   mit `defaults.responsibilities.losses_collector = "stripe"` (Managed Risk). Der bisherige Code in
+   `src/lib/stripe/connect.ts` muss deshalb auf `stripe.v2.core.accounts` umgestellt werden.
+2. Accounts v2 mit `fees_collector = stripe` und `losses_collector = stripe` ließ sich anlegen, mit Express-Dashboard
+   (Preview-API `2026-10-28.preview`) und mit Full-Dashboard.
+3. Bei Managed Risk trägt Stripe Betrugs- und Verlustrisiko der Betriebskonten. Destination Charges setzen dagegen
+   voraus, dass die Plattform die Verlusthaftung übernimmt (Bestätigung im Plattformprofil).
+4. Das Plattform-Konto hat `charges_enabled = false`. Vor dem Livegang müssen die Unternehmensdaten im Dashboard
+   vervollständigt werden.
+
+## Empfohlenes Modell (Entscheidung offen, siehe unten)
+
+| Baustein | Umsetzung |
+| --- | --- |
+| Betriebe | Accounts v2, `dashboard: express`, Konfiguration `merchant`, Stripe trägt Gebühren und Verluste, gehostetes Onboarding über Account Links |
+| Buchbar | erst bei aktiver Fähigkeit `card_payments` und Auszahlungen (v2: `merchant` aktiv, `stripe_balance.payouts` aktiv) |
+| Kundenzahlung | **Direct Charge** auf dem Konto des Betriebs über **Stripe Checkout** (gehostete Seite, Apple Pay und Google Pay automatisch), Provision als `payment_intent_data.application_fee_amount` aus `pricing.ts` |
+| Vertragspartner | Betrieb ist Händler der Zahlung (passt zu AGB: Vertrag zwischen Kunde und Betrieb) |
+| Buchung anlegen | erst nach Webhook `checkout.session.completed` (Connect-Ereignis), idempotent |
+| Erstattung | Refund auf dem Konto des Betriebs mit `refund_application_fee: true` |
+| Auszahlung | nach dem Auszahlungsplan des Betriebskontos (Stripe-Standard); eine Auszahlung erst nach Auftragsabschluss ist mit Managed Risk nicht vorgesehen |
+| Rückbuchungen | trägt das Konto des Betriebs; Stripe übernimmt das Ausfallrisiko |
+
+### Alternative B: Destination Charges (wie bisher geplant)
+
+Plattform ist Abwicklungsplattform und übernimmt die Verlusthaftung (nicht einbringliche negative Salden, Betrug).
+Erlaubt Auszahlung erst nach Auftragsabschluss. Erfordert Bestätigung im Stripe-Plattformprofil und eigenes
+Risikomanagement. Für einen Einzelbetreiber mit wenig Erfahrung in Zahlungsrisiken nicht empfohlen.
+
+## Mitgliedschaft der Betriebe (Billing)
+
+- Produkte „Mitgliedschaft monatlich“ (29,99 € netto) und „Mitgliedschaft jährlich“ (299,88 € netto) als Preise;
+  Beträge aus `pricing.ts` beim Anlegen übernehmen, Preis-IDs in `STRIPE_PRICE_MONTHLY` / `STRIPE_PRICE_YEARLY`.
+- Einführungsphase bleibt in unserer Datenbank (kein Stripe-Trial mit Karte). Abo entsteht nur durch aktive Wahl im
+  Dashboard über Checkout im Modus `subscription`.
+- Kündigung und Zahlungsmethode über das Stripe-Kundenportal; fehlgeschlagene Zahlungen mit Smart Retries; Status über
+  Webhooks `customer.subscription.*` und `invoice.payment_failed`.
+- Kunde des Abos: das v2-Konto des Betriebs mit Konfiguration `customer` (kein separates Customer-Objekt nötig).
+
+## Steuern (Stripe Tax) und Rechnungen (Invoicing)
+
+- In Stripe Tax die maltesische Registrierung (MT33258727) eintragen.
+- Abos mit `automatic_tax: { enabled: true }`; USt-IdNr. des Betriebs als `eu_vat` hinterlegen. Bei gültiger
+  USt-IdNr. rechnet Stripe Tax die Reverse-Charge-Behandlung automatisch und schreibt den Hinweis auf die Rechnung.
+  Text auf „Steuerschuldnerschaft des Leistungsempfängers“ prüfen bzw. per Rechnungsfußzeile ergänzen.
+- Provision: Plattformgebühren erzeugen keine Rechnung. Monatlich je Betrieb eine Rechnung über die einbehaltenen
+  Provisionen erstellen (Stripe Invoicing, `automatic_tax`, Reverse Charge), als bereits bezahlt markieren
+  (`paid_out_of_band`), PDF an den Betrieb.
+- Handwerkerleistung: Rechnung stellt der Betrieb. Bei Direct Charges kann er dafür sein Stripe-Dashboard nutzen;
+  Kunden erhalten zusätzlich die Stripe-Zahlungsbestätigung.
+- Betriebe ohne USt-IdNr. (Kleinunternehmer): Stripe Tax würde maltesische MwSt. berechnen, solange keine gültige
+  USt-IdNr. vorliegt. Mit der Steuerberatung klären.
+
+## Webhooks
+
+- Ein Endpunkt `/api/stripe/webhook` für Plattform-Ereignisse und ein zweiter Connect-Endpunkt (oder ein Endpunkt mit
+  beiden Ereignisarten) für Ereignisse auf den Betriebskonten. Signaturprüfung und Idempotenz sind vorhanden
+  (`stripe_events`).
+- Ereignisse: `v2.core.account[configuration.merchant].capability_status_updated` (Freigabe des Betriebs),
+  `checkout.session.completed`, `charge.refunded`, `charge.dispute.created`, `customer.subscription.*`,
+  `invoice.paid`, `invoice.payment_failed`.
+
+## Reihenfolge der Umsetzung
+
+1. Entscheidung Direct Charges mit Managed Risk (empfohlen) oder Destination Charges.
+2. `connect.ts` auf Accounts v2 umstellen, Onboarding-Link v2, Status-Abgleich über v2-Ereignisse.
+3. AGB für Betriebe und Kunden an das gewählte Modell anpassen (Auszahlungszeitpunkt, Rückbuchungen).
+4. Checkout für Buchungen (zusammen mit dem Buchungsablauf in Phase 3).
+5. Billing für die Mitgliedschaft, Kundenportal.
+6. Stripe Tax mit maltesischer Registrierung, monatliche Provisionsrechnungen.
+7. End-to-End-Test in der Sandbox, dann Plattform-Konto aktivieren und Live-Schlüssel setzen (durch den Betreiber).
