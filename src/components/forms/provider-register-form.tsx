@@ -78,7 +78,7 @@ export function ProviderRegisterForm({ categories }: { categories: { slug: strin
         </div>
       </fieldset>
 
-      <TermsCheckbox error={e.terms} />
+      <TermsCheckbox error={e.terms} termsHref="/agb-betriebe" termsLabel="AGB für Betriebe" />
       <p className="text-[14px] text-muted">
         Nach der Registrierung prüfen wir deine Angaben. Erst nach der Freigabe ist dein Profil öffentlich sichtbar. Die Einführungsphase
         ohne Grundgebühr beginnt mit der Freigabe.

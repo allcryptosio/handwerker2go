@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LegalPage } from "@/components/legal/legal-page";
+import { legal, operatorLine } from "@/config/legal";
 
 export const metadata: Metadata = { title: "Widerrufsbelehrung", alternates: { canonical: "/widerruf" }, robots: { index: false } };
 
@@ -22,11 +24,10 @@ export default function Page() {
         vierzehn Tage ab dem Tag des Vertragsabschlusses.
       </p>
       <p>
-        Um dein Widerrufsrecht auszuüben, musst du uns (handwerker2go, Joe Becker, Republic Street 266, VLT 1112 Valletta, Malta,
-        E-Mail: info@handwerker2go.com, Telefon: +356 7781 8522) oder dem Betrieb mittels einer eindeutigen Erklärung (z. B. ein
+        Um dein Widerrufsrecht auszuüben, musst du uns ({operatorLine()}, E-Mail: {legal.email}, Telefon: {legal.phone}) oder
+        dem Betrieb mittels einer eindeutigen Erklärung (z. B. ein
         mit der Post versandter Brief oder eine E-Mail) über deinen Entschluss, diesen Vertrag zu widerrufen, informieren. Du
-        kannst dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist. [Sobald Buchungen
-        möglich sind: Widerruf zusätzlich über die Widerrufsfunktion in deinem Kundenkonto.]
+        kannst dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist.
       </p>
       <p>
         Zur Wahrung der Widerrufsfrist reicht es aus, dass du die Mitteilung über die Ausübung des Widerrufsrechts vor Ablauf der
@@ -59,8 +60,7 @@ export default function Page() {
       <h2>Muster-Widerrufsformular</h2>
       <p>(Wenn du den Vertrag widerrufen willst, dann fülle bitte dieses Formular aus und sende es zurück.)</p>
       <p>
-        An: handwerker2go, Joe Becker, Republic Street 266, VLT 1112 Valletta, Malta, info@handwerker2go.com (zur Weiterleitung
-        an den Betrieb [Name des Betriebs laut Buchungsbestätigung])
+        An: {operatorLine()}, {legal.email} (zur Weiterleitung an den Betrieb, dessen Name in der Buchungsbestätigung steht)
       </p>
       <p>
         Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über die Erbringung der folgenden
@@ -81,6 +81,10 @@ export default function Page() {
         Datum: ____________
       </p>
       <p>(*) Unzutreffendes streichen.</p>
+      <p>
+        Neben dem Widerrufsrecht gilt die kostenlose Stornierung bis {legal.freeCancellationHours} Stunden vor dem Termin nach den{" "}
+        <Link href="/agb" className="underline">AGB für Kunden</Link>.
+      </p>
     </LegalPage>
   );
 }

@@ -6,6 +6,9 @@ import { Container } from "@/components/ui/container";
 import { currentUser } from "@/lib/auth";
 import { withDb } from "@/lib/db";
 import { formatCents, formatPercent } from "@/lib/pricing";
+import { startStripeOnboarding } from "@/lib/actions/auth-actions";
+import { stripeConfigured, stripeIsTestMode } from "@/lib/stripe/client";
+import { isBookable, syncConnectAccount } from "@/lib/stripe/connect";
 
 export const metadata: Metadata = { title: "Dashboard", robots: { index: false } };
 
@@ -30,6 +33,10 @@ async function Dashboard() {
   });
   if (!data) redirect("/fuer-handwerker/registrieren");
   const { p, cats, area, pricing } = data;
+  if (p.stripe_account_id && !(p.stripe_charges_enabled && p.stripe_payouts_enabled) && stripeConfigured()) {
+    const f = await syncConnectAccount(p.stripe_account_id).catch(() => null);
+    if (f) Object.assign(p, { stripe_charges_enabled: f.charges, stripe_payouts_enabled: f.payouts, stripe_details_submitted: f.details });
+  }
   const s = statusText[p.status];
   const introEnd = p.approved_at ? new Date(new Date(p.approved_at).setMonth(new Date(p.approved_at).getMonth() + pricing.intro_months)) : null;
   const fmt = new Intl.DateTimeFormat("de-DE", { dateStyle: "long", timeZone: "Europe/Berlin" });
@@ -48,6 +55,30 @@ async function Dashboard() {
           <div><div className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">Einführungsphase bis</div><div className="mt-1 text-lg font-extrabold">{fmt.format(introEnd)}</div></div>
           <div><div className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">Grundgebühr</div><div className="mt-1 text-lg font-extrabold">{formatCents(pricing.intro_fee_cents)}</div></div>
           <div><div className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">Provision</div><div className="mt-1 text-lg font-extrabold">{formatPercent(pricing.intro_commission_bps)}</div></div>
+        </section>
+      )}
+      {p.status === "approved" && (
+        <section className="flex flex-col gap-3 rounded-panel border border-line p-6">
+          <h2 className="text-lg font-bold">Auszahlungen über Stripe</h2>
+          {!stripeConfigured() ? (
+            <p className="text-[15px] text-ink-soft">Die Online-Zahlung wird gerade eingerichtet. Wir melden uns, sobald du dein Auszahlungskonto verbinden kannst.</p>
+          ) : isBookable(p) ? (
+            <p className="text-[15px] text-ink-soft">Dein Stripe-Konto ist verbunden und geprüft. Kunden können dich buchen und online bezahlen.</p>
+          ) : (
+            <>
+              <p className="text-[15px] text-ink-soft">
+                Damit Kunden dich buchen können, verbinde ein Stripe-Konto. Stripe prüft dabei deine Identität, dein Unternehmen und
+                deine Bankverbindung. Das dauert etwa zehn Minuten.
+                {p.stripe_details_submitted ? " Deine Angaben liegen Stripe vor und werden noch geprüft." : ""}
+              </p>
+              <form action={startStripeOnboarding}>
+                <button type="submit" className="rounded-full bg-brand px-5 py-3 font-bold text-white hover:bg-brand-dark">
+                  {p.stripe_account_id ? "Stripe-Einrichtung fortsetzen" : "Stripe-Konto verbinden"}
+                </button>
+              </form>
+            </>
+          )}
+          {stripeConfigured() && stripeIsTestMode() && <p className="text-[13px] text-muted">Testmodus: Es fließt kein echtes Geld.</p>}
         </section>
       )}
       <section className="rounded-panel border border-line p-6">

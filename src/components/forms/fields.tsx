@@ -32,13 +32,13 @@ export function Field({
   );
 }
 
-export function TermsCheckbox({ error }: { error?: string }) {
+export function TermsCheckbox({ error, termsHref = "/agb", termsLabel = "AGB" }: { error?: string; termsHref?: string; termsLabel?: string }) {
   return (
     <div className="flex flex-col gap-1.5">
       <label className="flex items-start gap-3 text-[15px] leading-snug">
         <input type="checkbox" name="terms" required className="mt-0.5 h-5 w-5 shrink-0 accent-[#12704f]" aria-invalid={!!error} />
         <span>
-          Ich akzeptiere die <a href="/agb" target="_blank" className="font-semibold text-brand underline">AGB</a> und habe die{" "}
+          Ich akzeptiere die <a href={termsHref} target="_blank" className="font-semibold text-brand underline">{termsLabel}</a> und habe die{" "}
           <a href="/datenschutz" target="_blank" className="font-semibold text-brand underline">Datenschutzerklärung</a> gelesen.
         </span>
       </label>

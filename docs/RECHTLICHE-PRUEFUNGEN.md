@@ -9,14 +9,14 @@ müssen folgende Punkte von Rechtsanwalt bzw. Steuerberatung geprüft und schrif
 - [ ] Datenschutzerklärung (DSGVO): alle Dienste (Supabase, Stripe, Resend, Mapbox, Hosting, Cloudflare), Rechtsgrundlagen, Speicherdauer, Drittlandübermittlung
 - [ ] Verträge zur Auftragsverarbeitung mit allen Dienstleistern
 - [ ] Cookie- und Einwilligungslösung, sobald nicht notwendige Dienste eingebunden werden (TDDDG)
-- [ ] AGB für Kunden und für Betriebe, Rolle der Plattform als Vermittler, Vertragspartner der Handwerkerleistung
-- [ ] Plattform- und Vermittlerpflichten: Ranking-Kriterien offenlegen (P2B-Verordnung, § 5b UWG), Hinweis, ob Anbieter Unternehmer ist (Art. 246d EGBGB)
+- [x] AGB für Kunden (/agb) und Betriebe (/agb-betriebe) getrennt, Platzhalter gefüllt (18.11.2026); anwaltliche Prüfung steht aus
+- [x] Ranking-Kriterien offengelegt auf /ranking (P2B-Verordnung, § 5b UWG); Sortierlogik muss in Phase 3 exakt so umgesetzt werden (docs/RANKING.md)
 - [ ] Verbraucherinformationen und Widerrufsbelehrung, vorzeitiger Leistungsbeginn bei Handwerkerleistungen
 - [ ] Elektronische Widerrufsfunktion (Widerrufsbutton), soweit für die Verträge erforderlich
 - [ ] Kündigungsbutton für Abos der Betriebe (§ 312k BGB gilt für Verbraucher, für B2B-Abos Vertragsbedingungen prüfen)
 - [ ] Transparente Preisangaben (PAngV) für Kunden, Endpreise inkl. USt
 - [ ] Bewertungen: Kennzeichnung, wie die Echtheit geprüft wird (§ 5b Abs. 3 UWG)
-- [ ] Zahlungsdiensterecht: Ist die Zahlungsabwicklung über Stripe Connect erlaubnisfrei (Handelsvertreter-Ausnahme, Rolle von Stripe)?
+- [ ] Zahlungsdiensterecht: Modell festgelegt (Stripe Connect Express, Destination Charge, keine Kundengelder auf Plattformkonten); Erlaubnisfreiheit nach ZAG anwaltlich bestätigen lassen
 - [ ] Digital Services Act: Pflichten als Online-Plattform (Kontaktstelle, Meldeverfahren, Nachverfolgbarkeit von Unternehmern)
 - [ ] Prüfung der Gewerbe- und Handwerksnachweise: welche Nachweise je Gewerk verlangt werden (z. B. Eintrag Handwerksrolle für zulassungspflichtige Handwerke)
 
@@ -31,3 +31,10 @@ müssen folgende Punkte von Rechtsanwalt bzw. Steuerberatung geprüft und schrif
 - [ ] DAC7-Meldepflichten als Plattformbetreiber
 - [ ] Eignung von Stripe Tax für die konkrete Transaktionsstruktur
 - [ ] Ertragsteuerliche Struktur (Einzelunternehmer in Malta) und Betriebsstätten-Risiko in Deutschland; Haftung als Einzelunternehmer, ggf. Gesellschaftsgründung
+
+## Offen aus der Datenschutzerklärung
+
+- [ ] Hostinger: Anschrift des Vertragspartners und Serverstandort bestätigen, AV-Vertrag abschließen
+- [ ] AV-Verträge mit Cloudflare und Google Workspace bestätigen
+- [ ] Aufbewahrungsdauer des Änderungsprotokolls (audit_logs) festlegen
+- [ ] Datenschutzerklärung um Stripe ergänzen, sobald Zahlungen aktiv sind

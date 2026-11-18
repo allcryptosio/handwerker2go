@@ -106,6 +106,9 @@ export default async function CategoryCityPage({ params }: PageProps<"/[stadt]/[
             Wir schalten gerade die ersten geprüften Betriebe in {city.name} frei. Sobald Betriebe verfügbar sind, siehst du
             hier ihre Preise, freien Termine und Bewertungen aus echten Buchungen.
           </p>
+          <p className="mt-2 text-[14px] text-muted">
+            <Link href="/ranking" className="underline hover:text-brand">So sortieren wir die Suchergebnisse</Link>
+          </p>
           <Link href="/fuer-handwerker" className="mt-5 inline-block rounded-full bg-brand px-6 py-3.5 font-bold text-white hover:bg-brand-dark">
             Du bist Handwerker in {city.name}? Jetzt anmelden
           </Link>

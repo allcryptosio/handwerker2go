@@ -114,18 +114,23 @@ registriert ──► pending (Prüfung) ──► approved = Beginn Einführung
 - Ohne aktives Abo nach der Einführungsphase ist das Profil nicht buchbar (`paused`), bestehende Buchungen laufen weiter.
 - Kündigung über Stripe Customer Portal oder eigenen Kündigungsbutton.
 
-## 5. Zahlungen mit Stripe
+## 5. Zahlungen mit Stripe (Code vorbereitet, nur Testmodus)
 
-- Konto der Plattform: Stripe-Konto des Betreibers (Joe Becker, Einzelunternehmer in Malta, USt-IdNr. MT33258727).
-- Betriebe: Stripe Connect Express (gehostetes Onboarding, Identitätsprüfung und Bankverbindung bei Stripe).
-- Kundenzahlung: Payment Element bzw. Checkout mit `transfer_data[destination]` und `application_fee_amount`
-  = Provision. Option für später: separate Charges and Transfers, falls Auszahlung erst nach Auftragsabschluss erfolgen soll.
-  Welches Modell rechtlich passt (Zahlungsdiensterecht, Händler der Transaktion), ist Teil der Prüfliste.
-- Webhooks: Signaturprüfung mit `STRIPE_WEBHOOK_SECRET`, jedes Event wird mit seiner ID in `stripe_events` gespeichert
-  und nur einmal verarbeitet. Ausgehende Stripe-Aufrufe mit Idempotency-Key aus der Buchungs-ID.
-- `commissions.booking_id` ist unique, damit eine Provision nie doppelt entsteht.
-- Rückerstattung, Teilrückerstattung, Stornierung und Chargeback laufen über Webhooks und erzeugen Gutschriften.
-- Keine Kartendaten auf unseren Servern.
+- Betriebe: Stripe Connect **Express** (`src/lib/stripe/connect.ts`). Stripe übernimmt KYC und Bankverbindung. Konto wird mit
+  Auszahlungsplan `manual` angelegt; Onboarding über `accountLinks` aus dem Dashboard.
+- **Buchbar** erst, wenn `status = approved` und Stripe `charges_enabled` und `payouts_enabled` meldet (`isBookable`,
+  Datenbankfunktion `app.provider_bookable`). Stripe-Felder kann nur Admin/System ändern (Trigger `app.provider_guard`).
+- Zahlung: Destination Charge mit `on_behalf_of` und `transfer_data.destination`; Provision als `application_fee_amount`
+  (`src/lib/stripe/payments.ts`). Satz aus `src/lib/pricing.ts` über `commissionBpsAt` (Einführungsphase ab Freischaltung).
+  Die Plattform nimmt keine Kundengelder auf eigene Konten.
+- Auszahlung an den Betrieb nach Abschluss des Auftrags (`releasePayout`, Payout auf dem verbundenen Konto).
+- Erstattung (Stornierung in der Frist, Widerruf, Restbetrag nach Pauschale): `refundBookingPayment` mit
+  `refund_application_fee` und `reverse_transfer`.
+- Webhook `/api/stripe/webhook`: Signaturprüfung, Idempotenz über Tabelle `stripe_events`; `account.updated` synchronisiert
+  den Kontostatus. Buchungsereignisse folgen mit Phase 3.
+- Sicherheitssperre: `sk_live_…` wird abgelehnt, solange `STRIPE_ALLOW_LIVE` nicht `1` ist.
+- Vorzeitiger Leistungsbeginn: `src/lib/legal/early-start.ts` und `EarlyStartConsentCheckbox`; Zustimmungen in Tabelle
+  `consents` (mit Zeitstempel und AGB-Version). Einbindung in den Buchungsablauf in Phase 3.
 
 ## 6. Steuerarchitektur (zu bestätigen durch Steuerberatung)
 

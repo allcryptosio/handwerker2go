@@ -246,3 +246,16 @@ export async function decideProvider(form: FormData) {
   }).catch(console.error);
   redirect("/admin");
 }
+
+// ---------------------------------------------------------------- Betrieb: Stripe-Onboarding
+export async function startStripeOnboarding() {
+  const { ensureConnectAccount, createOnboardingLink } = await import("@/lib/stripe/connect");
+  const u = await currentUser();
+  if (!u || u.role !== "provider") throw new Error("Nicht berechtigt");
+  const p = await withDb({ userId: u.id, role: "provider" }, async (db) =>
+    (await db.query("select id, status from provider_profiles where user_id = $1", [u.id])).rows[0],
+  );
+  if (!p || p.status !== "approved") throw new Error("Erst nach der Freischaltung möglich");
+  const accountId = await ensureConnectAccount(p.id);
+  redirect(await createOnboardingLink(accountId));
+}
