@@ -7,7 +7,7 @@ export default function Page() {
   return (
     <LegalPage title="Datenschutzerklärung">
       <h2>Verantwortlicher</h2>
-      <p>Joe Becker, Einzelunternehmer, Republic Street 266, VLT 1112 Valletta, Malta. Telefon +356 7781 8522, E-Mail: [folgt in Kürze]</p>
+      <p>Joe Becker, Einzelunternehmer, Republic Street 266, VLT 1112 Valletta, Malta. Telefon +356 7781 8522, E-Mail: info@handwerker2go.com</p>
       <h2>Welche Daten wir verarbeiten</h2>
       <p>[Kontodaten, Adressen, Buchungen, Zahlungsdaten über Stripe, E-Mail-Versand über Resend, Kartendienst über Mapbox. Für jede Verarbeitung Zweck, Rechtsgrundlage und Speicherdauer angeben.]</p>
       <h2>Auftragsverarbeiter und Drittländer</h2>

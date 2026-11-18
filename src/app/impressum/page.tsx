@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Impressum", alternates: { canonical:
 
 export default function Page() {
   return (
-    <LegalPage title="Impressum">
+    <LegalPage title="Impressum" draft={false}>
       <h2>Angaben gemäß § 5 DDG</h2>
       <p>
         Joe Becker
@@ -20,7 +20,7 @@ export default function Page() {
       </p>
       <h2>Kontakt</h2>
       <p>
-        E-Mail: [folgt in Kürze]
+        E-Mail: <a href="mailto:info@handwerker2go.com" className="underline">info@handwerker2go.com</a>
         <br />
         Telefon: <a href="tel:+35677818522" className="underline">+356 7781 8522</a>
       </p>
@@ -29,7 +29,7 @@ export default function Page() {
       <h2>Verantwortlich für den Inhalt</h2>
       <p>Joe Becker, Anschrift wie oben</p>
       <h2>Verbraucherstreitbeilegung</h2>
-      <p>[Angabe zur Teilnahme an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle, prüfen lassen]</p>
+      <p>Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
     </LegalPage>
   );
 }
