@@ -123,7 +123,7 @@ Steuer-IDs hinterlegen (der Code liest sie dann automatisch für jede Rechnung) 
 
 ## Zahlungsarten
 
-Nur Karte mit Apple Pay und Google Pay. `scripts/stripe-setup.mjs` legt dafür die Zahlungsart-Konfiguration
+Karte mit Apple Pay und Google Pay, SEPA-Lastschrift und PayPal. `scripts/stripe-setup.mjs` legt dafür die Zahlungsart-Konfiguration
 „handwerker2go Mitgliedschaft“ an (alle anderen Methoden aus); ihre ID gehört nach `STRIPE_PAYMENT_METHOD_CONFIG`.
 Sandbox: `pmc_1UdHMuEKlgMVBqXlyiZSf3VS`. Live: entsteht beim ersten Lauf von `pnpm stripe:setup` mit dem Live-Schlüssel.
 Die Standardkonfiguration des Live-Kontos (`pmc_1UdFnOE5NDOqrw3boPqAlw1K`) hatte u. a. BLIK, EPS, Kakao Pay, Klarna, MB Way,

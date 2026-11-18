@@ -67,8 +67,8 @@ const portalData = {
 };
 portal = portal ? await s.billingPortal.configurations.update(portal.id, portalData) : await s.billingPortal.configurations.create(portalData);
 
-// Zahlungsarten: nur Karte mit Apple Pay und Google Pay. Alle anderen ausdrücklich aus.
-const keep = new Set(["card", "apple_pay", "google_pay"]);
+// Zahlungsarten: Karte mit Apple Pay und Google Pay, SEPA-Lastschrift und PayPal. Alle anderen ausdrücklich aus.
+const keep = new Set(["card", "apple_pay", "google_pay", "sepa_debit", "paypal"]);
 const allPm = ["acss_debit", "affirm", "afterpay_clearpay", "alipay", "alma", "amazon_pay", "apple_pay", "bacs_debit", "bancontact", "billie", "blik", "boleto", "card", "cartes_bancaires", "cashapp", "crypto", "customer_balance", "eps", "fpx", "giropay", "google_pay", "grabpay", "ideal", "jcb", "kakao_pay", "klarna", "konbini", "kr_card", "link", "mb_way", "mobilepay", "multibanco", "naver_pay", "nz_bank_account", "oxxo", "p24", "pay_by_bank", "payco", "paynow", "paypal", "pix", "promptpay", "revolut_pay", "samsung_pay", "satispay", "scalapay", "sepa_debit", "sofort", "swish", "twint", "upi", "us_bank_account", "wechat_pay", "wero", "zip"];
 const pmcData = {};
 for (const k of allPm) pmcData[k] = { display_preference: { preference: keep.has(k) ? "on" : "off" } };
@@ -76,10 +76,11 @@ const pmcs = await s.paymentMethodConfigurations.list({ limit: 50 });
 let pmc = pmcs.data.find((c) => c.name === "handwerker2go Mitgliedschaft" && c.active);
 async function writePmc(fn) {
   // Unbekannte Zahlungsarten (je nach Konto/Version) einzeln entfernen und erneut versuchen
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 60; i++) {
     try { return await fn(); } catch (e) {
-      const bad = e.param?.split("[")[0] ?? e.message.match(/parameter: (\w+)/)?.[1];
+      const bad = e.message.match(/`(\w+)` is not available/)?.[1] ?? e.param?.split("[")[0] ?? e.message.match(/parameter: (\w+)/)?.[1];
       if (!bad || !(bad in pmcData)) throw e;
+      if (keep.has(bad)) console.log(`Hinweis: ${bad} ist in diesem Konto noch nicht freigeschaltet (Dashboard)`);
       delete pmcData[bad];
     }
   }
