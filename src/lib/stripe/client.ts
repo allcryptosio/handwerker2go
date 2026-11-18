@@ -11,7 +11,7 @@ export function getStripe(): Stripe | null {
   if (client !== undefined) return client;
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) return (client = null);
-  if (key.startsWith("sk_live_") && process.env.STRIPE_ALLOW_LIVE !== "1") {
+  if (/^(sk|rk)_live_/.test(key) && process.env.STRIPE_ALLOW_LIVE !== "1") {
     throw new Error("Stripe-Live-Schlüssel gesetzt, aber STRIPE_ALLOW_LIVE ist nicht 1. Zahlungen bleiben gesperrt.");
   }
   client = new Stripe(key, { appInfo: { name: "handwerker2go", url: "https://handwerker2go.com" } });
@@ -19,4 +19,4 @@ export function getStripe(): Stripe | null {
 }
 
 export const stripeConfigured = () => Boolean(process.env.STRIPE_SECRET_KEY);
-export const stripeIsTestMode = () => (process.env.STRIPE_SECRET_KEY ?? "").startsWith("sk_test_");
+export const stripeIsTestMode = () => /^(sk|rk)_test_/.test(process.env.STRIPE_SECRET_KEY ?? "");

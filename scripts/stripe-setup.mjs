@@ -7,7 +7,7 @@ import Stripe from "stripe";
 
 const key = process.env.STRIPE_SECRET_KEY;
 if (!key) throw new Error("STRIPE_SECRET_KEY fehlt");
-if (key.startsWith("sk_live_") && process.env.STRIPE_ALLOW_LIVE !== "1") throw new Error("Live-Schlüssel nur mit STRIPE_ALLOW_LIVE=1");
+if (/^(sk|rk)_live_/.test(key) && process.env.STRIPE_ALLOW_LIVE !== "1") throw new Error("Live-Schlüssel nur mit STRIPE_ALLOW_LIVE=1");
 const s = new Stripe(key);
 
 // Preise aus pricing.ts lesen (einfacher Parser, damit keine Werte doppelt gepflegt werden)

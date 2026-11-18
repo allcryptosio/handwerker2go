@@ -12,7 +12,7 @@ import Stripe from "stripe";
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, "").split("=")).map(([k, v]) => [k, v ?? true]));
 const key = process.env.STRIPE_SECRET_KEY;
 if (!key) { console.log("STRIPE_SECRET_KEY fehlt, nichts zu tun"); process.exit(0); }
-if (key.startsWith("sk_live_") && process.env.STRIPE_ALLOW_LIVE !== "1") throw new Error("Live-Schlüssel nur mit STRIPE_ALLOW_LIVE=1");
+if (/^(sk|rk)_live_/.test(key) && process.env.STRIPE_ALLOW_LIVE !== "1") throw new Error("Live-Schlüssel nur mit STRIPE_ALLOW_LIVE=1");
 const stripe = new Stripe(key);
 const productId = process.env.STRIPE_PRODUCT_COMMISSION;
 if (!productId) throw new Error("STRIPE_PRODUCT_COMMISSION fehlt (scripts/stripe-setup.mjs ausführen)");
