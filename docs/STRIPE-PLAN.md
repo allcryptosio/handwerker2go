@@ -129,3 +129,12 @@ Sandbox: `pmc_1UdHMuEKlgMVBqXlyiZSf3VS`. Live: entsteht beim ersten Lauf von `pn
 Die Standardkonfiguration des Live-Kontos (`pmc_1UdFnOE5NDOqrw3boPqAlw1K`) hatte u. a. BLIK, EPS, Kakao Pay, Klarna, MB Way,
 Naver Pay, Payco, Pix, Samsung Pay und Satispay aktiv; über den Stripe-Connector lässt sie sich nicht ändern.
 Buchungszahlungen (Direct Charges auf den Betriebskonten) brauchen in Phase 3 eine eigene Connect-Konfiguration.
+
+## Live geschaltet (18.11.2026)
+
+- Eingeschränkter Schlüssel (`rk_live_…`) nur in `/opt/handwerker2go/.env.local`, `STRIPE_ALLOW_LIVE=1`.
+- Webhook-Endpunkte: `we_1UdIClE5NDOqrw3b7iBTSuNO` (eigenes Konto, `STRIPE_WEBHOOK_SECRET`) und
+  `we_1UdIClE5NDOqrw3bmatw8fAV` (Betriebskonten, `STRIPE_WEBHOOK_SECRET_CONNECT`). Signatur beider Geheimnisse getestet.
+- Zahlungsarten-Konfiguration live: `pmc_1UdICLE5NDOqrw3bsp7XfDl5`. SEPA und PayPal sind eingeschaltet, werden aber erst nach
+  Freischaltung im Dashboard angezeigt.
+- Fehlendes Schlüsselrecht: Accounts v2 (Schreiben). Ohne dieses Recht schlägt „Stripe-Konto verbinden“ fehl.

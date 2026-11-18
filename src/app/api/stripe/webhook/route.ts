@@ -33,18 +33,23 @@ async function notifyPaymentFailed(invoice: Stripe.Invoice) {
  */
 export async function POST(request: Request) {
   const stripe = getStripe();
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!stripe || !secret) return new Response("Stripe nicht konfiguriert", { status: 503 });
+  // Zwei Endpunkte in Stripe: eigenes Konto (STRIPE_WEBHOOK_SECRET) und Betriebskonten (STRIPE_WEBHOOK_SECRET_CONNECT)
+  const secrets = [process.env.STRIPE_WEBHOOK_SECRET, process.env.STRIPE_WEBHOOK_SECRET_CONNECT].filter((x): x is string => Boolean(x));
+  if (!stripe || secrets.length === 0) return new Response("Stripe nicht konfiguriert", { status: 503 });
 
   const signature = request.headers.get("stripe-signature");
   if (!signature) return new Response("Signatur fehlt", { status: 400 });
   const payload = await request.text();
-  let event;
-  try {
-    event = stripe.webhooks.constructEvent(payload, signature, secret);
-  } catch {
-    return new Response("Ungültige Signatur", { status: 400 });
+  let event: Stripe.Event | undefined;
+  for (const secret of secrets) {
+    try {
+      event = stripe.webhooks.constructEvent(payload, signature, secret);
+      break;
+    } catch {
+      // nächstes Geheimnis versuchen
+    }
   }
+  if (!event) return new Response("Ungültige Signatur", { status: 400 });
 
   const isNew = await asSystem(async (db) =>
     (await db.query(
