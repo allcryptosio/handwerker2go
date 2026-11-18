@@ -97,6 +97,14 @@ for (const [acct, { amount, count }] of perAccount) {
     description: `Provision für ${count} über handwerker2go vermittelte Buchung${count === 1 ? "" : "en"} (${periodLabel})`,
     metadata: { period: periodStart },
   }, { idempotencyKey: `${idem}-item` });
+  // Reverse Charge greift nur mit USt-IdNr. des Betriebs. Ohne USt-IdNr. berechnet Stripe keine Steuer und druckt keinen
+  // Hinweis; diese Rechnung bleibt als Entwurf liegen und muss mit der Steuerberatung geklärt werden.
+  const draft = await stripe.invoices.retrieve(invoice.id);
+  const reasons = (draft.total_taxes ?? []).map((t) => t.taxability_reason);
+  if (!reasons.includes("reverse_charge")) {
+    console.log(`! ${acct}: kein Reverse Charge (${reasons.join(", ") || "keine Steuerzeile"}). USt-IdNr. fehlt? Rechnung ${invoice.id} bleibt Entwurf.`);
+    continue;
+  }
   // Die Provision ist bereits bei den Kundenzahlungen einbehalten. Als Guthaben gutschreiben, damit die Rechnung
   // mit „Fälliger Betrag 0,00 €“ abschließt. Fällt Steuer an (keine gültige USt-IdNr.), bleibt nur der Steueranteil offen.
   await stripe.rawRequest("POST", `/v1/customers/${acct}/balance_transactions`, {

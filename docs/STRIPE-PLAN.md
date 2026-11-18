@@ -100,3 +100,23 @@ Risikomanagement. Für einen Einzelbetreiber mit wenig Erfahrung in Zahlungsrisi
 | IBAN | `DE89370400440532013000` |
 | USt-IdNr. Checkout | `DE000000000` (gilt als geprüft) |
 | Karte | `4242 4242 4242 4242`, beliebiges Datum in der Zukunft, CVC 123 |
+
+## Live-Konto (eingerichtet am 18.11.2026)
+
+Konto `acct_1UdFmtE5NDOqrw3b`. Eingerichtet: Steuer-Standard netto (`exclusive`), Registrierung Malta
+(`taxreg_1UdGlRE5NDOqrw3bmr5Qw0c3`), Produkte, Preise, Kundenportal. Werte für die Live-`.env.local`:
+
+```
+STRIPE_PRICE_MONTHLY=price_1UdGlxE5NDOqrw3bohSRMS9E
+STRIPE_PRICE_YEARLY=price_1UdGlyE5NDOqrw3bLhfaZM7Y
+STRIPE_PRODUCT_COMMISSION=prod_VeZvGXAmphLrXG
+STRIPE_PORTAL_CONFIG=bpc_1UdGm6E5NDOqrw3b9O0Xv76f
+```
+
+Reverse Charge im Live-Modus geprüft (Rechnungsvorschau): Betrieb in DE mit USt-IdNr. ergibt `reverse_charge`, 0 € Steuer.
+Ohne USt-IdNr. ergibt sich `not_collecting` (keine Steuer, kein Hinweis). Deshalb ist die USt-IdNr. im Checkout Pflicht
+(`tax_id_collection.required = if_supported`), und Provisionsrechnungen ohne Reverse Charge bleiben als Entwurf liegen.
+Betriebe ohne USt-IdNr. (Kleinunternehmer): mit der Steuerberatung klären (OSS-Registrierung oder USt-IdNr. verlangen).
+
+Offen im Dashboard (nicht per API möglich): eigene USt-IdNr. MT33258727 unter Einstellungen → Billing → Rechnungen →
+Steuer-IDs hinterlegen (der Code liest sie dann automatisch für jede Rechnung) und unter Unternehmensdaten als `company.vat_id`.
