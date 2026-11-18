@@ -120,3 +120,12 @@ Betriebe ohne USt-IdNr. (Kleinunternehmer): mit der Steuerberatung klären (OSS-
 
 Offen im Dashboard (nicht per API möglich): eigene USt-IdNr. MT33258727 unter Einstellungen → Billing → Rechnungen →
 Steuer-IDs hinterlegen (der Code liest sie dann automatisch für jede Rechnung) und unter Unternehmensdaten als `company.vat_id`.
+
+## Zahlungsarten
+
+Nur Karte mit Apple Pay und Google Pay. `scripts/stripe-setup.mjs` legt dafür die Zahlungsart-Konfiguration
+„handwerker2go Mitgliedschaft“ an (alle anderen Methoden aus); ihre ID gehört nach `STRIPE_PAYMENT_METHOD_CONFIG`.
+Sandbox: `pmc_1UdHMuEKlgMVBqXlyiZSf3VS`. Live: entsteht beim ersten Lauf von `pnpm stripe:setup` mit dem Live-Schlüssel.
+Die Standardkonfiguration des Live-Kontos (`pmc_1UdFnOE5NDOqrw3boPqAlw1K`) hatte u. a. BLIK, EPS, Kakao Pay, Klarna, MB Way,
+Naver Pay, Payco, Pix, Samsung Pay und Satispay aktiv; über den Stripe-Connector lässt sie sich nicht ändern.
+Buchungszahlungen (Direct Charges auf den Betriebskonten) brauchen in Phase 3 eine eigene Connect-Konfiguration.

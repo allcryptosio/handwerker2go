@@ -50,6 +50,8 @@ export async function createMembershipCheckout(providerId: string, plan: Plan, i
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer_account: accountId,
+    // Eigene Zahlungsart-Konfiguration (Karte, Apple Pay, Google Pay), angelegt von scripts/stripe-setup.mjs
+    ...(process.env.STRIPE_PAYMENT_METHOD_CONFIG ? { payment_method_configuration: process.env.STRIPE_PAYMENT_METHOD_CONFIG } : {}),
     line_items: [{ price: priceId(plan), quantity: 1 }],
     automatic_tax: { enabled: true },
     tax_id_collection: { enabled: true, required: "if_supported" },
