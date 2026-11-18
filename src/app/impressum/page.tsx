@@ -10,8 +10,6 @@ export default function Page() {
       <p>
         Joe Becker
         <br />
-        Einzelunternehmer (Sole Trader)
-        <br />
         Republic Street 266
         <br />
         VLT 1112 Valletta
