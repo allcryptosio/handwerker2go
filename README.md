@@ -51,7 +51,7 @@ docs/                       Architektur, Plan, rechtliche Prüfliste
 
 ## Betrieb auf dem Server
 
-- Dienst: `systemctl status handwerker2go` (Port 3012, nur 127.0.0.1, eigener Systembenutzer, `NEXT_PUBLIC_NOINDEX=1`)
+- Dienst: `systemctl status handwerker2go` (Port 3012, nur 127.0.0.1, eigener Systembenutzer). Seit 18.11.2026 für Suchmaschinen freigegeben.
 - Deploy: `pnpm install --frozen-lockfile && pnpm build && systemctl restart handwerker2go` (erst bauen, dann neu starten)
 - Noch keine Domain und kein nginx-vhost. Öffentlich erreichbar wird die Seite erst mit Domain und Cloudflare.
 - Datenbank: lokal auf 127.0.0.1:5432, Rollen `h2g_owner` (Migrationen) und `h2g_app` (App, an RLS gebunden).
