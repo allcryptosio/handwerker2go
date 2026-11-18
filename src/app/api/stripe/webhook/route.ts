@@ -1,6 +1,31 @@
 import { asSystem } from "@/lib/db";
 import { getStripe } from "@/lib/stripe/client";
+import type Stripe from "stripe";
+import { sendMail } from "@/lib/mail";
+import { syncSubscription } from "@/lib/stripe/billing";
 import { syncConnectAccount } from "@/lib/stripe/connect";
+
+/** Fehlgeschlagene Abbuchung der Mitgliedschaft: Betrieb per E-Mail informieren (Stripe versucht es erneut) */
+async function notifyPaymentFailed(invoice: Stripe.Invoice) {
+  const accountId = invoice.customer_account;
+  if (!accountId) return;
+  const p = await asSystem(async (db) =>
+    (await db.query(`select p.company_name, u.email from provider_profiles p join "user" u on u.id = p.user_id where p.stripe_account_id = $1`, [accountId])).rows[0],
+  );
+  if (!p) return;
+  const base = process.env.BETTER_AUTH_URL ?? "https://handwerker2go.com";
+  await sendMail({
+    to: p.email,
+    template: "membership_payment_failed",
+    subject: "Zahlung deiner Mitgliedschaft fehlgeschlagen",
+    heading: "Die Abbuchung hat nicht geklappt",
+    paragraphs: [
+      `Hallo ${p.company_name}, die Zahlung für deine handwerker2go-Mitgliedschaft konnte nicht eingezogen werden. Stripe versucht es in den nächsten Tagen automatisch erneut.`,
+      "Bitte prüfe deine Zahlungsmethode. Ist die Gebühr 14 Tage nach Fälligkeit nicht bezahlt, dürfen wir dein Profil bis zum Zahlungseingang aus der Suche nehmen (AGB für Betriebe, § 4).",
+    ],
+    button: { label: "Zahlungsmethode prüfen", url: `${base}/dashboard` },
+  });
+}
 
 /**
  * Stripe-Webhook. Signatur wird mit STRIPE_WEBHOOK_SECRET geprüft, jedes Ereignis genau einmal verarbeitet.
@@ -34,6 +59,23 @@ export async function POST(request: Request) {
       case "account.updated":
         // Status eines Betriebskontos hat sich geändert (Connect-Ereignis, event.account = Konto des Betriebs)
         await syncConnectAccount(event.account ?? (event.data.object as { id: string }).id);
+        break;
+      case "customer.subscription.created":
+      case "customer.subscription.updated":
+      case "customer.subscription.deleted":
+      case "customer.subscription.paused":
+      case "customer.subscription.resumed":
+        await syncSubscription(event.data.object as Stripe.Subscription);
+        break;
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        if (!event.account && session.mode === "subscription" && typeof session.subscription === "string") {
+          await syncSubscription(await stripe.subscriptions.retrieve(session.subscription));
+        }
+        break;
+      }
+      case "invoice.payment_failed":
+        if (!event.account) await notifyPaymentFailed(event.data.object as Stripe.Invoice);
         break;
       default:
         // checkout.session.completed (Connect), charge.refunded, charge.dispute.* folgen mit den Buchungen (Phase 3)

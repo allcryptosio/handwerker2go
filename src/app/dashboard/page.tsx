@@ -5,12 +5,22 @@ import { SignOutButton } from "@/components/layout/sign-out-button";
 import { Container } from "@/components/ui/container";
 import { currentUser } from "@/lib/auth";
 import { withDb } from "@/lib/db";
-import { formatCents, formatPercent } from "@/lib/pricing";
-import { startStripeOnboarding } from "@/lib/actions/auth-actions";
+import { formatCents, formatPercent, providerPricing, yearlyPerMonthCents, yearlySavingsPercent } from "@/lib/pricing";
+import { openBillingPortal, startMembership, startStripeOnboarding } from "@/lib/actions/auth-actions";
 import { stripeConfigured, stripeIsTestMode } from "@/lib/stripe/client";
 import { isBookable, syncConnectAccount } from "@/lib/stripe/connect";
 
 export const metadata: Metadata = { title: "Dashboard", robots: { index: false } };
+
+const membershipText: Record<string, string> = {
+  trialing: "abgeschlossen, die Abrechnung beginnt nach der Einführungsphase",
+  active: "aktiv",
+  past_due: "Zahlung offen, Stripe versucht den Einzug erneut",
+  unpaid: "unbezahlt, dein Profil ist nicht in der Suche",
+  canceled: "beendet",
+  incomplete: "Zahlung noch nicht abgeschlossen",
+  paused: "pausiert",
+};
 
 const statusText: Record<string, { label: string; text: string; tone: string }> = {
   pending: { label: "In Prüfung", text: "Wir prüfen gerade deine Angaben und deinen Nachweis. Du bekommst eine E-Mail, sobald dein Betrieb freigeschaltet ist.", tone: "bg-[#fff8e1] border-[#e0a800]" },
@@ -79,6 +89,53 @@ async function Dashboard() {
             </>
           )}
           {stripeConfigured() && stripeIsTestMode() && <p className="text-[13px] text-muted">Testmodus: Es fließt kein echtes Geld.</p>}
+        </section>
+      )}
+      {p.status === "approved" && stripeConfigured() && (
+        <section className="flex flex-col gap-4 rounded-panel border border-line p-6">
+          <h2 className="text-lg font-bold">Mitgliedschaft</h2>
+          {["trialing", "active", "past_due", "unpaid", "paused"].includes(p.membership_status) ? (
+            <>
+              <p className="text-[15px] text-ink-soft">
+                {p.membership_plan === "yearly" ? "Jährlich" : "Monatlich"}: {membershipText[p.membership_status]}.
+                {p.membership_period_end && (p.membership_cancel_at_period_end
+                  ? ` Gekündigt zum ${fmt.format(new Date(p.membership_period_end))}.`
+                  : ` Nächste Abrechnung am ${fmt.format(new Date(p.membership_period_end))}.`)}
+              </p>
+              <form action={openBillingPortal}>
+                <button type="submit" className="rounded-full border-[1.5px] border-brand px-5 py-3 font-bold text-brand hover:bg-mint">
+                  Mitgliedschaft und Rechnungen verwalten
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <p className="text-[15px] text-ink-soft">
+                {introEnd && introEnd > new Date()
+                  ? `Bis zum ${fmt.format(introEnd)} zahlst du keine Grundgebühr. Wenn du jetzt einen Tarif wählst, beginnt die Abrechnung erst danach. Ohne Mitgliedschaft erscheint dein Profil nach der Einführungsphase nicht mehr in der Suche.`
+                  : "Deine Einführungsphase ist beendet. Mit einer Mitgliedschaft erscheint dein Profil wieder in der Suche."}
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <form action={startMembership} className="flex flex-col gap-2 rounded-card border border-line p-5">
+                  <input type="hidden" name="plan" value="monthly" />
+                  <span className="font-bold">Monatlich</span>
+                  <span className="text-2xl font-extrabold">{formatCents(providerPricing.monthly.feeCents)}<span className="text-sm font-semibold text-muted"> / Monat netto</span></span>
+                  <span className="text-[14px] text-ink-soft">{formatPercent(providerPricing.monthly.commissionBps)} Provision, monatlich kündbar</span>
+                  <button type="submit" className="mt-2 rounded-full bg-brand px-5 py-3 font-bold text-white hover:bg-brand-dark">Monatlich wählen</button>
+                </form>
+                <form action={startMembership} className="flex flex-col gap-2 rounded-card border-[1.5px] border-brand p-5">
+                  <input type="hidden" name="plan" value="yearly" />
+                  <span className="font-bold">Jährlich <span className="ml-1 rounded-full bg-mint px-2 py-0.5 text-xs text-brand-dark">{yearlySavingsPercent()} % günstiger</span></span>
+                  <span className="text-2xl font-extrabold">{formatCents(yearlyPerMonthCents())}<span className="text-sm font-semibold text-muted"> / Monat netto</span></span>
+                  <span className="text-[14px] text-ink-soft">{formatCents(providerPricing.yearly.feeCents)} jährlich im Voraus, {formatPercent(providerPricing.yearly.commissionBps)} Provision</span>
+                  <button type="submit" className="mt-2 rounded-full bg-brand px-5 py-3 font-bold text-white hover:bg-brand-dark">Jährlich wählen</button>
+                </form>
+              </div>
+              <p className="text-[13px] text-muted">
+                Alle Preise netto. Mit gültiger USt-IdNr. rechnen wir ohne Umsatzsteuer ab (Steuerschuldnerschaft des Leistungsempfängers).
+              </p>
+            </>
+          )}
         </section>
       )}
       <section className="rounded-panel border border-line p-6">

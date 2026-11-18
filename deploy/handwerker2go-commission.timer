@@ -1,0 +1,9 @@
+[Unit]
+Description=handwerker2go: Provisionsrechnungen am 1. jedes Monats
+
+[Timer]
+OnCalendar=*-*-01 06:00:00 Europe/Berlin
+Persistent=true
+
+[Install]
+WantedBy=timers.target

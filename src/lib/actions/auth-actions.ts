@@ -259,3 +259,36 @@ export async function startStripeOnboarding() {
   const accountId = await ensureConnectAccount(p.id);
   redirect(await createOnboardingLink(accountId));
 }
+
+async function approvedProvider() {
+  const u = await currentUser();
+  if (!u || u.role !== "provider") throw new Error("Nicht berechtigt");
+  const p = await withDb({ userId: u.id, role: "provider" }, async (db) =>
+    (await db.query(
+      `select p.id, p.status, p.approved_at, p.stripe_account_id, ps.intro_months
+         from provider_profiles p, lateral (select intro_months from pricing_settings where valid_from <= now() order by valid_from desc limit 1) ps
+        where p.user_id = $1`,
+      [u.id],
+    )).rows[0],
+  );
+  if (!p || p.status !== "approved") throw new Error("Erst nach der Freischaltung möglich");
+  return p;
+}
+
+/** Mitgliedschaft abschließen (monatlich oder jährlich) über Stripe Checkout */
+export async function startMembership(formData: FormData) {
+  const plan = formData.get("plan");
+  if (plan !== "monthly" && plan !== "yearly") throw new Error("Ungültiger Tarif");
+  const p = await approvedProvider();
+  const { createMembershipCheckout } = await import("@/lib/stripe/billing");
+  const introEnd = p.approved_at ? new Date(new Date(p.approved_at).setMonth(new Date(p.approved_at).getMonth() + p.intro_months)) : null;
+  redirect(await createMembershipCheckout(p.id, plan, introEnd));
+}
+
+/** Stripe-Kundenportal öffnen (Zahlungsmethode, Rechnungen, Tarifwechsel, Kündigung) */
+export async function openBillingPortal() {
+  const p = await approvedProvider();
+  if (!p.stripe_account_id) throw new Error("Noch keine Mitgliedschaft");
+  const { createPortalSession } = await import("@/lib/stripe/billing");
+  redirect(await createPortalSession(p.stripe_account_id));
+}

@@ -61,7 +61,8 @@ export default function Page() {
       </p>
       <p>
         (2) Vor dem Ende der Einführungsphase informieren wir den Betrieb rechtzeitig per E-Mail. Eine kostenpflichtige
-        Mitgliedschaft entsteht nur, wenn der Betrieb sie ausdrücklich abschließt. Zur Wahl stehen:
+        Mitgliedschaft entsteht nur, wenn der Betrieb sie ausdrücklich im Dashboard abschließt. Schließt er sie schon während der
+        Einführungsphase ab, beginnt die Abrechnung erst mit deren Ende. Zur Wahl stehen:
       </p>
       <ul className="list-disc pl-6">
         <li>
@@ -118,7 +119,8 @@ export default function Page() {
       </p>
       <p>
         (6) Die Rechnung über die Handwerkerleistung stellt der Betrieb an den Kunden. Wir rechnen gegenüber dem Betrieb nur unsere
-        Provision und die Mitgliedschaft ab.
+        Provision und die Mitgliedschaft ab. Über die im Vormonat einbehaltenen Provisionen erhält der Betrieb zu Beginn jedes
+        Monats eine Rechnung per E-Mail; sie ist bereits beglichen, weil die Provision bei den Kundenzahlungen einbehalten wurde.
       </p>
 
       <h2>§ 6 Umsatzsteuer</h2>

@@ -1,0 +1,11 @@
+# Monatliche Provisionsrechnungen (Vormonat). Installation erst nach Livegang von Stripe:
+#   cp deploy/handwerker2go-commission.* /etc/systemd/system/ && systemctl enable --now handwerker2go-commission.timer
+[Unit]
+Description=handwerker2go: Provisionsrechnungen für den Vormonat
+After=network-online.target postgresql.service
+
+[Service]
+Type=oneshot
+User=handwerker2go
+WorkingDirectory=/opt/handwerker2go
+ExecStart=/usr/bin/node --env-file=/opt/handwerker2go/.env.local scripts/commission-invoices.mjs

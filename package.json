@@ -9,7 +9,9 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
-    "admin:create": "node --env-file=.env.local scripts/create-admin.mjs"
+    "admin:create": "node --env-file=.env.local scripts/create-admin.mjs",
+    "stripe:setup": "node --env-file=.env.local scripts/stripe-setup.mjs",
+    "stripe:commission": "node --env-file=.env.local scripts/commission-invoices.mjs"
   },
   "dependencies": {
     "better-auth": "^1.7.25",

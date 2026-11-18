@@ -1,7 +1,7 @@
 # Stripe-Integrationsplan für handwerker2go
 
 Stand 18.11.2026. Erstellt aus der Stripe-Dokumentation und Tests in der Sandbox (Plattform-Konto Malta, EUR,
-Connect aktiv, Stripe Tax aktiv mit Ursprung MT, noch keine Steuer-Registrierung). Der Stripe-Planer
+Connect aktiv, Stripe Tax aktiv mit Ursprung MT und maltesischer Registrierung, eigene USt-IdNr. MT33258727 hinterlegt). Der Stripe-Planer
 (stripe_implementation_planner) war in dieser Sitzung nicht verfügbar.
 
 ## Sandbox-Befunde
@@ -44,6 +44,12 @@ Risikomanagement. Für einen Einzelbetreiber mit wenig Erfahrung in Zahlungsrisi
 - Kündigung und Zahlungsmethode über das Stripe-Kundenportal; fehlgeschlagene Zahlungen mit Smart Retries; Status über
   Webhooks `customer.subscription.*` und `invoice.payment_failed`.
 - Kunde des Abos: das v2-Konto des Betriebs mit Konfiguration `customer` (kein separates Customer-Objekt nötig).
+- **Umgesetzt** (`src/lib/stripe/billing.ts`, Dashboard-Abschnitt „Mitgliedschaft“): Checkout mit `customer_account`,
+  `trial_end` = Ende der Einführungsphase (nur wenn mehr als 48 h entfernt), `automatic_tax`, USt-IdNr.-Abfrage, eigene
+  USt-IdNr. auf jeder Rechnung (`account_tax_ids`). Kundenportal mit Zahlungsmethode, Rechnungen, Wechsel monatlich/jährlich
+  (ohne anteilige Verrechnung) und Kündigung zum Laufzeitende. Status in `provider_profiles.membership_*` über Webhooks.
+- Sichtbarkeit in der Suche: `app.provider_listed()` = freigeschaltet und (Einführungsphase oder Abo `trialing`/`active`/`past_due`).
+  Die Suche (Phase 3) muss diese Funktion verwenden.
 
 ## Steuern (Stripe Tax) und Rechnungen (Invoicing)
 
@@ -51,9 +57,11 @@ Risikomanagement. Für einen Einzelbetreiber mit wenig Erfahrung in Zahlungsrisi
 - Abos mit `automatic_tax: { enabled: true }`; USt-IdNr. des Betriebs als `eu_vat` hinterlegen. Bei gültiger
   USt-IdNr. rechnet Stripe Tax die Reverse-Charge-Behandlung automatisch und schreibt den Hinweis auf die Rechnung.
   Text auf „Steuerschuldnerschaft des Leistungsempfängers“ prüfen bzw. per Rechnungsfußzeile ergänzen.
-- Provision: Plattformgebühren erzeugen keine Rechnung. Monatlich je Betrieb eine Rechnung über die einbehaltenen
-  Provisionen erstellen (Stripe Invoicing, `automatic_tax`, Reverse Charge), als bereits bezahlt markieren
-  (`paid_out_of_band`), PDF an den Betrieb.
+- Provision: Plattformgebühren erzeugen keine Rechnung. **Umgesetzt** in `scripts/commission-invoices.mjs`
+  (`pnpm stripe:commission`, Timer in `deploy/`): je Betrieb und Monat eine Rechnung über die einbehaltenen Provisionen
+  (`automatic_tax`, Reverse Charge). Der Betrag wird vorher als Kundenguthaben gutgeschrieben, damit die Rechnung mit
+  „Fälliger Betrag 0,00 €“ abschließt (`paid_out_of_band` hätte im PDF weiter „fällig“ gezeigt). Doppelte Rechnungen
+  verhindern `commission_invoices (provider_id, period_start)` und Idempotenzschlüssel.
 - Handwerkerleistung: Rechnung stellt der Betrieb. Bei Direct Charges kann er dafür sein Stripe-Dashboard nutzen;
   Kunden erhalten zusätzlich die Stripe-Zahlungsbestätigung.
 - Betriebe ohne USt-IdNr. (Kleinunternehmer): Stripe Tax würde maltesische MwSt. berechnen, solange keine gültige
@@ -74,6 +82,21 @@ Risikomanagement. Für einen Einzelbetreiber mit wenig Erfahrung in Zahlungsrisi
 2. ~~`connect.ts` auf Accounts v2 umstellen, Onboarding-Link v2~~ (erledigt; Status-Abgleich über Dashboard-Aufruf und `account.updated`, v2-Thin-Events noch offen).
 3. ~~AGB anpassen~~ (erledigt: Auszahlung nach Stripe-Plan, Stripe-Gebühren und Rückbuchungen beim Betrieb).
 4. Checkout für Buchungen (zusammen mit dem Buchungsablauf in Phase 3).
-5. Billing für die Mitgliedschaft, Kundenportal.
-6. Stripe Tax mit maltesischer Registrierung, monatliche Provisionsrechnungen.
-7. End-to-End-Test in der Sandbox, dann Plattform-Konto aktivieren und Live-Schlüssel setzen (durch den Betreiber).
+5. ~~Billing für die Mitgliedschaft, Kundenportal~~ (erledigt, in der Sandbox getestet: Checkout, Webhooks, Portal).
+6. ~~Stripe Tax mit maltesischer Registrierung, monatliche Provisionsrechnungen~~ (erledigt; `pnpm stripe:setup` legt
+   Registrierung, USt-IdNr., Produkte, Preise und Portal idempotent an).
+7. End-to-End-Test der Kundenzahlung: braucht ein fertig eingerichtetes Test-Betriebskonto. Das gehostete Onboarding
+   zeigt automatisierten Browsern ein hCaptcha und muss einmal von Hand durchlaufen werden (Testdaten siehe unten).
+8. Live: Plattform-Konto aktivieren, im Live-Modus `pnpm stripe:setup` ausführen, Webhook-Endpunkte anlegen,
+   Live-Schlüssel setzen (durch den Betreiber).
+
+## Testdaten für das Onboarding (Sandbox)
+
+| Feld | Wert |
+| --- | --- |
+| SMS-Code | `000000` |
+| Geburtsdatum | 01.01.1901 |
+| Adresse | `address_full_match`, 20095 Hamburg |
+| IBAN | `DE89370400440532013000` |
+| USt-IdNr. Checkout | `DE000000000` (gilt als geprüft) |
+| Karte | `4242 4242 4242 4242`, beliebiges Datum in der Zukunft, CVC 123 |
