@@ -1,10 +1,11 @@
 import "server-only";
+import nodemailer from "nodemailer";
 import { asSystem } from "@/lib/db";
 import { site } from "@/lib/site";
 
 /**
  * E-Mail-Versand. Jede Mail landet zuerst in email_outbox (nachvollziehbar, wiederholbar).
- * MAIL_DRIVER=resend versendet sofort über Resend, MAIL_DRIVER=outbox speichert nur.
+ * MAIL_DRIVER=smtp versendet über SMTP (z. B. Google Workspace), resend über Resend, outbox speichert nur.
  */
 interface Mail {
   to: string;
@@ -36,6 +37,18 @@ ${btn}
   return { html, text };
 }
 
+let transport: ReturnType<typeof nodemailer.createTransport> | null = null;
+function smtp() {
+  transport ??= nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT ?? 465),
+    secure: Number(process.env.SMTP_PORT ?? 465) === 465,
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+    connectionTimeout: 15_000,
+  });
+  return transport;
+}
+
 export async function sendMail(m: Mail) {
   const { html, text } = render(m);
   const id: string = await asSystem(async (db) => {
@@ -45,6 +58,18 @@ export async function sendMail(m: Mail) {
     );
     return r.rows[0].id;
   });
+  if (process.env.MAIL_DRIVER === "smtp") {
+    try {
+      const info = await smtp().sendMail({ from: process.env.EMAIL_FROM, to: m.to, subject: m.subject, html, text });
+      await asSystem((db) =>
+        db.query("update email_outbox set status='sent', provider_message_id=$2, attempts=attempts+1, sent_at=now() where id=$1", [id, info.messageId ?? null]),
+      );
+    } catch (e) {
+      console.error("SMTP-Versand fehlgeschlagen", e);
+      await asSystem((db) => db.query("update email_outbox set status='failed', error=$2, attempts=attempts+1 where id=$1", [id, String(e).slice(0, 500)]));
+    }
+    return;
+  }
   if (process.env.MAIL_DRIVER !== "resend") return;
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -64,4 +89,6 @@ export async function sendMail(m: Mail) {
 }
 
 /** True, sobald E-Mails wirklich verschickt werden (sonst ist eine Registrierung nicht abschließbar). */
-export const mailReady = () => process.env.MAIL_DRIVER === "resend" && Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
+export const mailReady = () =>
+  (process.env.MAIL_DRIVER === "resend" && Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM)) ||
+  (process.env.MAIL_DRIVER === "smtp" && Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS && process.env.EMAIL_FROM));
