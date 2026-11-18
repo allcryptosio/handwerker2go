@@ -60,3 +60,9 @@ Für alle Bilder gilt:
 - Bilder mit KI-Personen nicht als „echte Kunden“ oder „unsere Handwerker“ bezeichnen. Sie sind Symbolbilder.
 - Vor der Nutzung die Lizenzbedingungen des jeweiligen Generators für kommerzielle Nutzung prüfen.
 - Echte Fotos von Partnerbetrieben, mit deren Einwilligung, wirken langfristig glaubwürdiger und können die KI-Bilder ersetzen.
+
+## Stand
+
+Am 18.11.2026 wurden alle 20 Bilder mit Higgsfield (Modell Z Image, Free-Plan) aus diesen Prompts erzeugt, auf maximal
+1600 px Breite verkleinert und als WebP (Qualität 80) in `public/bilder/` abgelegt. Es sind KI-Symbolbilder. Für echte
+Partnerbetriebe später durch echte Fotos ersetzen (gleicher Dateiname, dann neu bauen).
