@@ -14,7 +14,6 @@ import { PhotoSlot } from "@/components/ui/photo-slot";
 export function CategoryExplorer({ categories, citySlug }: { categories: ExplorerCategory[]; citySlug: string }) {
   const [active, setActive] = useState(0);
   const current = categories[active];
-  const fixedCount = current.services.filter((s) => s.mode === "festpreis").length;
 
   return (
     <div id="leistungen" className="mx-auto max-w-[1240px] scroll-mt-6 px-5 pb-16 sm:px-7">
@@ -61,26 +60,44 @@ export function CategoryExplorer({ categories, citySlug }: { categories: Explore
           ))}
         </ul>
 
-        <div className="flex flex-wrap overflow-hidden rounded-panel bg-white shadow-[0_2px_10px_rgba(11,46,31,0.06)]">
-          <PhotoSlot tone={current.tone} hint={current.photoHint} src={current.photoSrc} className="min-h-[260px] flex-[1_1_480px] sm:min-h-[320px]" />
-          <div className="flex min-w-0 flex-[1_1_400px] flex-col justify-center gap-4 p-7 sm:p-12">
+        <div className="grid overflow-hidden rounded-panel bg-white shadow-[0_2px_10px_rgba(11,46,31,0.06)] md:grid-cols-2">
+          <PhotoSlot
+            tone={current.tone}
+            hint={current.photoHint}
+            src={current.photoSrc}
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="aspect-[4/3] w-full md:aspect-auto md:h-full md:min-h-[380px]"
+          />
+          <div className="flex min-w-0 flex-col justify-center gap-5 p-7 sm:p-10">
             <h2 className="text-[32px] font-extrabold tracking-[-0.03em] text-brand-dark">{current.label}</h2>
             <p className="text-[17px] leading-relaxed text-ink-soft">{current.summary}</p>
-            <dl className="grid grid-cols-2 border-t border-line pt-4">
-              <div>
-                <dt className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">Festpreis-Leistungen</dt>
-                <dd className="mt-1 text-xl font-extrabold">{fixedCount}</dd>
-              </div>
-              <div className="border-l border-line pl-4">
-                <dt className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">Größere Projekte</dt>
-                <dd className="mt-1 text-xl font-extrabold">Per Angebot</dd>
-              </div>
-            </dl>
+            <ul className="divide-y divide-line border-y border-line">
+              {current.services.slice(0, 4).map((s) => (
+                <li key={s.slug}>
+                  <Link
+                    href={`/${citySlug}/${current.slug}#${s.slug}`}
+                    className="group flex items-center justify-between gap-3 py-3 text-[15px] font-semibold"
+                  >
+                    <span className="group-hover:text-brand">{s.name}</span>
+                    <span className="flex items-center gap-2">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                          s.mode === "festpreis" ? "bg-mint text-brand-dark" : "bg-soft text-ink-soft"
+                        }`}
+                      >
+                        {s.mode === "festpreis" ? "Festpreis" : "Angebot"}
+                      </span>
+                      <Icon name="pfeil" size={16} strokeWidth={2.2} className="text-muted group-hover:text-brand" />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
             <Link
               href={`/${citySlug}/${current.slug}`}
               className="self-start rounded-full bg-brand px-6 py-3.5 font-bold text-white transition-colors hover:bg-brand-dark"
             >
-              {current.trade} ansehen
+              Alle Leistungen ansehen
             </Link>
           </div>
         </div>
