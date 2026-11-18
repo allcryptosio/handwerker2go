@@ -14,7 +14,7 @@ export default function Page() {
 
       <h2>1. Verantwortlicher</h2>
       <p>
-        Joe Becker, Republic Street 266, VLT 1112 Valletta, Malta
+        Joe Becker, 157 - 69 Patri Felicjan Bilocca St, MRS 1521 Marsa, Malta
         <br />
         E-Mail: info@handwerker2go.com, Telefon: +356 7781 8522
       </p>

@@ -8,9 +8,9 @@ export const legal = {
   /** Name des Plattformbetreibers, wie er in AGB und Widerrufsbelehrung erscheint */
   operatorName: "handwerker2go",
   /** Straße und Postleitzahl */
-  operatorAddress: "Republic Street 266, VLT 1112",
+  operatorAddress: "157 - 69 Patri Felicjan Bilocca St, MRS 1521",
   /** Ort des Sitzes, zugleich Gerichtsstand gegenüber Kaufleuten (§ 38 ZPO) */
-  operatorCity: "Valletta (Malta)",
+  operatorCity: "Marsa (Malta)",
   /** Umsatzsteuer-Identifikationsnummer */
   vatId: "MT33258727",
   /** Kontakt für Widerruf, Kündigung und Fragen */

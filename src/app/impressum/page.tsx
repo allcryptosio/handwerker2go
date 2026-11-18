@@ -10,9 +10,9 @@ export default function Page() {
       <p>
         Joe Becker
         <br />
-        Republic Street 266
+        157 - 69 Patri Felicjan Bilocca St
         <br />
-        VLT 1112 Valletta
+        MRS 1521 Marsa
         <br />
         Malta
       </p>

@@ -16,7 +16,7 @@ const num = (re) => Number(src.match(re)[1]);
 const monthlyCents = num(/monthly:\s*\{\s*feeCents:\s*(\d+)/);
 const yearlyCents = num(/yearly:\s*\{\s*feeCents:\s*(\d+)/);
 
-const legal = { line1: "Republic Street 266", postal_code: "VLT 1112", city: "Valletta", country: "MT" };
+const legal = { line1: "157 - 69 Patri Felicjan Bilocca St", postal_code: "MRS 1521", city: "Marsa", country: "MT" };
 await s.tax.settings.update({ head_office: { address: legal }, defaults: { tax_behavior: "exclusive", tax_code: "txcd_10000000" } });
 const regs = await s.tax.registrations.list({ limit: 50 });
 if (!regs.data.some((r) => r.country === "MT" && r.status === "active")) {
