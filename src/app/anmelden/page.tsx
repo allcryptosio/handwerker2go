@@ -20,7 +20,9 @@ export default function LoginPage() {
         <RedirectIfSignedIn />
       </Suspense>
       <h1 className="text-[clamp(32px,4vw,44px)] font-extrabold tracking-[-0.03em] text-brand-dark">Anmelden</h1>
-      <LoginForm />
+      <Suspense fallback={<div className="h-[260px] animate-pulse rounded-panel bg-soft" />}>
+        <LoginForm />
+      </Suspense>
     </Container>
   );
 }

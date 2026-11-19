@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
+import { WINDOWS, formatDateLong, windowLabel } from "@/lib/booking/format";
 
 export interface ServiceChoice {
   slug: string;
@@ -19,14 +20,6 @@ export interface SearchValues {
   fenster?: string;
 }
 
-const WINDOWS = [
-  { id: "08-10", label: "08:00–10:00" },
-  { id: "10-12", label: "10:00–12:00" },
-  { id: "12-14", label: "12:00–14:00" },
-  { id: "14-16", label: "14:00–16:00" },
-  { id: "16-18", label: "16:00–18:00" },
-  { id: "18-20", label: "18:00–20:00" },
-];
 const TIMES = Array.from({ length: 26 }, (_, i) => `${String(7 + Math.floor(i / 2)).padStart(2, "0")}:${i % 2 ? "30" : "00"}`); // 07:00–19:30
 const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
@@ -43,11 +36,6 @@ const addDaysIso = (date: string, n: number) => {
   const [y, m, d] = date.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
 };
-export function formatDateLong(date: string) {
-  const [y, m, d] = date.split("-").map(Number);
-  return new Intl.DateTimeFormat("de-DE", { weekday: "short", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(Date.UTC(y, m - 1, d)));
-}
-export const windowLabel = (id?: string) => WINDOWS.find((w) => w.id === id)?.label;
 
 type Panel = "service" | "place" | "date" | "time" | null;
 

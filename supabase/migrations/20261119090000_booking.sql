@@ -99,7 +99,7 @@ create table bookings (
 );
 create index bookings_customer_idx on bookings (customer_id, starts_at desc);
 create index bookings_provider_idx on bookings (provider_id, starts_at);
-create trigger bookings_touch before update on bookings for each row execute function app.touch_updated_at();
+create trigger bookings_touch before update on bookings for each row execute function app.touch_updated_at_snake();
 
 create table booking_photos (
   id uuid primary key default gen_random_uuid(),

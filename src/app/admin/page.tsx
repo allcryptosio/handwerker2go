@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Suspense } from "react";
 import { SignOutButton } from "@/components/layout/sign-out-button";
 import { Container } from "@/components/ui/container";
@@ -35,7 +36,10 @@ async function Admin() {
     <>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h1 className="text-[clamp(30px,4vw,44px)] font-extrabold tracking-[-0.03em] text-brand-dark">Admin</h1>
-        <SignOutButton />
+        <div className="flex items-center gap-4">
+          <Link href="/admin/buchungen" className="font-semibold text-brand underline">Buchungen</Link>
+          <SignOutButton />
+        </div>
       </div>
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[["Kunden", stats.customers], ["Betriebe", stats.providers], ["Aktive Betriebe", stats.active], ["Warten auf Prüfung", stats.pending]].map(([k, v]) => (

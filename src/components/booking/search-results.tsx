@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { BookingSearch, type SearchValues, type ServiceChoice, formatDateLong, windowLabel } from "@/components/booking/booking-search";
+import { BookingSearch, type SearchValues, type ServiceChoice } from "@/components/booking/booking-search";
+import { formatDateLong, windowLabel } from "@/lib/booking/format";
 
 interface Hit {
   providerId: string;

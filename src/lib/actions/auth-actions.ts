@@ -198,6 +198,9 @@ export async function signIn(_: FormState, form: FormData): Promise<FormState> {
   } catch (e) {
     return { error: authMessage(e) };
   }
+  // Rücksprung nur auf eigene Pfade (kein offener Redirect)
+  const next = String(form.get("weiter") ?? "");
+  if (role === "customer" && /^\/(buchen|buchung|termin)\b[^\s\\]*$/.test(next) && !next.startsWith("//")) redirect(next);
   redirect(role === "admin" ? "/admin" : role === "provider" ? "/dashboard" : "/konto");
 }
 

@@ -4,6 +4,7 @@ import type Stripe from "stripe";
 import { sendMail } from "@/lib/mail";
 import { syncSubscription } from "@/lib/stripe/billing";
 import { syncConnectAccount } from "@/lib/stripe/connect";
+import { expireUnpaid, markPaid } from "@/lib/booking/lifecycle";
 
 /** Fehlgeschlagene Abbuchung der Mitgliedschaft: Betrieb per E-Mail informieren (Stripe versucht es erneut) */
 async function notifyPaymentFailed(invoice: Stripe.Invoice) {
@@ -77,6 +78,25 @@ export async function POST(request: Request) {
         if (!event.account && session.mode === "subscription" && typeof session.subscription === "string") {
           await syncSubscription(await stripe.subscriptions.retrieve(session.subscription));
         }
+        // Kundenzahlung einer Buchung (Direct Charge auf dem Betriebskonto)
+        if (event.account && session.mode === "payment" && session.metadata?.booking_id && session.payment_status === "paid") {
+          const pi = typeof session.payment_intent === "string" ? session.payment_intent : (session.payment_intent?.id ?? null);
+          await markPaid(session.metadata.booking_id, { sessionId: session.id, paymentIntentId: pi });
+        }
+        break;
+      }
+      case "checkout.session.async_payment_succeeded": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        if (event.account && session.metadata?.booking_id) {
+          const pi = typeof session.payment_intent === "string" ? session.payment_intent : (session.payment_intent?.id ?? null);
+          await markPaid(session.metadata.booking_id, { sessionId: session.id, paymentIntentId: pi });
+        }
+        break;
+      }
+      case "checkout.session.expired":
+      case "checkout.session.async_payment_failed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        if (event.account && session.metadata?.booking_id) await expireUnpaid(session.metadata.booking_id);
         break;
       }
       case "invoice.payment_failed":

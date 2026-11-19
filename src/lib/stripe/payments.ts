@@ -9,6 +9,7 @@ import { applicationFeeCents, commissionBpsAt } from "@/lib/stripe/commission";
  */
 export async function createBookingCheckout(input: {
   bookingRef: string;
+  bookingId: string;
   amountCents: number;
   serviceName: string;
   providerAccountId: string;
@@ -30,9 +31,11 @@ export async function createBookingCheckout(input: {
       payment_intent_data: {
         application_fee_amount: fee,
         description: input.serviceName,
-        metadata: { booking_ref: input.bookingRef, commission_bps: String(bps) },
+        metadata: { booking_ref: input.bookingRef, booking_id: input.bookingId, commission_bps: String(bps) },
       },
-      metadata: { booking_ref: input.bookingRef },
+      metadata: { booking_ref: input.bookingRef, booking_id: input.bookingId },
+      // Stripe-Minimum: 30 Minuten; so lange bleibt der Termin reserviert
+      expires_at: Math.floor(Date.now() / 1000) + 31 * 60,
       success_url: input.successUrl,
       cancel_url: input.cancelUrl,
     },

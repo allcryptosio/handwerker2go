@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { SignOutButton } from "@/components/layout/sign-out-button";
 import { Container } from "@/components/ui/container";
 import { currentUser } from "@/lib/auth";
@@ -56,6 +57,7 @@ async function Dashboard() {
         <h1 className="text-[clamp(30px,4vw,44px)] font-extrabold tracking-[-0.03em] text-brand-dark">{p.company_name}</h1>
         <SignOutButton />
       </div>
+      <DashboardNav active="/dashboard" />
       <section className={`rounded-panel border-[1.5px] p-6 ${s.tone}`}>
         <h2 className="text-lg font-bold">Status: {s.label}</h2>
         <p className="mt-2 text-[15px]">{s.text}{p.status_reason ? ` Grund: ${p.status_reason}` : ""}</p>
@@ -148,7 +150,7 @@ async function Dashboard() {
           <div className="sm:col-span-2"><dt className="text-muted">Leistungen</dt><dd className="font-semibold">{cats.join(", ")}</dd></div>
         </dl>
       </section>
-      <p className="text-[15px] text-muted">Leistungen mit Preisen, Kalender und Buchungen folgen in den nächsten Ausbaustufen.</p>
+      <p className="text-[15px] text-muted">Preise, Arbeitszeiten und freie Tage pflegst du unter „Kalender & Leistungen“, Buchungen findest du unter „Termine“.</p>
     </>
   );
 }
