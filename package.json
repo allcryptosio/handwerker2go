@@ -11,7 +11,9 @@
     "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
     "admin:create": "node --env-file=.env.local scripts/create-admin.mjs",
     "stripe:setup": "node --env-file=.env.local scripts/stripe-setup.mjs",
-    "stripe:commission": "node --env-file=.env.local scripts/commission-invoices.mjs"
+    "stripe:commission": "node --env-file=.env.local scripts/commission-invoices.mjs",
+    "test": "node --import tsx --no-warnings --test tests/*.test.ts",
+    "geo:import": "node --env-file=.env.local scripts/import-postal-codes.mjs"
   },
   "dependencies": {
     "better-auth": "^1.7.25",
@@ -34,6 +36,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   },
   "packageManager": "pnpm@10.33.3"
