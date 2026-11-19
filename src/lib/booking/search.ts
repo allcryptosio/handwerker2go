@@ -69,6 +69,18 @@ export async function serviceOptions(): Promise<ServiceOption[]> {
   );
 }
 
+/** Leistung über ihren Kurznamen (z. B. "lampe-anschliessen") */
+export async function templateBySlug(slug: string): Promise<ServiceOption | null> {
+  return asSystem(async (db) => {
+    const r = (await db.query(
+      `select t.id, t.slug, t.name, t.mode, c.slug cslug, c.label from service_templates t
+         join service_categories c on c.id = t.category_id where t.slug = $1 and c.active limit 1`,
+      [slug],
+    )).rows[0];
+    return r ? { templateId: r.id, slug: r.slug, name: r.name, categorySlug: r.cslug, categoryLabel: r.label, mode: r.mode } : null;
+  });
+}
+
 export interface ProviderInfo {
   providerId: string;
   slug: string;

@@ -3,7 +3,7 @@ import { isValidDate, isValidTime, timeWindows } from "@/lib/booking/time";
 
 export const searchSchema = z
   .object({
-    leistung: z.string().uuid(),
+    leistung: z.string().regex(/^[a-z0-9-]{2,60}$/),
     ort: z.string().trim().min(2).max(80),
     datum: z.string().refine(isValidDate),
     zeit: z.string().refine(isValidTime).optional(),

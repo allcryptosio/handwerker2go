@@ -56,3 +56,11 @@ body {
     animation-duration: 0.01ms !important;
   }
 }
+
+@keyframes h2g-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [class*="animate-[h2g-up"] { animation: none !important; }
+}

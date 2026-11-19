@@ -1,4 +1,4 @@
-import { resolvePlace, searchAvailability } from "@/lib/booking/search";
+import { resolvePlace, searchAvailability, templateBySlug } from "@/lib/booking/search";
 import { exclusionLabel } from "@/lib/booking/engine";
 import { searchSchema, windowById } from "./schema";
 
@@ -8,10 +8,12 @@ export async function GET(request: Request) {
   const parsed = searchSchema.safeParse(params);
   if (!parsed.success) return Response.json({ error: "Bitte Leistung, Ort, Tag und Uhrzeit angeben." }, { status: 400 });
   const d = parsed.data;
+  const tpl = await templateBySlug(d.leistung);
+  if (!tpl) return Response.json({ error: "Diese Leistung kennen wir nicht." }, { status: 422 });
   const place = await resolvePlace(d.ort);
   if (!place) return Response.json({ error: "Diesen Ort kennen wir nicht. Bitte eine Postleitzahl eingeben." }, { status: 422 });
   const result = await searchAvailability({
-    templateId: d.leistung,
+    templateId: tpl.templateId,
     place,
     date: d.datum,
     time: d.zeit,
@@ -19,7 +21,7 @@ export async function GET(request: Request) {
   });
   const reasons = Object.entries(result.funnel.excluded).map(([k, n]) => ({ reason: exclusionLabel[k as keyof typeof exclusionLabel], count: n }));
   return Response.json(
-    { place, hits: result.hits, funnel: { total: result.funnel.total, available: result.funnel.available, reasons } },
+    { place, service: tpl, hits: result.hits, funnel: { total: result.funnel.total, available: result.funnel.available, reasons } },
     { headers: { "cache-control": "no-store" } },
   );
 }
