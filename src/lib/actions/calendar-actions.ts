@@ -10,6 +10,8 @@ import { detectImageType, storage } from "@/lib/storage";
 export interface CalState {
   ok?: string;
   error?: string;
+  /** Zeitstempel nach dem Speichern, z. B. um ein neues Logo nachzuladen */
+  v?: number;
 }
 
 /** Eigener Betrieb des angemeldeten Nutzers; alle Schreibzugriffe laufen mit seiner Rolle (RLS: owns_provider) */
@@ -154,5 +156,5 @@ export async function uploadLogo(_: CalState, form: FormData): Promise<CalState>
   const key = await storage.put("logos", buf, t.ext);
   await asProvider(u.id, (db) => db.query("update provider_profiles set logo_key = $2 where id = $1", [pid, key]));
   revalidatePath("/dashboard/kalender");
-  return { ok: "Logo gespeichert." };
+  return { ok: "Logo gespeichert.", v: Date.now() };
 }

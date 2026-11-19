@@ -288,7 +288,7 @@ function PlacePanel({ query, onPick }: { query: string; onPick: (label: string) 
   const [places, setPlaces] = useState<{ postalCode: string; place: string }[]>([]);
   useEffect(() => {
     const q = query.trim();
-    if (q.length < 2) return setPlaces([]);
+    if (q.length < 2) return;
     const ctrl = new AbortController();
     const t = setTimeout(() => {
       fetch(`/api/orte?q=${encodeURIComponent(q)}`, { signal: ctrl.signal })
@@ -328,22 +328,22 @@ function DatePanel({ value, leistung, ort, onPick, onClose }: { value: string; l
   const maxDate = addDaysIso(today, 180);
   const start = value || today;
   const [ym, setYm] = useState({ y: Number(start.slice(0, 4)), m: Number(start.slice(5, 7)) - 1 });
-  const [available, setAvailable] = useState<Set<string> | null>(null);
-  const [loading, setLoading] = useState(false);
-
   const first = iso(ym.y, ym.m, 1);
+  const enabled = !!leistung && ort.trim().length >= 2;
+  const reqKey = `${leistung}|${ort}|${first < today ? today : first}`;
+  const [loaded, setLoaded] = useState<{ key: string; days: Set<string> } | null>(null);
   // Verfügbare Tage laden, sobald Leistung und Ort feststehen
   useEffect(() => {
-    if (!leistung || ort.trim().length < 2) return setAvailable(null);
+    if (!enabled) return;
     const ctrl = new AbortController();
-    setLoading(true);
     fetch(`/api/verfuegbarkeit/tage?${new URLSearchParams({ leistung, ort, von: first < today ? today : first })}`, { signal: ctrl.signal })
       .then((r) => r.json())
-      .then((d) => setAvailable(new Set(d.days ?? [])))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .then((d) => setLoaded({ key: reqKey, days: new Set(d.days ?? []) }))
+      .catch(() => {});
     return () => ctrl.abort();
-  }, [leistung, ort, first, today]);
+  }, [enabled, leistung, ort, first, today, reqKey]);
+  const available = enabled && loaded?.key === reqKey ? loaded.days : null;
+  const loading = enabled && loaded?.key !== reqKey;
 
   const daysInMonth = new Date(Date.UTC(ym.y, ym.m + 1, 0)).getUTCDate();
   const lead = (new Date(Date.UTC(ym.y, ym.m, 1)).getUTCDay() + 6) % 7; // Montag = 0

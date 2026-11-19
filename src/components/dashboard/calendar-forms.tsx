@@ -149,9 +149,9 @@ export function LogoForm({ hasLogo, providerId }: { hasLogo: boolean; providerId
   const [s, action, pending] = useActionState(uploadLogo, {});
   return (
     <form action={action} className="flex flex-wrap items-center gap-4">
-      {hasLogo ? (
+      {hasLogo || s.v ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={`/api/logo/${providerId}?v=${s.ok ? Date.now() : 0}`} alt="Dein Logo" className="h-16 w-16 rounded-2xl border border-line object-cover" />
+        <img src={`/api/logo/${providerId}?v=${s.v ?? 0}`} alt="Dein Logo" className="h-16 w-16 rounded-2xl border border-line object-cover" />
       ) : <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-soft text-[12px] text-muted">kein Logo</span>}
       <input type="file" name="logo" accept="image/jpeg,image/png,image/webp" required
         className="text-[14px] file:mr-3 file:min-h-10 file:rounded-full file:border-0 file:bg-mint file:px-4 file:font-semibold file:text-brand-dark" />

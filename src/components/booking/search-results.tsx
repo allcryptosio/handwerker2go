@@ -47,22 +47,21 @@ export function SearchResults({ services }: { services: ServiceChoice[] }) {
     fenster: params.get("fenster") ?? undefined,
   };
   const key = params.toString();
-  const [data, setData] = useState<Response | null>(null);
-  const [loading, setLoading] = useState(false);
+  const valid = !!(values.leistung && values.ort && values.datum && (values.zeit || values.fenster));
+  const [result, setResult] = useState<{ key: string; data: Response } | null>(null);
   const [sort, setSort] = useState<Sort>("empfohlen");
 
   useEffect(() => {
-    if (!values.leistung || !values.ort || !values.datum || (!values.zeit && !values.fenster)) return setData(null);
+    if (!valid) return;
     const ctrl = new AbortController();
-    setLoading(true);
     fetch(`/api/verfuegbarkeit?${key}`, { signal: ctrl.signal })
       .then((r) => r.json())
-      .then(setData)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .then((d: Response) => setResult({ key, data: d }))
+      .catch(() => {});
     return () => ctrl.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
+  }, [key, valid]);
+  const data = valid && result?.key === key ? result.data : null;
+  const loading = valid && result?.key !== key;
 
   const hits = useMemo(() => {
     const list = [...(data?.hits ?? [])];
