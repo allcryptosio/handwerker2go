@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { type Candidate, checkSlot, earliestSlot, timesBetween, travelMinutes } from "../src/lib/booking/engine";
-import { berlinTime, berlinToDate } from "../src/lib/booking/time";
+import { berlinTime, berlinToDate, isNationalHoliday } from "../src/lib/booking/time";
 
 const now = new Date("2026-11-19T09:00:00Z");
 const date = "2026-11-25"; // Mittwoch
@@ -77,4 +77,11 @@ test("Zeitfenster liefert frühesten freien Beginn", () => {
 test("Zeitumstellung: 29.03.2027 10:00 Berlin = 08:00 UTC (Sommerzeit)", () => {
   assert.equal(berlinToDate("2027-03-29", "10:00").toISOString(), "2027-03-29T08:00:00.000Z");
   assert.equal(berlinToDate("2026-11-25", "10:00").toISOString(), "2026-11-25T09:00:00.000Z");
+});
+
+test("Bundesweite Feiertage sind frei", () => {
+  for (const d of ["2026-12-25", "2026-12-26", "2027-01-01", "2027-03-26", "2027-03-29", "2027-05-06", "2027-05-17", "2027-10-03"]) assert.ok(isNationalHoliday(d), d);
+  assert.ok(!isNationalHoliday("2026-12-24"));
+  const r = checkSlot(base(), "2026-12-25", "14:00", now);
+  assert.equal(!r.ok && r.reason, "day_off");
 });

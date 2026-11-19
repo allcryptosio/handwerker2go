@@ -1,4 +1,4 @@
-import { addDays, berlinToDate, isoWeekday, minutesOf, timeOf } from "./time";
+import { addDays, berlinToDate, isNationalHoliday, isoWeekday, minutesOf, timeOf } from "./time";
 
 /**
  * Verfügbarkeitsberechnung (rein, ohne Datenbank, dadurch testbar).
@@ -69,7 +69,7 @@ export function checkSlot(c: Candidate, date: string, time: string, now: Date): 
   const blocks = c.hours[isoWeekday(date)] ?? [];
   const dayStart = berlinToDate(date, "00:00").getTime();
   const dayEnd = berlinToDate(addDays(date, 1), "00:00").getTime();
-  const dayOff = blocks.length === 0 || c.timeOff.some((t) => t.start <= dayStart && t.end >= dayEnd);
+  const dayOff = blocks.length === 0 || isNationalHoliday(date) || c.timeOff.some((t) => t.start <= dayStart && t.end >= dayEnd);
   if (dayOff) return { ok: false, reason: "day_off" };
 
   const travel = travelMinutes(c.distanceKm);

@@ -148,7 +148,17 @@ export async function registerProvider(_: FormState, form: FormData): Promise<Fo
         [pid, categories],
       );
       const city = await db.query("select id from cities where active order by sort limit 1");
-      await db.query("insert into service_areas (provider_id, city_id, label, radius_km) values ($1,$2,$3,$4)", [pid, city.rows[0]?.id ?? null, d.area_label, d.radius_km]);
+      // Mittelpunkt des Einsatzgebiets = Postleitzahl des Betriebs (für Entfernung und Anfahrtszeit)
+      await db.query(
+        `insert into service_areas (provider_id, city_id, label, radius_km, center)
+         values ($1, $2, $3, $4, (select location from postal_codes where postal_code = $5 order by (lower(place) = lower($6)) desc, length(place) limit 1))`,
+        [pid, city.rows[0]?.id ?? null, d.area_label, d.radius_km, d.postal_code, d.city],
+      );
+      // Standard-Arbeitszeiten Mo–Fr 8–17 Uhr, im Dashboard änderbar
+      await db.query(
+        "insert into provider_working_hours (provider_id, weekday, starts, ends) select $1, wd, '08:00', '17:00' from generate_series(1, 5) wd",
+        [pid],
+      );
       await db.query(
         "insert into provider_documents (provider_id, kind, storage_key, original_name, mime_type, size_bytes) values ($1,$2,$3,$4,$5,$6)",
         [pid, d.document_kind, key, doc!.name, doc!.type.mime, doc!.buf.length],
