@@ -32,7 +32,7 @@ interface Response {
   funnel?: { total: number; available: number; reasons: { reason: string; count: number }[] };
 }
 
-type Sort = "zeit" | "entfernung" | "bewertung" | "preis";
+type Sort = "empfohlen" | "zeit" | "entfernung" | "bewertung" | "preis";
 const eur = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
 const durationText = (m: number) => (m < 60 ? `${m} Min.` : m % 60 ? `${Math.floor(m / 60)} Std. ${m % 60} Min.` : `${m / 60} Std.`);
 
@@ -49,7 +49,7 @@ export function SearchResults({ services }: { services: ServiceChoice[] }) {
   const key = params.toString();
   const [data, setData] = useState<Response | null>(null);
   const [loading, setLoading] = useState(false);
-  const [sort, setSort] = useState<Sort>("zeit");
+  const [sort, setSort] = useState<Sort>("empfohlen");
 
   useEffect(() => {
     if (!values.leistung || !values.ort || !values.datum || (!values.zeit && !values.fenster)) return setData(null);
@@ -71,7 +71,8 @@ export function SearchResults({ services }: { services: ServiceChoice[] }) {
       sort === "entfernung" ? a.distanceKm - b.distanceKm
       : sort === "bewertung" ? (b.rating ?? 0) - (a.rating ?? 0) || b.reviewCount - a.reviewCount
       : sort === "preis" ? price(a) - price(b)
-      : a.start.localeCompare(b.start) || a.distanceKm - b.distanceKm,
+      : sort === "zeit" ? a.start.localeCompare(b.start) || a.distanceKm - b.distanceKm
+      : 0, // empfohlen: Reihenfolge vom Server (Kriterien auf /ranking)
     );
     return list;
   }, [data, sort]);
@@ -120,6 +121,7 @@ export function SearchResults({ services }: { services: ServiceChoice[] }) {
                 Sortieren
                 <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}
                   className="min-h-11 rounded-full border-[1.5px] border-line-strong bg-white px-4 text-[15px] font-normal outline-none focus:border-brand">
+                  <option value="empfohlen">Empfohlen</option>
                   <option value="zeit">Früheste Ankunft</option>
                   <option value="entfernung">Entfernung</option>
                   <option value="bewertung">Bewertung</option>

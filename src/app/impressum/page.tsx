@@ -28,6 +28,11 @@ export default function Page() {
       <p>Joe Becker, Anschrift wie oben</p>
       <h2>Verbraucherstreitbeilegung</h2>
       <p>Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+      <h2>Datenquellen</h2>
+      <p>
+        Postleitzahlen und Ortskoordinaten: <a className="underline" href="https://www.geonames.org">GeoNames</a>, lizenziert unter{" "}
+        <a className="underline" href="https://creativecommons.org/licenses/by/4.0/deed.de">CC BY 4.0</a>.
+      </p>
     </LegalPage>
   );
 }

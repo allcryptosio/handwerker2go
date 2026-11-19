@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Datenschutz", alternates: { canonica
 
 /**
  * Entwurf, Stand 18.11.2026. Beschreibt nur Verarbeitungen, die tatsächlich stattfinden.
- * Abschnitte für noch nicht aktive Dienste (Stripe, Mapbox, Resend) erst bei Aktivierung einfügen.
+ * Abschnitte für noch nicht aktive Dienste (Mapbox, Resend) erst bei Aktivierung einfügen.
  */
 export default function Page() {
   return (
@@ -78,14 +78,42 @@ export default function Page() {
         Öffentlich sichtbar sind nach der Freischaltung nur die Profilangaben des Betriebs, nicht Nachweise oder interne Daten.
       </p>
 
-      <h2>9. Protokollierung von Änderungen</h2>
+      <h2>9. Terminsuche und Buchungen</h2>
+      <p>
+        Für die Suche nach freien Betrieben verarbeiten wir die gewählte Leistung, die Postleitzahl oder den Ort sowie Tag und
+        Uhrzeit. Diese Suchangaben speichern wir nicht dauerhaft. Für die Entfernung nutzen wir eine Postleitzahlen-Datenbank auf
+        unserem eigenen Server; dabei werden keine Daten an Kartendienste übermittelt.
+      </p>
+      <p>
+        Wenn du buchst, speichern wir Leistung, Termin, Adresse des Einsatzorts, Name, Telefonnummer, E-Mail-Adresse, deine
+        Hinweise und freiwillig hochgeladene Fotos sowie, falls erforderlich, deine Erklärung zum Beginn der Leistung vor Ablauf
+        der Widerrufsfrist mit Zeitpunkt. Diese Angaben erhält der gebuchte Betrieb, damit er den Auftrag ausführen kann. Fotos
+        sind nur für dich, den Betrieb und unser Supportteam sichtbar. Zweck ist die Vermittlung und Abwicklung des Auftrags,
+        Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, für die Aufbewahrung von Buchungs- und Abrechnungsdaten Art. 6 Abs. 1
+        lit. c DSGVO. Buchungsdaten bewahren wir bis zum Ende der gesetzlichen Aufbewahrungsfristen auf. [Fristen prüfen.]
+      </p>
+
+      <h2>10. Online-Zahlung über Stripe</h2>
+      <p>
+        Zahlungen wickeln wir über Stripe ab (Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal Dock,
+        Dublin, D02 H210, Irland). Bei einer Buchung gibst du deine Zahlungsdaten direkt auf einer Seite von Stripe ein; wir
+        erhalten keine vollständigen Karten- oder Kontodaten. Empfänger der Zahlung ist der gebuchte Betrieb; Stripe übermittelt
+        uns den Zahlungsstatus und den einbehaltenen Provisionsbetrag. Für Handwerksbetriebe verarbeitet Stripe zusätzlich die
+        Angaben zur Identitäts- und Unternehmensprüfung sowie die Bankverbindung, für die Mitgliedschaft die Rechnungsdaten.
+        Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Stripe verarbeitet bestimmte Daten zur Betrugsprävention und zur
+        Erfüllung gesetzlicher Pflichten in eigener Verantwortung; Einzelheiten stehen in der Datenschutzerklärung von Stripe
+        unter stripe.com/de/privacy. Eine Übermittlung an Stripe, Inc. in den USA ist möglich; Stripe ist nach dem EU-US Data
+        Privacy Framework zertifiziert.
+      </p>
+
+      <h2>11. Protokollierung von Änderungen</h2>
       <p>
         Wichtige Vorgänge wie Registrierungen, Freischaltungen und Änderungen an Finanzdaten protokollieren wir mit Zeitpunkt
         und handelnder Person, um Missbrauch aufzuklären und gesetzliche Nachweispflichten zu erfüllen. Rechtsgrundlage ist
         Art. 6 Abs. 1 lit. c und f DSGVO. [Aufbewahrungsdauer festlegen.]
       </p>
 
-      <h2>10. E-Mail und Kontakt</h2>
+      <h2>12. E-Mail und Kontakt</h2>
       <p>
         Unsere E-Mail-Postfächer und der Versand von E-Mails der Website laufen über Google Workspace der Google Ireland
         Limited, Gordon House, Barrow Street, Dublin 4, Irland. Wenn du uns schreibst, verarbeiten wir deine Angaben zur
@@ -94,7 +122,7 @@ export default function Page() {
         Auftragsverarbeitung, prüfen].
       </p>
 
-      <h2>11. Datensicherung</h2>
+      <h2>13. Datensicherung</h2>
       <p>
         Wir erstellen täglich verschlüsselte Sicherungskopien unserer Daten, auf unserem Server und bei Cloudflare in der
         Europäischen Union. Sicherungen werden bis zu 12 Monate aufbewahrt und danach automatisch gelöscht. Gelöschte Daten
@@ -102,25 +130,21 @@ export default function Page() {
         Art. 32 DSGVO.
       </p>
 
-      <h2>12. Schriftarten und externe Inhalte</h2>
+      <h2>14. Schriftarten und externe Inhalte</h2>
       <p>
         Die auf der Website verwendeten Schriften werden von unserem eigenen Server geladen. Beim Besuch der Website werden
         keine Inhalte von Drittanbietern wie Google Fonts, Social-Media-Plattformen oder Videodiensten eingebunden.
       </p>
 
-      <p>
-        [Bei Aktivierung ergänzen: Online-Zahlung über Stripe (Stripe Payments Europe Ltd., Irland), Karten und
-        Adresssuche über Mapbox, E-Mail-Versand über Resend.]
-      </p>
 
-      <h2>13. Empfänger</h2>
+      <h2>15. Empfänger</h2>
       <p>
         Wenn du einen Auftrag erteilst oder eine Anfrage stellst, geben wir die dafür nötigen Angaben (Name, Adresse des
         Einsatzorts, Kontaktdaten, Beschreibung) an den ausgewählten Handwerksbetrieb weiter. Darüber hinaus geben wir Daten
         nur an die oben genannten Dienstleister oder an Behörden weiter, wenn wir dazu gesetzlich verpflichtet sind.
       </p>
 
-      <h2>14. Deine Rechte</h2>
+      <h2>16. Deine Rechte</h2>
       <p>
         Du hast das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der
         Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch gegen Verarbeitungen auf Grundlage berechtigter
@@ -131,7 +155,7 @@ export default function Page() {
         Malta (Information and Data Protection Commissioner, idpc.org.mt) oder bei der Behörde deines Wohnorts.
       </p>
 
-      <h2>15. Änderungen</h2>
+      <h2>17. Änderungen</h2>
       <p>
         Wir passen diese Datenschutzerklärung an, wenn sich unsere Website oder die eingesetzten Dienste ändern. Es gilt die
         jeweils hier veröffentlichte Fassung.

@@ -121,3 +121,35 @@ export const timesBetween = (from: string, to: string) => {
   for (let m = minutesOf(from); m < minutesOf(to); m += 30) out.push(timeOf(m));
   return out;
 };
+
+/**
+ * Empfohlene Reihenfolge (öffentlich erklärt auf /ranking, src/config/ranking.ts).
+ * Gewichte absteigend: Entfernung 40 %, freier Termin 25 %, Bewertungen 20 %, Zuverlässigkeit 10 %, Profil 5 %.
+ * Abo-Modell und Provision fließen bewusst NICHT ein.
+ */
+export const RANK_WEIGHTS = { distance: 0.4, availability: 0.25, reviews: 0.2, reliability: 0.1, profile: 0.05 } as const;
+
+export interface RankInput {
+  distanceKm: number;
+  radiusKm: number;
+  /** Minuten zwischen Wunschbeginn (bzw. Fensterbeginn) und frühester Ankunft */
+  delayMin: number;
+  windowMin: number;
+  rating: number | null;
+  reviewCount: number;
+  /** Anteil vom Betrieb abgelehnter oder abgesagter Buchungen (0–1), null = noch keine Buchungen */
+  providerCancelRate: number | null;
+  hasLogo: boolean;
+  offeredServices: number;
+}
+
+export function rankScore(r: RankInput): number {
+  const distance = Math.max(0, 1 - r.distanceKm / Math.max(r.radiusKm, 1));
+  const availability = r.windowMin > 0 ? Math.max(0, 1 - r.delayMin / r.windowMin) : 1;
+  // Neue Betriebe ohne Bewertung starten neutral, damit sie nicht benachteiligt werden
+  const reviews = r.rating === null || r.reviewCount === 0 ? 0.6 : (r.rating / 5) * Math.min(1, 0.5 + r.reviewCount / 10);
+  const reliability = r.providerCancelRate === null ? 1 : 1 - Math.min(1, r.providerCancelRate);
+  const profile = (r.hasLogo ? 0.5 : 0) + Math.min(0.5, r.offeredServices / 6);
+  const w = RANK_WEIGHTS;
+  return w.distance * distance + w.availability * availability + w.reviews * reviews + w.reliability * reliability + w.profile * profile;
+}

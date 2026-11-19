@@ -1,7 +1,7 @@
 import "server-only";
 import { asSystem } from "@/lib/db";
-import { type Candidate, type Exclusion, earliestSlot, timesBetween } from "@/lib/booking/engine";
-import { addDays, berlinToDate, berlinTime, isoWeekday } from "@/lib/booking/time";
+import { type Candidate, type Exclusion, earliestSlot, rankScore, timesBetween } from "@/lib/booking/engine";
+import { addDays, berlinToDate, berlinTime, isoWeekday, minutesOf } from "@/lib/booking/time";
 
 export interface Place {
   postalCode: string;
@@ -97,6 +97,9 @@ export interface ProviderInfo {
   bookingMode: "instant" | "confirm";
   bufferMin: number;
   stripeAccountId: string | null;
+  radiusKm: number;
+  providerCancelRate: number | null;
+  offeredServices: number;
   approvedAt: string;
 }
 
@@ -120,7 +123,10 @@ async function loadCandidates(opts: { templateId: string; lat: number; lon: numb
               (select array_agg(c2.label order by c2.sort) from provider_categories pc2 join service_categories c2 on c2.id = pc2.category_id where pc2.provider_id = p.id) cats,
               (select round(avg(rating)::numeric, 1) from reviews r where r.provider_id = p.id and r.visible) rating,
               (select count(*) from reviews r where r.provider_id = p.id and r.visible) review_count,
-              (select count(*) from bookings b where b.provider_id = p.id and b.status = 'completed') job_count
+              (select count(*) from bookings b where b.provider_id = p.id and b.status = 'completed') job_count,
+              (select count(*) from bookings b where b.provider_id = p.id and b.status in ('confirmed', 'completed', 'declined', 'cancelled')) decided_count,
+              (select count(*) from bookings b where b.provider_id = p.id and (b.status = 'declined' or (b.status = 'cancelled' and coalesce(b.cancel_reason, '') not in ('Storniert durch Kunden', 'Termin bereits vergeben')))) provider_cancel_count,
+              (select count(*) from provider_services s2 where s2.provider_id = p.id and s2.active) offered_services
          from service_templates t
          join provider_categories pc on pc.category_id = t.category_id
          join provider_profiles p on p.id = pc.provider_id
@@ -178,6 +184,9 @@ async function loadCandidates(opts: { templateId: string; lat: number; lon: numb
         bookingMode: r.booking_mode,
         bufferMin: r.buffer_minutes,
         stripeAccountId: r.stripe_account_id,
+        radiusKm: Number(r.radius_km),
+        providerCancelRate: Number(r.decided_count) > 0 ? Number(r.provider_cancel_count) / Number(r.decided_count) : null,
+        offeredServices: Number(r.offered_services),
         approvedAt: new Date(r.approved_at).toISOString(),
       };
       return { info, candidate };
@@ -195,6 +204,7 @@ export interface SearchInput {
 }
 
 export interface SearchHit extends ProviderInfo {
+  score: number;
   start: string; // ISO
   end: string;
   arrival: string; // "HH:MM"
@@ -213,15 +223,24 @@ export async function searchAvailability(input: SearchInput, providerId?: string
   const now = new Date();
   const hits: SearchHit[] = [];
   const excluded: Partial<Record<Exclusion, number>> = {};
+  const wish = minutesOf(times[0]);
+  const windowMin = input.window ? minutesOf(input.window.to) - minutesOf(input.window.from) : 0;
   for (const { info, candidate } of loaded) {
     const r = earliestSlot(candidate, input.date, times, now);
     if (r.ok) {
-      hits.push({ ...info, start: r.start.toISOString(), end: r.end.toISOString(), arrival: berlinTime(r.start), travelMin: r.travelMin });
+      const arrival = berlinTime(r.start);
+      const score = rankScore({
+        distanceKm: info.distanceKm, radiusKm: info.radiusKm, delayMin: minutesOf(arrival) - wish, windowMin,
+        rating: info.rating, reviewCount: info.reviewCount, providerCancelRate: info.providerCancelRate,
+        hasLogo: !!info.logoKey, offeredServices: info.offeredServices,
+      });
+      hits.push({ ...info, score, start: r.start.toISOString(), end: r.end.toISOString(), arrival, travelMin: r.travelMin });
     } else {
       excluded[r.reason] = (excluded[r.reason] ?? 0) + 1;
     }
   }
-  hits.sort((a, b) => a.start.localeCompare(b.start) || a.distanceKm - b.distanceKm);
+  // Empfohlene Reihenfolge nach den veröffentlichten Kriterien (/ranking)
+  hits.sort((a, b) => b.score - a.score || a.distanceKm - b.distanceKm);
   return { hits, funnel: { total: loaded.length, available: hits.length, excluded } };
 }
 

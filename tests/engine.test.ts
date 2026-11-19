@@ -85,3 +85,16 @@ test("Bundesweite Feiertage sind frei", () => {
   const r = checkSlot(base(), "2026-12-25", "14:00", now);
   assert.equal(!r.ok && r.reason, "day_off");
 });
+
+test("Ranking: Entfernung wiegt am meisten, Abo/Provision kommen nicht vor", async () => {
+  const { rankScore, RANK_WEIGHTS } = await import("../src/lib/booking/engine");
+  const base = { distanceKm: 5, radiusKm: 25, delayMin: 0, windowMin: 0, rating: null, reviewCount: 0, providerCancelRate: null, hasLogo: false, offeredServices: 1 };
+  const near = rankScore({ ...base, distanceKm: 2 });
+  const farButGreatReviews = rankScore({ ...base, distanceKm: 15, rating: 5, reviewCount: 20 });
+  assert.ok(near > farButGreatReviews, "näher schlägt bessere Bewertung bei großem Entfernungsunterschied");
+  assert.ok(rankScore({ ...base, rating: 4.8, reviewCount: 12 }) > rankScore(base), "gute Bewertungen helfen bei gleicher Entfernung");
+  assert.ok(rankScore({ ...base, providerCancelRate: 0.3 }) < rankScore(base), "Absagen kosten Punkte");
+  const ws = Object.values(RANK_WEIGHTS);
+  assert.deepEqual([...ws].sort((a, b) => b - a), ws, "Gewichte absteigend wie auf /ranking");
+  assert.equal(Object.keys(RANK_WEIGHTS).join(), "distance,availability,reviews,reliability,profile");
+});

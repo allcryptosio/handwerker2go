@@ -29,3 +29,24 @@ zeigen derzeit keine Betriebe. Abweichungen, die beim Bau der Suche zu lösen si
 Vorschlag zur Umsetzung der Gewichtung: lexikografische Sortierung nach Entfernungsband (z. B. 0–3, 3–7, 7–15 km), dann
 Terminverfügbarkeit, dann Bewertungswert, dann Zuverlässigkeit, dann Profilwert. So bleibt die öffentlich beschriebene
 Reihenfolge exakt nachvollziehbar. Abo- und Provisionsfelder dürfen in der Abfrage nicht vorkommen (Code-Review-Regel).
+
+## Umsetzung (Phase 3, 19.11.2026)
+
+Die Suche (`src/lib/booking/search.ts`) zeigt nur Betriebe, die zum Wunschtermin tatsächlich können
+(Einsatzgebiet, Arbeitszeiten, freie Tage, Feiertage, gebuchte Termine, Dauer, Anfahrt, Puffer, Vorlauf).
+Die Standard-Sortierung „Empfohlen“ setzt die fünf Kriterien von `/ranking` als gewichtete Punktzahl um
+(`rankScore` in `src/lib/booking/engine.ts`, Test in `tests/engine.test.ts`):
+
+| Kriterium | Gewicht | Messgröße |
+| --- | --- | --- |
+| Entfernung | 40 % | 1 − Entfernung / Radius des Einsatzgebiets |
+| Freier Termin | 25 % | wie nah die früheste Ankunft am Wunschbeginn liegt (bei exakter Uhrzeit immer voll) |
+| Bewertungen | 20 % | Durchschnitt und Anzahl; ohne Bewertungen neutraler Startwert 0,6 |
+| Zuverlässigkeit | 10 % | Anteil vom Betrieb abgelehnter oder abgesagter Buchungen (Antwortzeit noch nicht gemessen) |
+| Vollständiges Profil | 5 % | Logo vorhanden, Anzahl angebotener Leistungen mit Preis |
+
+Abo-Modell, Provision und Zahlungen an uns fließen nicht ein. Kunden können zusätzlich selbst nach früheste Ankunft,
+Entfernung, Bewertung oder Preis sortieren.
+
+Offene Abweichung: „wie schnell der Betrieb auf Anfragen antwortet“ (Text auf /ranking) wird noch nicht gemessen.
+Entweder Antwortzeit ergänzen (Zeit von `requested` bis `confirmed`) oder den Satz auf /ranking anpassen.
