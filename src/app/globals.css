@@ -69,3 +69,22 @@ body {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+
+/* Sprüche im Hero: aufploppen, stehen bleiben, verschwinden (Desktop: bis zu zwei gleichzeitig) */
+@keyframes h2g-pop {
+  0% { opacity: 0; transform: scale(0.6) translateY(10px); filter: blur(6px); }
+  4% { opacity: 1; transform: scale(1.08); filter: blur(0); }
+  7% { transform: scale(1); }
+  36% { opacity: 1; transform: scale(1); filter: blur(0); }
+  42% { opacity: 0; transform: scale(0.94) translateY(-6px); filter: blur(4px); }
+  100% { opacity: 0; }
+}
+/* Mobil: immer nur einer sichtbar */
+@keyframes h2g-pop-solo {
+  0% { opacity: 0; transform: scale(0.6) translateY(8px); filter: blur(6px); }
+  3% { opacity: 1; transform: scale(1.08); filter: blur(0); }
+  5% { transform: scale(1); }
+  16% { opacity: 1; transform: scale(1); filter: blur(0); }
+  19.5% { opacity: 0; transform: translateY(-6px); filter: blur(4px); }
+  100% { opacity: 0; }
+}
