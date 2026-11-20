@@ -1,0 +1,11 @@
+# Terminerinnerung 24 Stunden vorher an Kunde und Betrieb.
+#   cp deploy/handwerker2go-reminders.* /etc/systemd/system/ && systemctl enable --now handwerker2go-reminders.timer
+[Unit]
+Description=handwerker2go: Terminerinnerungen verschicken
+After=network-online.target postgresql.service
+
+[Service]
+Type=oneshot
+User=handwerker2go
+WorkingDirectory=/opt/handwerker2go
+ExecStart=/usr/bin/node --conditions=react-server --import tsx --env-file=/opt/handwerker2go/.env.local scripts/reminders.mts

@@ -9,7 +9,7 @@ const eur = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", c
 const when = (d: Date) =>
   new Intl.DateTimeFormat("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" }).format(d) + " Uhr";
 
-export type BookingEvent = "confirmed" | "requested" | "provider_confirmed" | "declined" | "cancelled_by_customer" | "cancelled_by_provider";
+export type BookingEvent = "confirmed" | "requested" | "provider_confirmed" | "declined" | "cancelled_by_customer" | "cancelled_by_provider" | "reminder";
 
 /** Lädt die Buchung und schickt passende Mails an Kunde und Betrieb */
 export async function notifyBooking(bookingId: string, event: BookingEvent) {
@@ -74,6 +74,19 @@ export async function notifyBooking(bookingId: string, event: BookingEvent) {
       toCustomer(`Storniert: ${b.service_name}`, "Deine Buchung ist storniert", [b.refunded_cents > 0 ? `Wir erstatten ${eur(b.refunded_cents)} über Stripe auf dein Zahlungsmittel.` : "Die Buchung ist storniert."]);
       toProvider(`Storniert: ${b.service_name}`, "Ein Kunde hat storniert", ["Der Termin ist wieder frei."]);
       break;
+    case "reminder": {
+      const day = start.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Berlin" });
+      const time = start.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" });
+      const ymd = (d: Date) => d.toLocaleDateString("sv-SE", { timeZone: "Europe/Berlin" });
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const rel = ymd(start) === ymd(new Date()) ? "heute" : ymd(start) === ymd(tomorrow) ? "morgen" : `am ${day}`;
+      const Rel = rel.charAt(0).toUpperCase() + rel.slice(1);
+      toCustomer(`Erinnerung: ${b.service_name} ${rel} um ${time} Uhr`, `${Rel} ist dein Termin`, [
+        `${b.company_name} kommt am ${day} um ${time} Uhr zu dir. Bitte sorg dafür, dass jemand da ist und der Arbeitsbereich zugänglich ist.`,
+      ], [provider, "Du kannst doch nicht? Dann sag den Termin bitte so früh wie möglich über die Buchungsseite ab, damit der Betrieb planen kann."]);
+      toProvider(`Erinnerung: ${b.service_name} ${rel} um ${time} Uhr`, `${Rel} steht ein Auftrag an`, [`Kurze Erinnerung an deinen Termin am ${day} um ${time} Uhr.`]);
+      break;
+    }
     case "cancelled_by_provider":
       toCustomer(`Abgesagt: ${b.service_name}`, "Der Betrieb hat abgesagt", [`${b.company_name} musste den Termin absagen.${b.price_type === "fixed" ? " Du bekommst den vollen Betrag über Stripe zurück." : ""}`]);
       break;

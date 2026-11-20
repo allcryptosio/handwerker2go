@@ -224,6 +224,46 @@ export async function registerProvider(_: FormState, form: FormData): Promise<Fo
   return { ok: true, message: successMessage };
 }
 
+// ---------------------------------------------------------------- Passwort vergessen
+const forgotSchema = z.object({ email });
+
+/** Schickt einen Link zum Zurücksetzen. Antwortet immer gleich, damit niemand ausspähen kann, ob es ein Konto gibt. */
+export async function requestPasswordReset(_: FormState, form: FormData): Promise<FormState> {
+  const parsed = forgotSchema.safeParse(Object.fromEntries(form));
+  if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) };
+  try {
+    await auth.api.requestPasswordReset({ body: { email: parsed.data.email, redirectTo: "/passwort-neu" }, headers: await headers() });
+  } catch (e) {
+    console.error(e);
+  }
+  return { ok: true, message: "Wenn es ein Konto mit dieser E-Mail-Adresse gibt, haben wir dir einen Link geschickt. Schau auch im Spam-Ordner nach. Der Link ist 1 Stunde gültig." };
+}
+
+const resetSchema = z
+  .object({
+    token: z.string().min(10, "Der Link ist ungültig. Bitte fordere einen neuen an."),
+    password: z.string().min(10, "Mindestens 10 Zeichen").max(128),
+    password2: z.string(),
+  })
+  .refine((d) => d.password === d.password2, { path: ["password2"], message: "Die Passwörter stimmen nicht überein" });
+
+export async function resetPassword(_: FormState, form: FormData): Promise<FormState> {
+  const parsed = resetSchema.safeParse(Object.fromEntries(form));
+  if (!parsed.success) {
+    const fe = fieldErrors(parsed.error);
+    return fe.token ? { error: fe.token } : { fieldErrors: fe };
+  }
+  try {
+    await auth.api.resetPassword({ body: { token: parsed.data.token, newPassword: parsed.data.password }, headers: await headers() });
+  } catch (e) {
+    if (e instanceof APIError && String((e.body as { code?: string } | undefined)?.code ?? "").includes("INVALID_TOKEN")) {
+      return { error: "Der Link ist abgelaufen oder wurde schon benutzt. Bitte fordere einen neuen an." };
+    }
+    return { error: authMessage(e) };
+  }
+  redirect("/anmelden?passwort=neu");
+}
+
 // ---------------------------------------------------------------- Anmelden / Abmelden
 const loginSchema = z.object({ email, password: z.string().min(1, "Bitte gib dein Passwort ein") });
 

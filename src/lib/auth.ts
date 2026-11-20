@@ -15,6 +15,34 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     minPasswordLength: 10,
     autoSignIn: false,
+    resetPasswordTokenExpiresIn: 60 * 60,
+    // Nach dem Zurücksetzen alle anderen Sitzungen abmelden (falls jemand Fremdes eingeloggt war)
+    revokeSessionsOnPasswordReset: true,
+    sendResetPassword: async ({ user, url }) => {
+      await sendMail({
+        to: user.email,
+        template: "password-reset",
+        subject: "Passwort zurücksetzen",
+        heading: `Hallo ${user.name},`,
+        paragraphs: [
+          "du hast ein neues Passwort für dein Konto bei handwerker2go angefordert. Über den Button legst du es fest.",
+          "Der Link ist 1 Stunde gültig. Wenn du das nicht warst, ignoriere diese E-Mail einfach. Dein Passwort bleibt dann unverändert.",
+        ],
+        button: { label: "Neues Passwort festlegen", url },
+      });
+    },
+    onPasswordReset: async ({ user }) => {
+      await sendMail({
+        to: user.email,
+        template: "password-changed",
+        subject: "Dein Passwort wurde geändert",
+        heading: `Hallo ${user.name},`,
+        paragraphs: [
+          "das Passwort für dein Konto bei handwerker2go wurde gerade geändert. Aus Sicherheitsgründen haben wir dich auf allen Geräten abgemeldet.",
+          "Warst du das nicht? Dann antworte bitte sofort auf diese E-Mail.",
+        ],
+      }).catch(console.error);
+    },
   },
   emailVerification: {
     sendOnSignUp: true,
