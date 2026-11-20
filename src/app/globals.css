@@ -39,6 +39,8 @@ html {
   color: var(--color-ink);
   background: #ffffff;
   -webkit-text-size-adjust: 100%;
+  /* Platz für die klebende Navigationsleiste bei Sprungmarken */
+  scroll-padding-top: 96px;
 }
 
 body {
