@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>handwerker2go Vertriebsmappe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --brand:#12704f; --dark:#0b2e1f; --mint:#eaf5ee; --ink:#1a1e1d; --soft:#3f4442; --muted:#565958; --line:#e3e6e4; --bg:#f5f7f6; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Inter, system-ui, sans-serif; color: var(--ink); background: #fff; line-height: 1.6; }
+  a { color: var(--brand); font-weight: 600; }
+  header.hero { background: var(--dark); color: #fff; padding: 48px 24px 40px; }
+  .wrap { max-width: 920px; margin: 0 auto; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -0.04em; }
+  .logo img { width: 32px; height: 32px; border-radius: 8px; box-shadow: 0 0 0 2px rgba(255,255,255,.8); }
+  .go { background: #fff; color: var(--dark); border-radius: 6px; padding: 0 6px; margin-left: 2px; }
+  h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.08; letter-spacing: -0.03em; margin: 22px 0 10px; }
+  .hero p { color: #cfe3d7; max-width: 640px; margin: 0; font-size: 17px; }
+  nav.toc { background: var(--bg); border-bottom: 1px solid var(--line); padding: 14px 24px; position: sticky; top: 0; z-index: 5; }
+  nav.toc .wrap { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; }
+  nav.toc a { text-decoration: none; color: var(--dark); }
+  main { padding: 8px 24px 80px; }
+  section { padding-top: 40px; }
+  h2 { font-size: 26px; letter-spacing: -0.02em; margin: 0 0 6px; color: var(--dark); }
+  h3 { font-size: 18px; margin: 26px 0 8px; color: var(--dark); }
+  .intro { color: var(--soft); margin: 0 0 18px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .card { border: 1px solid var(--line); border-radius: 16px; padding: 18px; background: #fff; }
+  .card.mint { background: var(--mint); border-color: #c6dfcf; }
+  .card strong { display: block; margin-bottom: 4px; }
+  .card p { margin: 0; color: var(--soft); font-size: 15px; }
+  .dl { display: flex; align-items: center; gap: 14px; }
+  .dl img { width: 64px; height: 64px; border-radius: 10px; border: 1px solid var(--line); object-fit: cover; background: #fff; }
+  .warn { border-left: 4px solid #b42318; background: #fef3f2; border-radius: 12px; padding: 16px 18px; }
+  .warn strong { color: #8a1c12; }
+  .note { border-left: 4px solid var(--brand); background: var(--mint); border-radius: 12px; padding: 14px 18px; color: var(--dark); }
+  ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  ol.steps > li { counter-increment: s; position: relative; padding: 16px 18px 16px 62px; border: 1px solid var(--line); border-radius: 16px; }
+  ol.steps > li::before { content: counter(s); position: absolute; left: 18px; top: 16px; width: 30px; height: 30px; border-radius: 50%; background: var(--dark); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .say { margin: 6px 0 0; padding: 10px 14px; background: var(--bg); border-radius: 10px; font-style: italic; color: var(--ink); }
+  .tip { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--bg); }
+  details { border: 1px solid var(--line); border-radius: 14px; padding: 0 18px; margin-bottom: 10px; }
+  details[open] { padding-bottom: 14px; }
+  summary { cursor: pointer; font-weight: 700; padding: 14px 0; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; float: right; color: var(--brand); font-weight: 800; }
+  details[open] summary::after { content: "–"; }
+  details p { margin: 0 0 8px; color: var(--soft); }
+  .mail { border: 1px solid var(--line); border-radius: 16px; margin-bottom: 18px; overflow: hidden; }
+  .mail-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .mail-head strong { color: var(--dark); }
+  .mail-head .when { font-size: 13px; color: var(--muted); display: block; font-weight: 500; }
+  .copy { border: 0; background: var(--brand); color: #fff; font: inherit; font-weight: 700; font-size: 14px; border-radius: 999px; padding: 8px 16px; cursor: pointer; }
+  .copy.done { background: var(--dark); }
+  pre { margin: 0; padding: 16px; white-space: pre-wrap; font-family: inherit; font-size: 15px; line-height: 1.6; }
+  .kv { display: grid; grid-template-columns: 170px 1fr; gap: 6px 14px; font-size: 15px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-weight: 600; }
+  @media (max-width: 600px) { .kv { grid-template-columns: 1fr; } .kv dd { margin-bottom: 6px; } }
+  footer { color: var(--muted); font-size: 13px; padding: 30px 24px 50px; border-top: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="logo"><img src="https://handwerker2go.com/stripe/icon.png" alt="">handwerker<span class="go">2go</span></div>
+  <h1>Vertriebsmappe für Handwerksbetriebe</h1>
+  <p>Alles für die Gewinnung der ersten Betriebe in Hamburg: Material zum Mitnehmen, Gesprächsleitfaden für Telefon und Besuch, Antworten auf Einwände und E-Mail-Vorlagen.</p>
+</div></header>
+
+<nav class="toc" aria-label="Inhalt"><div class="wrap">
+  <a href="#material">Material</a><a href="#recht">Spielregeln</a><a href="#zielgruppe">Zielgruppe</a><a href="#telefon">Telefon</a><a href="#besuch">Besuch</a><a href="#einwaende">Einwände</a><a href="#mails">E-Mails</a><a href="#danach">Nach der Zusage</a>
+</div></nav>
+
+<main><div class="wrap">
+
+<section id="material">
+  <h2>Material</h2>
+  <p class="intro">Zum Ausdrucken, Mitschicken und Zeigen. Alle Dateien liegen auf der Website und sind jederzeit abrufbar.</p>
+  <div class="cards">
+    <div class="card dl"><img src="https://handwerker2go.com/vertrieb/handwerker2go-partner-info-vorschau.png" alt=""><div><strong>Ein-Seiten-Info (PDF, A4)</strong><p>Nutzen, Ablauf, Konditionen, Voraussetzungen, QR-Code. Unten ist Platz für deinen Namen und deine Nummer.</p><p><a href="https://handwerker2go.com/vertrieb/handwerker2go-partner-info.pdf">PDF herunterladen</a></p></div></div>
+    <div class="card dl"><img src="https://handwerker2go.com/vertrieb/partner-qr-code.png" alt=""><div><strong>QR-Code zur Partnerseite</strong><p>Führt auf handwerker2go.com/partner. Für Visitenkarten, Aufkleber und Flyer.</p><p><a href="https://handwerker2go.com/vertrieb/partner-qr-code.png">PNG</a> (Druck bis A5) oder <a href="https://handwerker2go.com/vertrieb/partner-qr-code.svg">SVG</a> (beliebig groß)</p></div></div>
+    <div class="card dl"><img src="https://handwerker2go.com/og/vertrauen-uebergabe.jpg" alt=""><div><strong>Partnerseite und Ratgeber</strong><p>Zum Zeigen auf dem Handy und zum Mitschicken.</p><p><a href="https://handwerker2go.com/partner">Partnerseite</a>, <a href="https://handwerker2go.com/partner/ratgeber">Ratgeber für Betriebe</a></p></div></div>
+  </div>
+  <h3>Die Konditionen auf einen Blick</h3>
+  <table>
+    <thead><tr><th>Modell</th><th>Gilt</th><th>Grundgebühr</th><th>Provision</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Einführung</strong></td><td>Monat 1 bis 3 ab Freischaltung</td><td>0,00 €</td><td>10 %</td></tr>
+      <tr><td><strong>Monatlich</strong></td><td>ab Monat 4, monatlich kündbar</td><td>29,99 € pro Monat</td><td>15 %</td></tr>
+      <tr><td><strong>Jährlich</strong></td><td>ab Monat 4, 12 Monate Laufzeit</td><td>299,88 € im Jahr (24,99 € pro Monat)</td><td>15 %</td></tr>
+    </tbody>
+  </table>
+  <p class="tip">Alle Preise netto. Provision fällt nur an, wenn ein Kunde über handwerker2go bucht und bezahlt; Stripe behält sie bei der Zahlung automatisch ein. Nach der Einführung entscheidet der Betrieb frei, ob er weitermacht.</p>
+</section>
+
+<section id="recht">
+  <h2>Spielregeln für die Ansprache</h2>
+  <div class="warn">
+    <p><strong>Keine Werbe-E-Mails ohne Einwilligung.</strong> Auch an Betriebe ist eine E-Mail mit Werbung nur erlaubt, wenn der Empfänger vorher ausdrücklich zugestimmt hat (§ 7 Abs. 2 Nr. 2 UWG). Das gilt auch für Kontaktformulare, WhatsApp und SMS. Deshalb: zuerst anrufen oder vorbeigehen, fragen, ob du die Infos schicken darfst, und erst dann die E-Mail senden.</p>
+  </div>
+  <div class="cards" style="margin-top:14px">
+    <div class="card"><strong>Anruf beim Betrieb</strong><p>Erlaubt, wenn ein sachlicher Bezug zum Betrieb besteht (mutmaßliche Einwilligung). Bei Handwerksbetrieben, deren Leistung wir vermitteln, ist das gegeben. Auf „bitte nicht mehr anrufen“ sofort reagieren und notieren.</p></div>
+    <div class="card"><strong>Persönlicher Besuch</strong><p>Erlaubt. Am besten nicht mitten in einen Auftrag platzen, sondern morgens früh oder am späten Nachmittag in der Werkstatt.</p></div>
+    <div class="card"><strong>Flyer in den Briefkasten</strong><p>Erlaubt, außer bei „Keine Werbung“-Aufkleber.</p></div>
+    <div class="card"><strong>Ehrlich bleiben</strong><p>Keine Zusagen zu Auftragszahlen oder Umsätzen. Wir starten gerade in Hamburg; das ist der Grund für die Einführungsphase ohne Grundgebühr.</p></div>
+  </div>
+  <p class="tip">Diese Hinweise sind eine praktische Orientierung, keine Rechtsberatung.</p>
+</section>
+
+<section id="zielgruppe">
+  <h2>Wen wir ansprechen</h2>
+  <p class="intro">Kleine Betriebe und Solo-Selbstständige in Hamburg, die Lücken im Kalender haben oder keine Lust auf Telefon-Pingpong für kleine Aufträge.</p>
+  <table>
+    <thead><tr><th>Leistung auf handwerker2go</th><th>Typische Betriebe</th><th>Besonderheit</th></tr></thead>
+    <tbody>
+      <tr><td>Elektro, Sanitär, Maler</td><td>Meisterbetriebe, kleine GmbHs, Einzelunternehmer mit Handwerkskarte</td><td>Eintragung in die Handwerksrolle nötig</td></tr>
+      <tr><td>Möbelmontage, Wandmontage</td><td>Montageservices, Tischler, Hausmeisterdienste</td><td>Viele Festpreis-Aufträge, ideal für Online-Buchung</td></tr>
+      <tr><td>Entrümpelung, Umzugshilfe</td><td>Entrümpler, kleine Umzugsfirmen</td><td>Meist Besichtigung und Angebot statt Festpreis</td></tr>
+      <tr><td>Gartenpflege</td><td>Garten- und Landschaftsbauer, Hausmeisterdienste</td><td>Saisonal, im Frühjahr ansprechen</td></tr>
+    </tbody>
+  </table>
+  <h3>Was der Betrieb für die Registrierung braucht</h3>
+  <dl class="kv">
+    <dt>Pflicht</dt><dd>Gewerbeanmeldung, Nachweis der Betriebshaftpflicht</dd>
+    <dt>Elektro, Sanitär, Maler</dt><dd>zusätzlich Eintragung in die Handwerksrolle (Handwerkskarte)</dd>
+    <dt>Für Stripe</dt><dd>Ausweis, Bankverbindung (IBAN), Firmendaten</dd>
+    <dt>Ab Monat 4</dt><dd>USt-IdNr. für die Mitgliedschaft. Ohne USt-IdNr. ist die Mitgliedschaft derzeit nicht möglich, vorher klären.</dd>
+  </dl>
+  <h3>Wo du Betriebe findest</h3>
+  <p class="intro">Google Maps (Suche „Elektriker Hamburg-Barmbek“ usw., nach Stadtteilen vorgehen), Mitgliederverzeichnisse der Innungen, Handwerkskammer Hamburg, Fahrzeugbeschriftungen und Werkstätten im eigenen Viertel, Empfehlungen bereits gewonnener Betriebe.</p>
+</section>
+
+<section id="telefon">
+  <h2>Gesprächsleitfaden Telefon</h2>
+  <p class="intro">Ziel des Anrufs ist nicht der Abschluss am Telefon, sondern eines davon: die Registrierung gemeinsam starten, einen kurzen Besuch vereinbaren oder die Erlaubnis bekommen, die Infos per E-Mail zu schicken. Dauer: 3 bis 5 Minuten.</p>
+  <ol class="steps">
+    <li><span class="label">Einstieg (10 Sekunden)</span>
+      <p class="say">„Guten Tag, hier ist [Name] von handwerker2go aus Hamburg. Wir bringen Kunden aus der Nachbarschaft direkt in die freien Termine von Handwerksbetrieben. Haben Sie zwei Minuten, oder passt es später besser?“</p>
+      <p class="tip">Passt es nicht: Rückrufzeit vereinbaren und notieren. Nie gegen ein „gerade schlecht“ anreden.</p></li>
+    <li><span class="label">Frage statt Vortrag</span>
+      <p class="say">„Wie kommen Sie im Moment an neue Aufträge, eher über Empfehlungen, Google oder Portale?“</p>
+      <p class="say">„Gibt es Zeiten, in denen der Kalender Lücken hat, oder Kleinaufträge, für die sich das Hin und Her am Telefon kaum lohnt?“</p>
+      <p class="tip">Zuhören und mitschreiben. Die Antworten bestimmen, welchen Nutzen du betonst.</p></li>
+    <li><span class="label">Nutzen in drei Sätzen</span>
+      <p class="say">„Bei uns sehen Kunden nur Ihre wirklich freien Zeiten und buchen direkt, zum Festpreis, den Sie selbst festlegen. Bezahlt wird vorab online, das Geld kommt über Stripe direkt auf Ihr Konto, ohne Rechnungen hinterherzulaufen. Sie kaufen keine Anfragen, es fällt nur eine Provision an, wenn wirklich gebucht und bezahlt wird.“</p></li>
+    <li><span class="label">Konditionen, wenn gefragt</span>
+      <p class="say">„Die ersten drei Monate ohne Grundgebühr, nur 10 Prozent Provision auf gebuchte Aufträge. Danach entscheiden Sie: 29,99 Euro im Monat, monatlich kündbar, oder 24,99 Euro im Monat bei Jahreszahlung, jeweils plus 15 Prozent Provision. Alles netto.“</p></li>
+    <li><span class="label">Ehrlich zum Start</span>
+      <p class="say">„Wir starten gerade in Hamburg und suchen die ersten Betriebe pro Gewerk. Wer jetzt dabei ist, steht von Anfang an in der Suche, und die ersten drei Monate kosten keine Grundgebühr.“</p></li>
+    <li><span class="label">Abschluss: eine der drei Optionen</span>
+      <p class="say">„Die Registrierung dauert etwa zehn Minuten. Wollen wir das gleich zusammen machen, soll ich kurz bei Ihnen vorbeikommen, oder darf ich Ihnen die Infos per E-Mail schicken?“</p>
+      <p class="tip">Bei „per E-Mail“: E-Mail-Adresse und Einwilligung notieren (Datum, Uhrzeit, Name). Dann Vorlage 1 verwenden.</p></li>
+  </ol>
+</section>
+
+<section id="besuch">
+  <h2>Gesprächsleitfaden Besuch</h2>
+  <p class="intro">Ein Besuch ist die stärkste Form der Ansprache: Du kannst die Seite zeigen und die Registrierung direkt mitmachen.</p>
+  <ol class="steps">
+    <li><span class="label">Vorbereitung</span><p>Ausgedruckte Ein-Seiten-Info mit deinem Namen, Handy mit geöffneter Seite handwerker2go.com, Kurzinfo zum Betrieb (Gewerk, Stadtteil, Google-Bewertungen).</p></li>
+    <li><span class="label">Einstieg</span><p class="say">„Ich bin [Name] von handwerker2go. Wir sind eine neue Buchungsplattform für Handwerker hier in Hamburg. Ich will Ihnen in fünf Minuten zeigen, wie Kunden Sie damit direkt buchen.“</p></li>
+    <li><span class="label">Kundensicht zeigen</span><p>Auf dem Handy die Startseite öffnen, eine Leistung des Betriebs wählen, Postleitzahl und Wunschtermin eingeben. Zeigen: Kunde sieht nur freie Zeiten, Festpreis, bezahlt vorab.</p><p class="tip">Solange noch wenige Betriebe live sind, kann die Suche leer sein. Dann offen sagen: „Genau hier würde Ihr Betrieb stehen.“</p></li>
+    <li><span class="label">Betriebssicht erklären</span><p>Partnerseite öffnen: Kalender mit eigenen Arbeitszeiten, Urlaub, Einsatzgebiet, Pufferzeiten. Buchungen kann der Betrieb sofort annehmen lassen oder selbst bestätigen.</p></li>
+    <li><span class="label">Registrierung gemeinsam starten</span><p>handwerker2go.com/partner/registrieren öffnen. Firmendaten eingeben, Gewerbeanmeldung und Haftpflicht-Nachweis abfotografieren und hochladen (bei Elektro, Sanitär, Maler auch die Handwerkskarte).</p><p class="tip">Fehlt ein Dokument, trotzdem anfangen und später nachreichen lassen. Nach der Freischaltung wird das Stripe-Konto verbunden (Ausweis und IBAN bereithalten).</p></li>
+    <li><span class="label">Abschluss und nächster Schritt</span><p class="say">„Wir prüfen die Unterlagen in der Regel innerhalb eines Werktags. Dann bekommen Sie eine E-Mail und können Preise und Zeiten eintragen. Ich melde mich danach kurz, falls Sie Hilfe brauchen.“</p><p>Ein-Seiten-Info dalassen.</p></li>
+  </ol>
+</section>
+
+<section id="einwaende">
+  <h2>Häufige Einwände</h2>
+  <details><summary>„Ich habe keine Zeit, die Auftragsbücher sind voll.“</summary>
+    <p>„Das freut mich zu hören. Gerade dann hilft es, dass Kunden nur Zeiten buchen können, die Sie selbst freigeben. Sie können auch nur Lückenfüller anbieten, zum Beispiel Kleinaufträge am Freitagnachmittag. Und wenn es mal ruhiger wird, ist das Profil schon da.“</p></details>
+  <details><summary>„Was kostet mich das?“</summary>
+    <p>„Drei Monate ohne Grundgebühr, 10 Prozent Provision nur auf gebuchte und bezahlte Aufträge. Danach 29,99 Euro im Monat, monatlich kündbar, plus 15 Prozent Provision. Keine Kosten für Anfragen, keine Einrichtungsgebühr.“</p></details>
+  <details><summary>„Mit MyHammer oder Check24 habe ich schlechte Erfahrungen gemacht.“</summary>
+    <p>„Das hören wir oft. Der Unterschied: Bei uns kaufen Sie keine Anfragen und konkurrieren nicht mit zehn anderen um ein Angebot. Der Kunde bucht einen festen Termin zu Ihrem Preis und bezahlt vorher. Provision fällt nur an, wenn das passiert ist.“</p></details>
+  <details><summary>„15 Prozent Provision sind mir zu viel.“</summary>
+    <p>„Rechnen Sie die Zeit dagegen, die sonst für Telefonate, Angebote für Kleinkram und Mahnungen draufgeht. Den Festpreis legen Sie selbst fest, also können Sie ihn so kalkulieren, dass es passt. In den ersten drei Monaten sind es nur 10 Prozent, so können Sie es ohne Risiko ausprobieren.“</p></details>
+  <details><summary>„Gibt es überhaupt schon Kunden?“</summary>
+    <p>„Wir starten gerade in Hamburg und bauen zuerst das Angebot an Betrieben auf, damit Kunden nicht ins Leere suchen. Deshalb die drei Monate ohne Grundgebühr. Ich verspreche Ihnen keine bestimmte Zahl an Aufträgen, aber Sie gehen kein Risiko ein.“</p>
+    <p>Nicht übertreiben. Keine Kundenzahlen nennen, die es nicht gibt.</p></details>
+  <details><summary>„Ich will den Auftrag vorher sehen, Festpreise gehen bei mir nicht.“</summary>
+    <p>„Kein Problem. Für Leistungen wie Entrümpelung oder größere Arbeiten bucht der Kunde einen kostenlosen Besichtigungstermin, Sie schauen sich das an und machen danach ein Angebot. Und Sie können jede Buchung selbst bestätigen statt sofort annehmen.“</p></details>
+  <details><summary>„Online-Kram ist mir zu kompliziert.“</summary>
+    <p>„Die Registrierung dauert zehn Minuten, und ich mache sie gern mit Ihnen zusammen. Danach kommen Buchungen per E-Mail mit Adresse und Telefonnummer des Kunden, mehr müssen Sie nicht tun.“</p></details>
+  <details><summary>„Was ist, wenn ein Kunde nicht da ist oder kurzfristig absagt?“</summary>
+    <p>„Bis 24 Stunden vorher kann der Kunde kostenlos stornieren. Danach steht Ihnen eine Pauschale von 25 Prozent des Festpreises zu, höchstens Ihre Anfahrtskosten. Der Kunde bekommt außerdem 24 Stunden vorher eine Erinnerung.“</p></details>
+  <details><summary>„Ich habe keine USt-IdNr.“ (Kleinunternehmer)</summary>
+    <p>Ehrlich sagen: Die Einführungsphase geht auch so, für die Mitgliedschaft ab Monat 4 ist eine USt-IdNr. derzeit Pflicht. Die USt-IdNr. kann beim Bundeszentralamt für Steuern kostenlos beantragt werden. Im Zweifel an den Betreiber weitergeben.</p></details>
+  <details><summary>„Warum sollen meine Bankdaten zu Stripe?“</summary>
+    <p>„Stripe ist einer der größten Zahlungsanbieter weltweit und zahlt das Geld direkt an Sie aus. Wir sehen Ihre Bankdaten nicht und bekommen das Geld der Kunden nie auf unser Konto. Stripe prüft dafür einmal Ihre Identität, das ist gesetzlich vorgeschrieben.“</p></details>
+</section>
+
+<section id="mails">
+  <h2>E-Mail-Vorlagen</h2>
+  <div class="note">Nur nach einem Gespräch mit Einwilligung oder als Antwort auf eine Anfrage des Betriebs senden. Platzhalter in eckigen Klammern ersetzen. Das PDF als Link mitschicken oder anhängen.</div>
+  <div style="height:16px"></div>
+
+  <div class="mail"><div class="mail-head"><div><strong>1. Nach dem Telefonat</strong><span class="when">Am selben Tag, nach Zustimmung im Gespräch</span></div><button class="copy" type="button">Kopieren</button></div>
+<pre>Betreff: handwerker2go: die Infos aus unserem Telefonat
+
+Guten Tag [Anrede Name],
+
+danke für das nette Gespräch eben. Wie besprochen hier die wichtigsten Infos zu handwerker2go:
+
+Kunden aus Hamburg sehen Ihre freien Termine, buchen Sie direkt zum Festpreis und bezahlen vorab online. Das Geld kommt über Stripe direkt auf Ihr Konto.
+
+Ihre Konditionen:
+- Monat 1 bis 3: keine Grundgebühr, 10 % Provision auf gebuchte Aufträge
+- danach 29,99 € im Monat (monatlich kündbar) oder 24,99 € im Monat bei Jahreszahlung, jeweils 15 % Provision
+- alle Preise netto, keine Kosten für Anfragen
+
+Alles auf einer Seite: https://handwerker2go.com/vertrieb/handwerker2go-partner-info.pdf
+Registrierung (ca. 10 Minuten): https://handwerker2go.com/partner/registrieren
+
+Für die Registrierung brauchen Sie Gewerbeanmeldung und Haftpflicht-Nachweis[, bei Ihrem Gewerk zusätzlich die Handwerkskarte].
+
+Bei Fragen erreichen Sie mich unter [Telefon] oder per Antwort auf diese E-Mail.
+
+Viele Grüße
+[Name]
+handwerker2go
+https://handwerker2go.com/partner</pre></div>
+
+  <div class="mail"><div class="mail-head"><div><strong>2. Nachfassen</strong><span class="when">5 bis 7 Tage nach Vorlage 1, wenn noch keine Registrierung</span></div><button class="copy" type="button">Kopieren</button></div>
+<pre>Betreff: Kurze Rückfrage zu handwerker2go
+
+Guten Tag [Anrede Name],
+
+ich wollte kurz nachhören, ob Sie sich handwerker2go schon ansehen konnten.
+
+Falls es an der Zeit liegt: Ich mache die Registrierung gern mit Ihnen zusammen am Telefon oder komme kurz vorbei, das dauert etwa zehn Minuten. Schlagen Sie mir einfach eine Zeit vor.
+
+Und falls es gerade nicht passt, sagen Sie mir gern Bescheid, dann melde ich mich nicht weiter.
+
+Viele Grüße
+[Name]
+handwerker2go
+[Telefon]</pre></div>
+
+  <div class="mail"><div class="mail-head"><div><strong>3. Nach dem Besuch</strong><span class="when">Wenn die Registrierung vor Ort gestartet wurde</span></div><button class="copy" type="button">Kopieren</button></div>
+<pre>Betreff: Ihre Registrierung bei handwerker2go
+
+Guten Tag [Anrede Name],
+
+danke für Ihre Zeit heute. Ihre Registrierung ist bei uns eingegangen. So geht es weiter:
+
+1. Wir prüfen Ihre Unterlagen, in der Regel innerhalb eines Werktags. Sie bekommen eine E-Mail, sobald Ihr Betrieb freigeschaltet ist.
+2. Danach verbinden Sie im Dashboard Ihr Auszahlungskonto bei Stripe (Ausweis und IBAN bereithalten).
+3. Dann tragen Sie Ihre Leistungen, Preise und Arbeitszeiten ein. Ab da können Kunden Sie buchen.
+[Noch fehlt: Dokument. Sie können es im Dashboard nachreichen.]
+
+Ihre ersten drei Monate laufen ohne Grundgebühr ab der Freischaltung.
+
+Wenn es irgendwo hakt, rufen Sie mich gern an: [Telefon].
+
+Viele Grüße
+[Name]
+handwerker2go</pre></div>
+
+  <div class="mail"><div class="mail-head"><div><strong>4. Antwort auf eine Anfrage des Betriebs</strong><span class="when">Wenn ein Betrieb sich von selbst meldet, z. B. über info@handwerker2go.com</span></div><button class="copy" type="button">Kopieren</button></div>
+<pre>Betreff: AW: [Betreff der Anfrage]
+
+Guten Tag [Anrede Name],
+
+danke für Ihr Interesse an handwerker2go.
+
+Kurz zusammengefasst: Kunden aus Hamburg buchen Sie direkt in Ihre freien Termine, zum Festpreis, den Sie selbst festlegen, und bezahlen vorab online. Sie kaufen keine Anfragen; Provision fällt nur auf gebuchte und bezahlte Aufträge an. Die ersten drei Monate gibt es ohne Grundgebühr.
+
+Alle Details auf einer Seite: https://handwerker2go.com/vertrieb/handwerker2go-partner-info.pdf
+Direkt registrieren: https://handwerker2go.com/partner/registrieren
+
+[Antwort auf die konkrete Frage]
+
+Viele Grüße
+[Name]
+handwerker2go</pre></div>
+</section>
+
+<section id="danach">
+  <h2>Nach der Zusage</h2>
+  <ol class="steps">
+    <li><span class="label">Prüfen und freischalten</span><p>Neue Registrierungen kommen per E-Mail an die Admin-Adresse. In <a href="https://handwerker2go.com/admin">/admin</a> Unterlagen prüfen und freischalten, möglichst innerhalb eines Werktags. Die Hinweise in /admin zeigen fehlende Nachweise und Kontaktdaten im Profil.</p></li>
+    <li><span class="label">Stripe verbinden</span><p>Nach der Freischaltung verbindet der Betrieb sein Auszahlungskonto. Häufigster Stolperstein: Ausweis oder IBAN nicht zur Hand. Nach zwei Tagen ohne Stripe-Verbindung kurz anrufen.</p></li>
+    <li><span class="label">Startklar machen</span><p>Im Dashboard führt die Checkliste „Startklar“ durch Leistungen, Preise, Arbeitszeiten und Einsatzgebiet. Für eine Leistung erscheint der Betrieb in der Suche, sobald sie mit Arbeitszeiten eingetragen ist; Festpreis-Buchungen mit Zahlung gehen erst mit verbundenem Stripe-Konto.</p></li>
+    <li><span class="label">Erste Buchung begleiten</span><p>Nach der ersten Buchung kurz nachfragen, ob alles geklappt hat. Zufriedene Betriebe nach Empfehlungen fragen: „Kennen Sie Kollegen, für die das auch passen würde?“</p></li>
+  </ol>
+  <h3>Einfache Liste zum Nachhalten</h3>
+  <table>
+    <thead><tr><th>Spalte</th><th>Inhalt</th></tr></thead>
+    <tbody>
+      <tr><td>Betrieb, Gewerk, Stadtteil</td><td>Wer und wo</td></tr>
+      <tr><td>Kontakt</td><td>Ansprechpartner, Telefon, E-Mail</td></tr>
+      <tr><td>Einwilligung E-Mail</td><td>ja oder nein, mit Datum und Uhrzeit</td></tr>
+      <tr><td>Status</td><td>angerufen, Rückruf, Infos geschickt, besucht, registriert, freigeschaltet, Stripe verbunden, startklar, kein Interesse</td></tr>
+      <tr><td>Nächster Schritt</td><td>Was, wann</td></tr>
+      <tr><td>Notizen</td><td>Einwände, Wünsche, „bitte nicht mehr kontaktieren“</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</div></main>
+<footer><div class="wrap">handwerker2go Vertriebsmappe, Stand 20. November 2026. Konditionen laut AGB für Betriebe; bei Änderungen der Preise diese Mappe und das PDF aktualisieren.</div></footer>
+
+<script>
+document.querySelectorAll('.copy').forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    const text = btn.closest('.mail').querySelector('pre').innerText;
+    try { await navigator.clipboard.writeText(text); } catch (e) {
+      const r = document.createRange(); r.selectNodeContents(btn.closest('.mail').querySelector('pre'));
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r); document.execCommand('copy'); s.removeAllRanges();
+    }
+    btn.textContent = 'Kopiert'; btn.classList.add('done');
+    setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('done'); }, 1800);
+  });
+});
+</script>
+</body>
+</html>
