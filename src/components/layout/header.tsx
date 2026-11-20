@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Logo } from "@/components/ui/logo";
 import { Icon } from "@/components/ui/icon";
-import { useScrolled } from "@/components/layout/use-scrolled";
 
 const links = [
   { href: "/#leistungen", label: "Leistungen" },
@@ -13,7 +12,7 @@ const links = [
   { href: "/ratgeber", label: "Ratgeber" },
 ];
 
-/** Hintergrund hinter der schwebenden Leiste, passend zum ersten Abschnitt der Seite */
+/** Hintergrund hinter der runden Leiste, passend zum ersten Abschnitt der Seite */
 const backdrop = (p: string) => (p === "/" ? "bg-mint" : "bg-white");
 
 /** Liest die aktuelle URL (muss in <Suspense> liegen) */
@@ -24,11 +23,10 @@ export function Header() {
 /** Reine Ansicht, auch als Suspense-Platzhalter nutzbar */
 export function HeaderView({ pathname }: { pathname: string }) {
   const [open, setOpen] = useState(false);
-  const scrolled = useScrolled();
   const isOn = (href: string) => !href.includes("#") && (pathname === href || pathname.startsWith(`${href}/`));
 
   return (
-    <header className={`sticky top-0 z-40 px-3 pt-3 transition-colors sm:px-5 ${scrolled || open ? "bg-transparent" : backdrop(pathname)}`}>
+    <header className={`relative z-40 px-3 pt-3 sm:px-5 ${backdrop(pathname)}`}>
       <div className="mx-auto max-w-[1184px] rounded-[32px] bg-white shadow-[0_6px_24px_rgba(11,46,31,0.08),0_0_0_1px_rgba(11,46,31,0.06)]">
         <div className="flex h-16 items-center gap-4 pl-4 pr-2.5 sm:pl-5">
           <Logo />

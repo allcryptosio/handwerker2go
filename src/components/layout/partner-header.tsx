@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { Logo } from "@/components/ui/logo";
-import { useScrolled } from "@/components/layout/use-scrolled";
 
 /** Bewusst nur drei Links, damit in der Leiste nichts umbricht („Fair für alle“ steht auf der Seite selbst) */
 const links = [
@@ -14,16 +13,15 @@ const links = [
   { href: "/partner/ratgeber", label: "Ratgeber" },
 ];
 
-/** Kopfzeile des Partner-Bereichs für Handwerksbetriebe: schwebende dunkle Leiste */
+/** Kopfzeile des Partner-Bereichs für Handwerksbetriebe: runde dunkle Leiste (scrollt normal mit) */
 export function PartnerHeader() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname() ?? "";
   const inDashboard = pathname.startsWith("/dashboard");
-  const scrolled = useScrolled();
   const isOn = (href: string) => !href.includes("#") && (pathname === href || pathname.startsWith(`${href}/`));
 
   return (
-    <header className={`sticky top-0 z-40 px-3 pt-3 text-white transition-colors sm:px-5 ${scrolled || open ? "bg-transparent" : "bg-brand-dark"}`}>
+    <header className="relative z-40 bg-brand-dark px-3 pt-3 text-white sm:px-5">
       <div className="mx-auto max-w-[1184px] rounded-[32px] bg-brand-deep shadow-[0_6px_24px_rgba(11,46,31,0.18),0_0_0_1px_rgba(255,255,255,0.08)]">
         <div className="flex h-16 items-center gap-4 pl-4 pr-2.5 sm:pl-5">
           <Logo inverted href="/partner" />
