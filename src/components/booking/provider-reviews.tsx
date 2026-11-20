@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { asSystem } from "@/lib/db";
 
 const date = (d: Date) => new Intl.DateTimeFormat("de-DE", { month: "long", year: "numeric", timeZone: "Europe/Berlin" }).format(d);
@@ -41,7 +42,7 @@ export async function ProviderReviews({ providerId }: { providerId: string }) {
           ))}
         </ul>
       )}
-      <p className="text-[12px] text-muted">Bewerten kann nur, wer über handwerker2go gebucht hat und dessen Termin stattgefunden hat. <a href="/agb#bewertungen" className="underline">So prüfen wir Bewertungen</a></p>
+      <p className="text-[12px] text-muted">Bewerten kann nur, wer über handwerker2go gebucht hat und dessen Termin stattgefunden hat. <Link href="/agb#bewertungen" className="underline">So prüfen wir Bewertungen</Link></p>
     </section>
   );
 }
