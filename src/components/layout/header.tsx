@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Logo } from "@/components/ui/logo";
 import { Icon } from "@/components/ui/icon";
-import { useScrolled } from "@/components/layout/use-scrolled";
 
 const links = [
   { href: "/#leistungen", label: "Leistungen" },
@@ -13,8 +12,8 @@ const links = [
   { href: "/ratgeber", label: "Ratgeber" },
 ];
 
-/** Hintergrund hinter der schwebenden Leiste, passend zum ersten Abschnitt der Seite */
-const backdrop = (p: string) => (p === "/" ? "bg-mint" : "bg-white");
+/** Grüne Unterstreichung der aktiven Seite an der Unterkante der Leiste */
+const underline = "after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:rounded-t after:bg-brand";
 
 /** Liest die aktuelle URL (muss in <Suspense> liegen) */
 export function Header() {
@@ -24,44 +23,46 @@ export function Header() {
 /** Reine Ansicht, auch als Suspense-Platzhalter nutzbar */
 export function HeaderView({ pathname }: { pathname: string }) {
   const [open, setOpen] = useState(false);
-  const scrolled = useScrolled();
   const isOn = (href: string) => !href.includes("#") && (pathname === href || pathname.startsWith(`${href}/`));
 
   return (
-    <header className={`sticky top-0 z-40 px-3 pt-3 transition-colors sm:px-5 ${scrolled || open ? "bg-transparent" : backdrop(pathname)}`}>
-      <div className="mx-auto max-w-[1184px] rounded-[32px] bg-white shadow-[0_6px_24px_rgba(11,46,31,0.08),0_0_0_1px_rgba(11,46,31,0.06)]">
-        <div className="flex h-16 items-center gap-4 pl-4 pr-2.5 sm:pl-5">
-          <Logo />
+    <header className="border-b border-line bg-white">
+      <div className="mx-auto flex h-[72px] max-w-[1240px] items-center gap-4 px-5 sm:px-7">
+        <Logo />
 
-          <nav aria-label="Hauptnavigation" className="hidden flex-1 items-center justify-center gap-1 whitespace-nowrap text-[15px] font-semibold lg:flex">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                aria-current={isOn(l.href) ? "page" : undefined}
-                className={`rounded-full px-4 py-2 transition-colors ${isOn(l.href) ? "bg-mint text-brand" : "hover:bg-soft"}`}
-              >
-                {l.label}
-              </Link>
-            ))}
-            <Link href="/partner" className="hidden rounded-full px-4 py-2 text-muted transition-colors hover:bg-soft hover:text-ink xl:block">
-              Für Betriebe
+        <nav aria-label="Hauptnavigation" className="ml-7 hidden h-full items-center gap-7 whitespace-nowrap text-[15px] font-semibold lg:flex">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              aria-current={isOn(l.href) ? "page" : undefined}
+              className={`relative flex h-full items-center transition-colors hover:text-brand ${isOn(l.href) ? `text-brand ${underline}` : ""}`}
+            >
+              {l.label}
             </Link>
-          </nav>
+          ))}
+        </nav>
 
-          <div className="hidden items-center gap-1.5 whitespace-nowrap lg:flex">
-            <Link href="/anmelden" className="rounded-full px-3.5 py-2.5 text-[15px] font-semibold transition-colors hover:bg-soft">
-              Anmelden
-            </Link>
-            <Link href="/#suche" className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-3 text-[15px] font-bold text-white transition-colors hover:bg-brand-dark">
-              Termin finden
-              <Icon name="pfeil" size={16} strokeWidth={2.4} />
-            </Link>
-          </div>
+        <div className="ml-auto hidden items-center gap-2.5 whitespace-nowrap lg:flex">
+          <Link href="/partner" className="hidden items-center gap-1.5 rounded-full bg-mint px-3 py-1.5 text-[13px] font-bold text-brand transition-colors hover:bg-mint-soft xl:inline-flex">
+            Für Betriebe
+          </Link>
+          <Link href="/anmelden" className="rounded-full border-[1.5px] border-line px-[18px] py-2.5 text-[15px] font-semibold transition-colors hover:border-brand hover:text-brand">
+            Anmelden
+          </Link>
+          <Link href="/#suche" className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-[11px] text-[15px] font-bold text-white transition-colors hover:bg-brand-dark">
+            <Icon name="suche" size={16} strokeWidth={2.4} />
+            Termin finden
+          </Link>
+        </div>
 
+        <div className="ml-auto flex items-center gap-2 lg:hidden">
+          <Link href="/#suche" className="hidden rounded-full bg-brand px-4 py-2.5 text-[14px] font-bold text-white min-[400px]:inline-block">
+            Termin finden
+          </Link>
           <button
             type="button"
-            className="ml-auto inline-flex h-11 w-11 items-center justify-center rounded-full bg-mint text-brand-dark lg:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line"
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Menü schließen" : "Menü öffnen"}
@@ -70,27 +71,24 @@ export function HeaderView({ pathname }: { pathname: string }) {
             <Icon name={open ? "schliessen" : "menue"} size={20} strokeWidth={2.2} />
           </button>
         </div>
-
-        {open && (
-          <nav id="mobile-nav" aria-label="Hauptnavigation" className="border-t border-line px-5 pb-5 lg:hidden">
-            <ul className="flex flex-col">
-              {[...links, { href: "/anmelden", label: "Anmelden" }].map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} onClick={() => setOpen(false)} className="block border-b border-line py-4 text-base font-semibold">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <Link href="/#suche" onClick={() => setOpen(false)} className="mt-4 block rounded-full bg-brand px-5 py-3.5 text-center font-bold text-white">
-              Termin finden
-            </Link>
-            <Link href="/partner" onClick={() => setOpen(false)} className="mt-3 block py-2 text-center text-[15px] font-semibold text-muted">
-              Für Handwerksbetriebe
-            </Link>
-          </nav>
-        )}
       </div>
+
+      {open && (
+        <nav id="mobile-nav" aria-label="Hauptnavigation" className="border-t border-line px-5 pb-5 lg:hidden">
+          <ul className="flex flex-col">
+            {[...links, { href: "/anmelden", label: "Anmelden" }].map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} onClick={() => setOpen(false)} className="block border-b border-line py-4 text-base font-semibold">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link href="/partner" onClick={() => setOpen(false)} className="mt-4 block py-2 text-[15px] font-semibold text-muted">
+            Für Handwerksbetriebe
+          </Link>
+        </nav>
+      )}
     </header>
   );
 }
