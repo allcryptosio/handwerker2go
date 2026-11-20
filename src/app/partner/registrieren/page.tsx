@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "Betrieb registrieren",
   description: `Registriere deinen Handwerksbetrieb bei handwerker2go. Die ersten ${p.introMonths} Monate ohne Grundgebühr.`,
   alternates: { canonical: "/partner/registrieren" },
+  openGraph: { title: "Betrieb registrieren | handwerker2go für Betriebe", url: "/partner/registrieren", type: "website" },
 };
 
 export default function Page() {

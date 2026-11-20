@@ -15,6 +15,7 @@ export function PartnerFooter() {
             <strong>Für Betriebe</strong>
             <Link href="/partner/registrieren" className="hover:text-brand">Betrieb registrieren</Link>
             <Link href="/anmelden?weiter=/dashboard" className="hover:text-brand">Zum Dashboard</Link>
+            <Link href="/partner/ratgeber" className="hover:text-brand">Ratgeber für Betriebe</Link>
             <Link href="/ranking" className="hover:text-brand">So sortieren wir</Link>
             <Link href="/" className="hover:text-brand">Zur Kundenseite</Link>
           </nav>

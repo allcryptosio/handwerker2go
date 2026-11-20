@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArticleCard } from "@/components/ratgeber/article-card";
 import { Container } from "@/components/ui/container";
+import { partnerArticles } from "@/content/partner-ratgeber";
 import { Icon } from "@/components/ui/icon";
 import {
   formatCents,
@@ -11,10 +13,14 @@ import {
   yearlySavingsPercent,
 } from "@/lib/pricing";
 
+const metaTitle = "Partner werden: Aufträge für Handwerksbetriebe in Hamburg";
+const metaDescription = `Mehr Aufträge aus deiner Nachbarschaft: Kunden buchen deinen Betrieb direkt in freie Termine, bezahlen online, du bekommst das Geld über Stripe. Die ersten ${p.introMonths} Monate ohne Grundgebühr.`;
+
 export const metadata: Metadata = {
-  title: "Partner werden: Aufträge für Handwerksbetriebe in Hamburg",
-  description: `Mehr Aufträge aus deiner Nachbarschaft: Kunden buchen deinen Betrieb direkt in freie Termine, bezahlen online, du bekommst das Geld über Stripe. Die ersten ${p.introMonths} Monate ohne Grundgebühr.`,
+  title: metaTitle,
+  description: metaDescription,
   alternates: { canonical: "/partner" },
+  openGraph: { title: metaTitle, description: metaDescription, url: "/partner", type: "website", images: [{ url: "/bilder/vertrauen-uebergabe.webp" }] },
 };
 
 const h2 = "text-[clamp(30px,3.6vw,46px)] font-extrabold leading-[1.08] tracking-[-0.03em] text-brand-dark";
@@ -62,13 +68,20 @@ export default function PartnerLandingPage() {
     { q: "Wie werde ich in der Suche gefunden?", a: "Entscheidend sind Entfernung, freie Termine, Bewertungen, Zuverlässigkeit und ein vollständiges Profil. Abo und Provision haben keinen Einfluss, bezahlte Platzierungen gibt es nicht." },
   ];
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <section className="bg-brand-dark text-white">
         <Container className="grid items-center gap-12 py-20 lg:grid-cols-[1.2fr_1fr] lg:py-24">
           <div className="flex flex-col gap-6">
             <span className="self-start rounded-full bg-white/10 px-3 py-1 text-[13px] font-bold text-brand-light">Für Handwerksbetriebe in Hamburg</span>
-            <h1 className="text-[clamp(38px,5.2vw,68px)] font-extrabold leading-[1.02] tracking-[-0.035em]">Mehr Aufträge. Weniger Telefonieren.</h1>
+            <h1 className="text-[clamp(38px,5.2vw,68px)] font-extrabold leading-[1.02] tracking-[-0.035em]">Mehr Aufträge für deinen Handwerksbetrieb. Weniger Telefonieren.</h1>
             <p className="max-w-[580px] text-lg leading-relaxed text-[#cfe3d7]">
               Kunden aus deiner Nachbarschaft buchen dich direkt in deine freien Termine und zahlen online. Du kümmerst dich um das, was
               du am besten kannst: dein Handwerk.
@@ -190,6 +203,18 @@ export default function PartnerLandingPage() {
               </details>
             ))}
           </div>
+        </Container>
+      </section>
+
+      <section aria-labelledby="partner-ratgeber-titel" className="bg-soft">
+        <Container className="flex flex-col gap-8 py-20">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <h2 id="partner-ratgeber-titel" className={h2}>Ratgeber für Betriebe</h2>
+            <Link href="/partner/ratgeber" className="rounded-full border-[1.5px] border-brand-dark px-5 py-3 font-bold text-brand-dark hover:bg-brand-dark hover:text-white">Alle Artikel</Link>
+          </div>
+          <ul className="grid gap-6 md:grid-cols-3">
+            {partnerArticles.map((a) => <li key={a.slug}><ArticleCard a={a} basePath="/partner/ratgeber" /></li>)}
+          </ul>
         </Container>
       </section>
 

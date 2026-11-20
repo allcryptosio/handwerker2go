@@ -10,7 +10,7 @@ const links = [
   { href: "/partner#ablauf", label: "So funktioniert’s" },
   { href: "/partner#schutz", label: "Fair für alle" },
   { href: "/partner#konditionen", label: "Konditionen" },
-  { href: "/partner#fragen", label: "Fragen" },
+  { href: "/partner/ratgeber", label: "Ratgeber" },
 ];
 
 /** Kopfzeile des Partner-Bereichs für Handwerksbetriebe */

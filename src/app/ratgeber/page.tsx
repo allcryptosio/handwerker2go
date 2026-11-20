@@ -8,6 +8,12 @@ export const metadata: Metadata = {
   title: "Ratgeber: Tipps rund um Handwerker, Kosten und Ablauf",
   description: "Kosten, Ablauf, Tipps: Unser Ratgeber erklärt kurz und ehrlich, was du vor dem Handwerker-Termin wissen musst. Von Entrümpelung bis Maler.",
   alternates: { canonical: "/ratgeber" },
+  openGraph: {
+    title: "Ratgeber: Tipps rund um Handwerker, Kosten und Ablauf",
+    description: "Kosten, Ablauf, Tipps: kurz und ehrlich erklärt, bevor der Handwerker klingelt.",
+    url: "/ratgeber",
+    type: "website",
+  },
 };
 
 export default function RatgeberPage() {
