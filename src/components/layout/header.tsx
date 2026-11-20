@@ -8,6 +8,7 @@ import { Icon } from "@/components/ui/icon";
 const links = [
   { href: "/#leistungen", label: "Leistungen" },
   { href: "/#so-funktionierts", label: "So funktioniert’s" },
+  { href: "/ratgeber", label: "Ratgeber" },
   { href: "/anmelden", label: "Anmelden" },
 ];
 

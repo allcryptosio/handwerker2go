@@ -25,6 +25,7 @@ export function Footer() {
           )}
           <nav aria-label="Für Handwerker" className="flex flex-col gap-2.5">
             <strong>Für Handwerker</strong>
+            <Link href="/ratgeber" className="hover:text-brand">Ratgeber</Link>
             <Link href="/fuer-handwerker" className="hover:text-brand">Betrieb anmelden</Link>
             <Link href="/fuer-handwerker#konditionen" className="hover:text-brand">Konditionen</Link>
             <Link href="/anmelden" className="hover:text-brand">Zum Dashboard</Link>
