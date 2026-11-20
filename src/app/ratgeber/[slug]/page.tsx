@@ -113,11 +113,11 @@ export default async function ArticlePage({ params }: PageProps<"/ratgeber/[slug
         ))}
 
         <section className="flex flex-col items-start gap-4 rounded-banner bg-brand-dark p-8 text-white">
-          <h2 className="text-[clamp(24px,2.8vw,34px)] font-extrabold leading-tight tracking-[-0.02em]">Kein Bock auf Selbermachen?</h2>
+          <h2 className="text-[clamp(24px,2.8vw,34px)] font-extrabold leading-tight tracking-[-0.02em]">{a.service.slug ? "Kein Bock auf Selbermachen?" : "Bereit für weniger Stress?"}</h2>
           <p className="text-[17px] text-white/85">
-            Wähl Ort und Wunschtermin, und wir zeigen dir in Echtzeit, welche geprüften {category?.trade ?? "Betriebe"} dann wirklich Zeit haben.
+            Wähl Ort und Wunschtermin, und wir zeigen dir in Echtzeit, welche geprüften {category?.trade ?? "Handwerksbetriebe"} dann wirklich Zeit haben.
           </p>
-          <Link href={`/termin?leistung=${a.service.slug}`} className="rounded-full bg-white px-6 py-3 font-bold text-brand-dark transition-colors hover:bg-mint">
+          <Link href={a.service.slug ? `/termin?leistung=${a.service.slug}` : "/termin"} className="rounded-full bg-white px-6 py-3 font-bold text-brand-dark transition-colors hover:bg-mint">
             {a.service.label}
           </Link>
         </section>
