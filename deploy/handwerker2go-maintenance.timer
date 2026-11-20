@@ -1,0 +1,9 @@
+[Unit]
+Description=handwerker2go: Wartungs-Job täglich um 04:30
+
+[Timer]
+OnCalendar=*-*-* 04:30:00 Europe/Berlin
+Persistent=true
+
+[Install]
+WantedBy=timers.target

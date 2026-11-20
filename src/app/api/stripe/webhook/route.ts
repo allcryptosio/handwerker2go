@@ -6,6 +6,34 @@ import { syncSubscription } from "@/lib/stripe/billing";
 import { syncConnectAccount } from "@/lib/stripe/connect";
 import { expireUnpaid, markPaid } from "@/lib/booking/lifecycle";
 
+/** Erinnerung vor der Verlängerung der Jahresmitgliedschaft (AGB für Betriebe § 4 Abs. 2) */
+async function notifyRenewal(invoice: Stripe.Invoice) {
+  const accountId = invoice.customer_account;
+  if (!accountId) return;
+  const p = await asSystem(async (db) =>
+    (await db.query(
+      `select p.company_name, p.membership_plan, p.membership_cancel_at_period_end, u.email from provider_profiles p join "user" u on u.id = p.user_id where p.stripe_account_id = $1`,
+      [accountId],
+    )).rows[0],
+  );
+  if (!p || p.membership_plan !== "yearly" || p.membership_cancel_at_period_end) return;
+  const base = process.env.BETTER_AUTH_URL ?? "https://handwerker2go.com";
+  const due = invoice.next_payment_attempt ?? invoice.period_end;
+  const date = new Intl.DateTimeFormat("de-DE", { dateStyle: "long", timeZone: "Europe/Berlin" }).format(new Date(due * 1000));
+  const amount = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format((invoice.amount_due ?? 0) / 100);
+  await sendMail({
+    to: p.email,
+    template: "membership_renewal_provider",
+    subject: `Deine Jahresmitgliedschaft verlängert sich am ${date}`,
+    heading: "Deine Mitgliedschaft verlängert sich bald",
+    paragraphs: [
+      `Hallo ${p.company_name}, deine Jahresmitgliedschaft bei handwerker2go verlängert sich am ${date} um weitere 12 Monate. Abgebucht werden dann ${amount}.`,
+      "Wenn du nicht verlängern möchtest, kannst du die Mitgliedschaft bis dahin im Dashboard unter „Mitgliedschaft und Rechnungen verwalten“ zum Ende der Laufzeit kündigen.",
+    ],
+    button: { label: "Mitgliedschaft verwalten", url: `${base}/dashboard` },
+  });
+}
+
 /** Fehlgeschlagene Abbuchung der Mitgliedschaft: Betrieb per E-Mail informieren (Stripe versucht es erneut) */
 async function notifyPaymentFailed(invoice: Stripe.Invoice) {
   const accountId = invoice.customer_account;
@@ -99,6 +127,20 @@ export async function POST(request: Request) {
         if (event.account && session.metadata?.booking_id) await expireUnpaid(session.metadata.booking_id);
         break;
       }
+      case "charge.dispute.created": {
+        // Rückbuchung: Buchung gegen Löschung sperren (Datenschutzerklärung Abschnitt 16, anhängiger Streit)
+        const dispute = event.data.object as Stripe.Dispute;
+        const pi = typeof dispute.payment_intent === "string" ? dispute.payment_intent : dispute.payment_intent?.id;
+        if (pi) {
+          await asSystem((db) =>
+            db.query("update bookings set legal_hold = true, legal_hold_reason = $2 where stripe_payment_intent_id = $1", [pi, `Rückbuchung ${dispute.id}`]),
+          );
+        }
+        break;
+      }
+      case "invoice.upcoming":
+        if (!event.account) await notifyRenewal(event.data.object as Stripe.Invoice);
+        break;
       case "invoice.payment_failed":
         if (!event.account) await notifyPaymentFailed(event.data.object as Stripe.Invoice);
         break;

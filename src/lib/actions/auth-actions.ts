@@ -214,6 +214,9 @@ const decisionSchema = z.object({
   providerId: z.string().uuid(),
   decision: z.enum(["approve", "reject", "suspend"]),
   reason: z.string().trim().max(500).optional(),
+}).refine((d) => d.decision === "approve" || (d.reason?.length ?? 0) >= 5, {
+  message: "Bitte einen Grund angeben (geht per E-Mail an den Betrieb)",
+  path: ["reason"],
 });
 
 function slugify(s: string) {
@@ -224,7 +227,9 @@ function slugify(s: string) {
 export async function decideProvider(form: FormData) {
   const admin = await currentUser();
   if (!admin || admin.role !== "admin") throw new Error("Nicht berechtigt");
-  const d = decisionSchema.parse(Object.fromEntries(form));
+  const parsed = decisionSchema.safeParse(Object.fromEntries(form));
+  if (!parsed.success) redirect("/admin?fehler=begruendung");
+  const d = parsed.data;
   const status = d.decision === "approve" ? "approved" : d.decision === "reject" ? "rejected" : "suspended";
   const result = await withDb({ userId: admin.id, role: "admin" }, async (db) => {
     const before = (await db.query("select p.*, u.email from provider_profiles p join \"user\" u on u.id = p.user_id where p.id = $1 for update", [d.providerId])).rows[0];

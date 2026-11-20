@@ -12,7 +12,8 @@ export const metadata: Metadata = { title: "Admin", robots: { index: false, foll
 
 const label: Record<string, string> = { pending: "In Prüfung", approved: "Freigeschaltet", rejected: "Abgelehnt", suspended: "Gesperrt" };
 
-async function Admin() {
+async function Admin({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+  const sp = await searchParams;
   const u = await currentUser();
   if (!u) redirect("/anmelden");
   if (u.role !== "admin") redirect("/");
@@ -51,6 +52,11 @@ async function Admin() {
           {outbox} E-Mail(s) warten im Ausgang. Der Versand startet, sobald ein E-Mail-Anbieter eingerichtet ist (MAIL_DRIVER).
         </p>
       )}
+      {sp.fehler === "begruendung" && (
+        <p role="alert" className="rounded-card border-[1.5px] border-[#b42318] bg-[#fef3f2] p-4 text-[15px]">
+          Bitte gib bei Ablehnung oder Sperre eine Begründung an (mindestens 5 Zeichen). Sie geht per E-Mail an den Betrieb (AGB für Betriebe § 10).
+        </p>
+      )}
       <h2 className="text-2xl font-extrabold">Betriebe</h2>
       {providers.length === 0 && <p className="text-muted">Noch keine Registrierungen.</p>}
       <ul className="flex flex-col gap-4">
@@ -74,7 +80,7 @@ async function Admin() {
             </dl>
             <form action={decideProvider} className="mt-5 flex flex-wrap items-end gap-3">
               <input type="hidden" name="providerId" value={p.id} />
-              <label className="flex min-w-[240px] flex-1 flex-col gap-1 text-sm font-semibold">Begründung (bei Ablehnung oder Sperre)
+              <label className="flex min-w-[240px] flex-1 flex-col gap-1 text-sm font-semibold">Begründung (Pflicht bei Ablehnung oder Sperre, geht per E-Mail an den Betrieb)
                 <input name="reason" maxLength={500} className="min-h-11 rounded-xl border-[1.5px] border-line-strong px-3 font-normal" />
               </label>
               {p.status !== "approved" && <button name="decision" value="approve" className="min-h-11 rounded-full bg-brand px-5 font-bold text-white hover:bg-brand-dark">Freischalten</button>}
@@ -88,11 +94,11 @@ async function Admin() {
   );
 }
 
-export default function Page() {
+export default function Page({ searchParams }: PageProps<"/admin">) {
   return (
     <Container className="flex max-w-[1100px] flex-col gap-6 py-16">
       <Suspense fallback={<p>Lädt …</p>}>
-        <Admin />
+        <Admin searchParams={searchParams as Promise<Record<string, string | undefined>>} />
       </Suspense>
     </Container>
   );

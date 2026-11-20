@@ -37,7 +37,7 @@ export function Footer() {
             <Link href="/agb" className="hover:text-brand">AGB für Kunden</Link>
             <Link href="/agb-betriebe" className="hover:text-brand">AGB für Betriebe</Link>
             <Link href="/widerruf" className="hover:text-brand">Widerrufsbelehrung</Link>
-            <Link href="/datenschutz#cookies" className="hover:text-brand">Cookie-Einstellungen</Link>
+            <Link href="/datenschutz#cookies" className="hover:text-brand">Hinweise zu Cookies</Link>
             <Link href="/ranking" className="hover:text-brand">So sortieren wir</Link>
           </nav>
         </div>

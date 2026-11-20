@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Email } from "@/components/legal/email";
 import { LegalPage } from "@/components/legal/legal-page";
 
 export const metadata: Metadata = { title: "Impressum", alternates: { canonical: "/impressum" }, robots: { index: false } };
@@ -18,7 +19,7 @@ export default function Page() {
       </p>
       <h2>Kontakt</h2>
       <p>
-        E-Mail: <a href="mailto:info@handwerker2go.com" className="underline">info@handwerker2go.com</a>
+        E-Mail: <Email />
         <br />
         Telefon: <a href="tel:+35677818522" className="underline">+356 7781 8522</a>
       </p>

@@ -1,40 +1,57 @@
-# Erforderliche rechtliche und steuerliche Prüfungen
+# Offene rechtliche und steuerliche Prüfpunkte
 
-Alle Rechtstexte auf der Website sind Entwürfe mit Platzhaltern und **nicht anwaltlich geprüft**. Vor dem Livegang
-müssen folgende Punkte von Rechtsanwalt bzw. Steuerberatung geprüft und schriftlich bestätigt werden.
+Stand 20.11.2026. **Intern, nicht auf der Website.** Die öffentlichen Rechtstexte (/datenschutz, /agb, /agb-betriebe,
+/widerruf, /impressum) sind so formuliert, dass sie keine unbestätigten Fakten behaupten. Die folgenden Punkte sollte eine
+Rechtsanwältin bzw. ein Datenschutzberater und die Steuerberatung prüfen. Dies ist keine Rechtsberatung.
 
-## Recht
+## Datenschutzerklärung
 
-- [ ] Impressum nach § 5 DDG für Joe Becker, Einzelunternehmer (Sole Trader) in Malta: ladungsfähige Anschrift, Kontakt, ggf. Register- oder Gewerbeangaben
-- [ ] Datenschutzerklärung (DSGVO): alle Dienste (Supabase, Stripe, Resend, Mapbox, Hosting, Cloudflare), Rechtsgrundlagen, Speicherdauer, Drittlandübermittlung
-- [ ] Verträge zur Auftragsverarbeitung mit allen Dienstleistern
-- [ ] Cookie- und Einwilligungslösung, sobald nicht notwendige Dienste eingebunden werden (TDDDG)
-- [x] AGB für Kunden (/agb) und Betriebe (/agb-betriebe) getrennt, Platzhalter gefüllt (18.11.2026); anwaltliche Prüfung steht aus
-- [x] Ranking-Kriterien offengelegt auf /ranking (P2B-Verordnung, § 5b UWG); Sortierlogik muss in Phase 3 exakt so umgesetzt werden (docs/RANKING.md)
-- [ ] Verbraucherinformationen und Widerrufsbelehrung, vorzeitiger Leistungsbeginn bei Handwerkerleistungen
-- [ ] Elektronische Widerrufsfunktion (Widerrufsbutton), soweit für die Verträge erforderlich
-- [ ] Kündigungsbutton für Abos der Betriebe (§ 312k BGB gilt für Verbraucher, für B2B-Abos Vertragsbedingungen prüfen)
-- [ ] Transparente Preisangaben (PAngV) für Kunden, Endpreise inkl. USt
-- [ ] Bewertungen: Kennzeichnung, wie die Echtheit geprüft wird (§ 5b Abs. 3 UWG)
-- [ ] Zahlungsdiensterecht: Modell festgelegt (Stripe Connect Express, Destination Charge, keine Kundengelder auf Plattformkonten); Erlaubnisfreiheit nach ZAG anwaltlich bestätigen lassen
-- [ ] Digital Services Act: Pflichten als Online-Plattform (Kontaktstelle, Meldeverfahren, Nachverfolgbarkeit von Unternehmern)
-- [ ] Prüfung der Gewerbe- und Handwerksnachweise: welche Nachweise je Gewerk verlangt werden (z. B. Eintrag Handwerksrolle für zulassungspflichtige Handwerke)
+- [ ] **Auftragsverarbeitung:** Die DSE sagt, dass Hostinger, Cloudflare und Google Workspace im Auftrag verarbeiten (Art. 28). Die AV-Verträge sind bei allen drei Bestandteil der Standard-Vertragsbedingungen; bitte in den Konten bestätigen (Google: Admin-Konsole, Konto, Rechtliches und Compliance, Data Processing Amendment; Cloudflare: Self-Serve Subscription Agreement mit DPA; Hostinger: DPA in den AGB).
+- [ ] **Hostinger:** Standort Frankfurt am Main laut IP-Registrierung (AS47583); Vertragspartner und Anschrift im Hostinger-Konto prüfen.
+- [ ] **Stripe-Rolle:** Die DSE beschreibt Stripe als in eigener Verantwortung tätig (Betrugsprävention, KYC, gesetzliche Pflichten). Für den Zahlungsvorgang selbst prüfen, ob Stripe teils als Auftragsverarbeiter zu nennen ist.
+- [ ] **Drittland:** DPF-Zertifizierung von Cloudflare, Stripe und Google sowie die SCC in deren Verträgen bestätigen.
+- [ ] **Cloudflare:** Bei aktivem Bot-Schutz kann Cloudflare das Cookie `__cf_bm` setzen; derzeit beim ersten Aufruf kein Cookie beobachtet. Bei Änderung in die Cookie-Tabelle aufnehmen.
+- [ ] **Login-Cookie:** Name `__Secure-better-auth.session_token`, 30 Tage, technisch geprüft am 20.11.2026; Einordnung unter § 25 Abs. 2 Nr. 2 TDDDG bestätigen.
+- [ ] **Bewertungen:** Die Bewertungsfunktion ist im Datenmodell vorhanden, die Eingabe für Kunden noch nicht gebaut. Die DSE beschreibt sie bereits; beim Bau so umsetzen (nur Sterne, Text, Datum öffentlich).
+- [ ] **Speicherfristen:** 3 Jahre (§§ 195, 199 BGB, Art. 6 Rom I), 9 Jahre (ITMA Cap. 372 Art. 19(5), deckt VAT Act Cap. 406 Art. 48(4) und Commercial Code Cap. 13 Art. 26), 12 Monate für Fotos und Freitext, 9 Jahre Protokoll: bestätigen. Companies Act Art. 163 bewusst nicht angewendet (nur für Gesellschaften).
+- [ ] **Abgrenzung Beschreibung/Freitext:** beide in `bookings.notes`; 12 Monate bei Angebotsanfragen (`price_type = 'quote'`), 3 Jahre bei Festpreis-Buchungen.
+- [ ] **E-Mail-Ausgang:** `email_outbox` speichert Mailinhalte; Frist ist nicht festgelegt. Vorschlag: nach 3 Jahren löschen (wie Buchungsdaten).
+- [ ] **Gewerbenachweise:** keine eigene Frist festgelegt.
+- [ ] **DAC7:** Anwendbarkeit von S.L. 123.127 auf einen Einzelunternehmer (natürliche Person) als meldenden Plattformbetreiber, ab wann, und ob die Ausnahme für kleine Plattformen greift. Reg. 13(12)(i) (5 Jahre) bestätigen. Das deutsche PStTG gilt für Plattformbetreiber mit Sitz in Deutschland; Bezug für Malta prüfen.
+- [ ] **Aufsicht:** IDPC Malta als federführende Behörde bestätigen.
+- [ ] **Datenschutzbeauftragter:** Pflicht verneint (Einzelunternehmer, keine umfangreiche Verarbeitung besonderer Kategorien); bestätigen.
 
-## Steuern
+## AGB für Kunden
 
-- [ ] Umsatzsteuerliche Registrierung: MT33258727 vorhanden, Art der Registrierung (Artikel 10 oder Artikel 11 in Malta) prüfen, ggf. Registrierung in Deutschland
-- [x] Provision und Abo an deutsche Betriebe: Nettorechnung, Reverse charge, keine maltesische MwSt. (Entscheidung des Betreibers, gleiche Regelung wie deinminijob.com)
-- [ ] Kleinunternehmer-Betriebe (§ 19 UStG): schulden die USt nach § 13b ebenfalls, können sie aber nicht als Vorsteuer abziehen; Hinweis in AGB/Registrierung prüfen
-- [ ] Ob die Plattform in irgendeiner Konstellation als Leistungserbringer der Handwerkerleistung gilt (darf nicht ungeprüft angenommen werden)
-- [ ] Rechnungsstellung im Namen der Betriebe (Gutschriftverfahren oder Rechnung durch den Betrieb)
-- [ ] Erstattungen und Gutschriften
-- [ ] DAC7-Meldepflichten als Plattformbetreiber
-- [ ] Eignung von Stripe Tax für die konkrete Transaktionsstruktur
-- [ ] Ertragsteuerliche Struktur (Einzelunternehmer in Malta) und Betriebsstätten-Risiko in Deutschland; Haftung als Einzelunternehmer, ggf. Gesellschaftsgründung
+- [ ] **Vertragsschluss:** Bestätigung „im Namen des Betriebs“ (Vollmacht des Betriebs in den AGB für Betriebe, § 2 Abs. 1).
+- [ ] **Stornopauschale:** 25 % des Festpreises, höchstens Anfahrtskosten, mit Gegenbeweis; Wirksamkeit nach §§ 307 ff., 309 Nr. 5 BGB.
+- [ ] **Besichtigungstermin:** kostenloser Termin als eigener Vertrag zwischen Kunde und Betrieb; der Werkvertrag entsteht erst mit Angebotsannahme.
+- [ ] **Änderungsklausel:** ohne Zustimmungsfiktion für Verbraucher umgesetzt (Zustimmung bei der nächsten Buchung).
+- [ ] **Bewertungen:** Angaben nach § 5b Abs. 3 UWG (wie Echtheit sichergestellt wird) stehen in AGB § 7 und auf /ranking.
 
-## Offen aus der Datenschutzerklärung
+## AGB für Betriebe
 
-- [ ] Hostinger: Anschrift des Vertragspartners und Serverstandort bestätigen, AV-Vertrag abschließen
-- [ ] AV-Verträge mit Cloudflare und Google Workspace bestätigen
-- [ ] Aufbewahrungsdauer des Änderungsprotokolls (audit_logs) festlegen
-- [ ] Datenschutzerklärung um Stripe ergänzen, sobald Zahlungen aktiv sind
+- [ ] **P2B-Verordnung:** Anwendbarkeit (Betriebe als gewerbliche Nutzer, Kunden in der EU). Umgesetzt: Gründe für Einschränkung und Aussetzung, Begründung per E-Mail, 30 Tage Frist bei Beendigung, Ausnahmen nach Art. 4 Abs. 4, Ranking-Hauptparameter (Art. 5), Datenzugang (Art. 9).
+- [ ] **Beschwerdesystem (Art. 11) und Mediation (Art. 12):** gelten nicht für kleine Unternehmen; KMU-Status bestätigen. Ein einfacher E-Mail-Beschwerdeweg ist umgesetzt (§ 10 Abs. 3).
+- [ ] **DSA:** Pflichten als Online-Plattform, Meldeverfahren nach Art. 16 (Meldung unzulässiger Inhalte per E-Mail umgesetzt), Nachverfolgbarkeit von Unternehmern (Art. 30, entfällt bei Kleinst- und Kleinunternehmen), Kontaktstellen (Art. 11, 12).
+- [ ] **Zustimmungsfiktion bei Änderungen (§ 12):** gegenüber Unternehmern mit Hinweis und Kündigungsrecht; Wirksamkeit prüfen.
+- [ ] **Gerichtsstand Malta (§ 13)** bei deutschem Recht: Wirksamkeit gegenüber Kaufleuten prüfen. Alternative: Gerichtsstand am Sitz des Betriebs oder Hamburg.
+- [ ] **Umgehungsverbot (§ 7 Abs. 3):** Reichweite (nur über die Plattform vermittelte Aufträge) prüfen.
+- [ ] **DAC7-Mitwirkung (§ 7 Abs. 4):** Sperre nach zwei erfolglosen Erinnerungen; Pflichtenkreis prüfen.
+- [ ] **USt-IdNr. als Pflicht für die Mitgliedschaft:** Kleinunternehmer ohne USt-IdNr. können keine Mitgliedschaft abschließen; gewollt?
+- [ ] **Erinnerung vor Verlängerung des Jahresabos:** umgesetzt über das Stripe-Ereignis `invoice.upcoming`. Den Vorlauf stellst du im Stripe-Dashboard ein (Einstellungen, Billing, Abonnements, „Upcoming renewal events“), empfohlen 30 Tage.
+
+## Widerrufsbelehrung
+
+- [ ] **Du-Form:** Abweichung vom Muster (Sie-Form) kann die Gesetzlichkeitsfiktion (Art. 246a § 1 Abs. 2 S. 2 EGBGB) gefährden; prüfen, ob die Sie-Form sicherer ist.
+- [ ] **Wer belehrt:** Die Belehrung erfolgt für den Betrieb; handwerker2go als zusätzlicher Empfänger. Prüfen, ob die Plattform als Empfangsbote so genannt werden kann.
+- [ ] **Dauerhafter Datenträger:** Die vollständige Belehrung mit den Daten des Betriebs steht jetzt in der Buchungsbestätigung per E-Mail.
+- [ ] **§ 312g Abs. 2 Nr. 11 BGB (dringende Reparaturen):** Hinweis bleibt drin; prüfen, ob er für die angebotenen Leistungen passt.
+- [ ] **Widerrufsbutton:** Prüfen, ob eine elektronische Widerrufsfunktion für die Verträge erforderlich ist.
+
+## Zahlungen und Steuern
+
+- [ ] **ZAG:** Erlaubnisfreiheit bei Direct Charges über Stripe Connect (Zahlung direkt an den Betrieb, Plattform behält nur Provision ein).
+- [ ] **Umsatzsteuer der Plattform:** Registrierung MT33258727 (Artikel 10 oder 11, Malta); Reverse Charge für Provision und Mitgliedschaft an deutsche Unternehmer.
+- [ ] **Kleinunternehmer-Betriebe (§ 19 UStG):** schulden die Umsatzsteuer nach § 13b UStG, ohne Vorsteuerabzug; Hinweis an Betriebe prüfen.
+- [ ] **PAngV:** Festpreise als Endpreise inkl. USt, soweit der Betrieb USt berechnet.

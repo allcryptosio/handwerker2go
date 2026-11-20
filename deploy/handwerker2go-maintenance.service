@@ -1,0 +1,11 @@
+# Täglicher Wartungs-Job: Erinnerung Einführungsphase, Speicherdauer (Löschen/Anonymisieren), abgelaufene Sitzungen.
+#   cp deploy/handwerker2go-maintenance.* /etc/systemd/system/ && systemctl enable --now handwerker2go-maintenance.timer
+[Unit]
+Description=handwerker2go: täglicher Wartungs-Job (Erinnerungen, Speicherdauer)
+After=network-online.target postgresql.service
+
+[Service]
+Type=oneshot
+User=handwerker2go
+WorkingDirectory=/opt/handwerker2go
+ExecStart=/usr/bin/node --conditions=react-server --import tsx --env-file=/opt/handwerker2go/.env.local scripts/maintenance.mts

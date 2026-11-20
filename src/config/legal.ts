@@ -1,11 +1,11 @@
 /**
  * Zentrale Angaben zum Plattformbetreiber für AGB, Widerrufsbelehrung und Ranking-Seite.
- * Rechtstexte lesen nur von hier. Sobald die Betreiberfirma registriert ist, hier eintragen.
- *
- * TODO(Betreiber): operatorName auf die eingetragene Firma ändern (aktuell Platzhalter = Marke).
+ * Rechtstexte lesen nur von hier. Betreiber ist eine natürliche Person (Einzelunternehmer in Malta) mit Handelsname.
  */
 export const legal = {
-  /** Name des Plattformbetreibers, wie er in AGB und Widerrufsbelehrung erscheint */
+  /** Inhaber (natürliche Person), wie im Impressum */
+  operatorPerson: "Joe Becker",
+  /** Handelsname */
   operatorName: "handwerker2go",
   /** Straße und Postleitzahl */
   operatorAddress: "157 - 69 Patri Felicjan Bilocca St, MRS 1521",
@@ -23,8 +23,12 @@ export const legal = {
   /** Gesetzliche Widerrufsfrist in Tagen */
   withdrawalDays: 14,
   /** Stand der Rechtstexte, wird in Zustimmungen mitgespeichert */
-  termsVersion: "2026-11-18",
+  termsVersion: "2026-11-20",
 } as const;
 
 /** "Name, Straße, Ort" für Fließtext */
-export const operatorLine = () => `${legal.operatorName}, ${legal.operatorAddress} ${legal.operatorCity}`;
+export const operatorLine = () =>
+  `${legal.operatorPerson}, handelnd unter „${legal.operatorName}“, ${legal.operatorAddress} Marsa, Malta`;
+
+/** Stand der Rechtstexte als „20.11.2026“ */
+export const termsDate = () => legal.termsVersion.split("-").reverse().join(".");
