@@ -11,7 +11,9 @@ export function Hero({ cityName }: { cityName: string }) {
       <p className="max-w-[620px] text-lg leading-normal text-ink-soft sm:text-[19px]">
         Geprüfte Handwerksbetriebe in {cityName}. Leistung, Ort und Wunschtermin wählen: Wir zeigen dir nur Betriebe, die dann wirklich Zeit haben.
       </p>
-      <BookingSearch services={serviceChoices()} />
+      <div id="suche" className="flex w-full justify-center">
+        <BookingSearch services={serviceChoices()} />
+      </div>
     </div>
   );
 }

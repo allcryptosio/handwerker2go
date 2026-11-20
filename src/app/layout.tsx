@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Suspense } from "react";
-import { Header } from "@/components/layout/header";
+import { Header, HeaderView } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ChromeSwitch } from "@/components/layout/chrome-switch";
 import { PartnerFooter } from "@/components/layout/partner-footer";
@@ -57,7 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-white focus:px-4 focus:py-2">
           Zum Inhalt springen
         </a>
-        <Suspense fallback={<Header />}>
+        <Suspense fallback={<HeaderView pathname="" />}>
           <ChromeSwitch customer={<Header />} partner={<PartnerHeader />} />
         </Suspense>
         <main id="main" className="flex-1">
