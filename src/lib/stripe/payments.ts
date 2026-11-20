@@ -1,5 +1,6 @@
 import "server-only";
 import { getStripe } from "@/lib/stripe/client";
+import { bookingCheckoutBranding } from "@/lib/stripe/branding";
 import { applicationFeeCents, commissionBpsAt } from "@/lib/stripe/commission";
 
 /**
@@ -26,6 +27,7 @@ export async function createBookingCheckout(input: {
     {
       mode: "payment",
       locale: "de",
+      branding_settings: bookingCheckoutBranding(),
       customer_email: input.customerEmail,
       line_items: [{ quantity: 1, price_data: { currency: "eur", unit_amount: input.amountCents, product_data: { name: input.serviceName } } }],
       payment_intent_data: {

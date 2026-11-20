@@ -3,6 +3,7 @@ import type Stripe from "stripe";
 import { asSystem, audit } from "@/lib/db";
 import { getStripe } from "@/lib/stripe/client";
 import { ensureConnectAccount } from "@/lib/stripe/connect";
+import { platformCheckoutBranding } from "@/lib/stripe/branding";
 
 /**
  * Mitgliedschaft der Betriebe über Stripe Billing.
@@ -50,6 +51,7 @@ export async function createMembershipCheckout(providerId: string, plan: Plan, i
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer_account: accountId,
+    branding_settings: platformCheckoutBranding(),
     // Eigene Zahlungsart-Konfiguration (Karte, Apple Pay, Google Pay), angelegt von scripts/stripe-setup.mjs
     ...(process.env.STRIPE_PAYMENT_METHOD_CONFIG ? { payment_method_configuration: process.env.STRIPE_PAYMENT_METHOD_CONFIG } : {}),
     line_items: [{ price: priceId(plan), quantity: 1 }],
