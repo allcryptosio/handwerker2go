@@ -110,7 +110,7 @@ export default function Page() {
         Für die Registrierung eines Betriebs verarbeiten wir Firmenname, Rechtsform, Anschrift, Ansprechperson, E-Mail-Adresse,
         Telefonnummer, Passwort (als Hash), freiwillig die USt-IdNr., die angebotenen Sparten und Leistungen mit Preisen,
         Einsatzgebiet, Arbeitszeiten, Beschreibung, Logo und einen gewerblichen Nachweis. Den Nachweis sieht nur unser Prüfteam;
-        er wird nicht veröffentlicht. Zweck ist die Prüfung und Freischaltung, das öffentliche Profil, die Terminplanung und die
+        er wird nicht veröffentlicht. Wir löschen ihn 6 Monate nach einer Ablehnung, sonst mit dem Betriebskonto. Zweck ist die Prüfung und Freischaltung, das öffentliche Profil, die Terminplanung und die
         Abrechnung; Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Öffentlich sichtbar sind nur Profilangaben, Leistungen,
         Preise und Bewertungen des Betriebs.
       </p>
@@ -246,6 +246,20 @@ export default function Page() {
               <td className={td}>Art. 6 Abs. 1 lit. b DSGVO; Datenminimierung (Art. 5 Abs. 1 lit. e DSGVO)</td>
               <td className={td}>12 Monate nach Abschluss der Buchung; bei einem anhängigen Streit wie Buchungsdaten</td>
               <td className={td}>keine gesetzliche Mindestfrist</td>
+            </tr>
+            <tr className="border-b border-line">
+              <td className={td}>Gewerbenachweise von Handwerksbetrieben</td>
+              <td className={td}>Prüfung und Nachweis der Freischaltung</td>
+              <td className={td}>Art. 6 Abs. 1 lit. b DSGVO</td>
+              <td className={td}>bis zur Löschung des Betriebskontos; bei Ablehnung 6 Monate nach der Entscheidung</td>
+              <td className={td}>Vertrag</td>
+            </tr>
+            <tr className="border-b border-line">
+              <td className={td}>Inhalte versendeter E-Mails (Buchungsbestätigungen, Hinweise)</td>
+              <td className={td}>Nachweis über Benachrichtigungen, Abwehr von Ansprüchen</td>
+              <td className={td}>Art. 6 Abs. 1 lit. f DSGVO</td>
+              <td className={td}>3 Jahre ab Ende des Kalenderjahres, in dem die E-Mail versendet wurde</td>
+              <td className={td}>§§ 195, 199 BGB</td>
             </tr>
             <tr className="border-b border-line">
               <td className={td}>Server-Protokolle</td>

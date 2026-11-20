@@ -17,6 +17,9 @@ Sperre automatisch, Aufheben manuell nach Erledigung des Streits.
 | Erklärungen vorzeitiger Beginn (b) | `consents` | wie (b) | löschen |
 | Abrechnungsteil (c) | `bookings` (Rest), `commission_invoices` | 9 Jahre | löschen; Rechnungen bei Stripe nach Stripes Aufbewahrung |
 | Protokoll | `audit_logs` | 9 Jahre | löschen (Trigger erlaubt nur dem System Einträge > 9 Jahre) |
+| E-Mail-Ausgang | `email_outbox` (Mailinhalte) | 3 Jahre ab Ende des Versandjahres | löschen |
+| Gewerbenachweise | `provider_documents` + Dateien `nachweise/` | 6 Monate nach Ablehnung (Zeitpunkt aus `audit_logs`), sonst mit dem Betriebskonto | Datei und Zeile löschen |
+| Verwaiste Dateien | Nachweise gelöschter Konten, ersetzte Logos, Fotos gelöschter Buchungen | 1 Tag | Datei löschen |
 | Sitzungen, Bestätigungslinks | `session`, `verification` | 30 Tage nach Ablauf | löschen |
 | Server-Protokolle (f) | nginx, Journal | 14 bzw. 7 Tage | logrotate, journald |
 | Sicherungen | restic lokal und R2 | 12 Monate | Sicherungsrotation |
@@ -30,4 +33,4 @@ neuer Protokolleintrag weiter unlöschbar.
 
 ## Noch offen
 
-Siehe docs/RECHTLICHE-PRUEFUNGEN.md: Frist für `email_outbox` und Gewerbenachweise.
+Fristen für `email_outbox` und Gewerbenachweise am 20.11.2026 vom Betreiber festgelegt und umgesetzt.

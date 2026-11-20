@@ -2,10 +2,12 @@
 //  1. Erinnerung an Betriebe 14 Tage vor dem Ende der Einführungsphase (AGB für Betriebe § 4 Abs. 2)
 //  2. Speicherdauer nach Datenschutzerklärung Abschnitt 16: Fotos/Freitext nach 12 Monaten, Anonymisierung nach
 //     3 Jahren ab Jahresende, Abrechnungsteil und Protokoll nach 9 Jahren. Buchungen mit legal_hold bleiben unberührt.
+//     E-Mail-Ausgang nach 3 Jahren ab Jahresende, Gewerbenachweise 6 Monate nach Ablehnung
 //  3. Abgelaufene Sitzungen und Bestätigungslinks entfernen
+//  4. Verwaiste Dateien (Nachweise gelöschter Konten, ersetzte Logos) entfernen
 //
 // Nutzung: node --conditions=react-server --import tsx --env-file=.env.local scripts/maintenance.mts [--dry-run]
-import { unlink } from "node:fs/promises";
+import { readdir, stat, unlink } from "node:fs/promises";
 import path from "node:path";
 import pg from "pg";
 import { sendMail } from "@/lib/mail";
@@ -109,11 +111,59 @@ await tx(async () => {
   const oldAudit = await db.query(`delete from audit_logs where created_at < now() - interval '9 years'`);
   log(`Protokolleinträge gelöscht: ${oldAudit.rowCount}`);
 
+  // E-Mail-Ausgang: Inhalte versendeter Mails 3 Jahre ab Ende des Versandjahres
+  const mails = await db.query(`delete from email_outbox where date_trunc('year', created_at) + interval '4 years' < now()`);
+  log(`E-Mails aus dem Ausgang gelöscht: ${mails.rowCount}`);
+
+  // Gewerbenachweise: 6 Monate nach Ablehnung des Betriebs (bei gelöschten Konten siehe verwaiste Dateien unten)
+  const docs = (await db.query(
+    `select d.id, d.storage_key from provider_documents d join provider_profiles p on p.id = d.provider_id
+      where p.status = 'rejected'
+        and coalesce((select max(a.created_at) from audit_logs a
+                       where a.entity = 'provider_profiles' and a.entity_id = p.id::text and a.action = 'provider.reject'), p.updated_at)
+            < now() - interval '6 months'`,
+  )).rows;
+  for (const d of docs) {
+    if (!dry) {
+      const full = path.resolve(storageDir, d.storage_key);
+      if (full.startsWith(path.resolve(storageDir) + path.sep)) await unlink(full).catch(() => {});
+      await db.query("delete from provider_documents where id = $1", [d.id]);
+    }
+  }
+  log(`Gewerbenachweise abgelehnter Betriebe gelöscht: ${docs.length}`);
+
   // 3. Abgelaufene Sitzungen und Bestätigungslinks
   const sessions = await db.query(`delete from "session" where "expiresAt" < now() - interval '30 days'`);
   const verifications = await db.query(`delete from verification where "expiresAt" < now() - interval '30 days'`);
   log(`Abgelaufene Sitzungen: ${sessions.rowCount}, Bestätigungslinks: ${verifications.rowCount}`);
 });
+
+// ---------------------------------------------------------------- 4. Verwaiste Dateien
+// Nachweise gelöschter Betriebskonten, ersetzte Logos, Fotos gelöschter Buchungen: Dateien ohne Datenbankeintrag,
+// die älter als 1 Tag sind, werden entfernt.
+const known = new Set(
+  (await db.query(
+    `select storage_key k from provider_documents union all select storage_key from booking_photos
+     union all select logo_key from provider_profiles where logo_key is not null`,
+  )).rows.map((r) => r.k as string),
+);
+let orphans = 0;
+for (const dir of ["nachweise", "logos", "auftragsfotos"]) {
+  const root = path.join(storageDir, dir);
+  const months = await readdir(root).catch(() => [] as string[]);
+  for (const m of months) {
+    for (const f of await readdir(path.join(root, m)).catch(() => [] as string[])) {
+      const key = `${dir}/${m}/${f}`;
+      if (known.has(key)) continue;
+      const full = path.join(root, m, f);
+      const st = await stat(full).catch(() => null);
+      if (!st || !st.isFile() || st.mtimeMs > Date.now() - 86_400_000) continue;
+      orphans++;
+      if (!dry) await unlink(full).catch(() => {});
+    }
+  }
+}
+log(`Verwaiste Dateien entfernt: ${orphans}`);
 
 await db.end();
 process.exit(0);

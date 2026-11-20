@@ -15,8 +15,8 @@ Rechtsanwältin bzw. ein Datenschutzberater und die Steuerberatung prüfen. Dies
 - [ ] **Bewertungen:** Die Bewertungsfunktion ist im Datenmodell vorhanden, die Eingabe für Kunden noch nicht gebaut. Die DSE beschreibt sie bereits; beim Bau so umsetzen (nur Sterne, Text, Datum öffentlich).
 - [ ] **Speicherfristen:** 3 Jahre (§§ 195, 199 BGB, Art. 6 Rom I), 9 Jahre (ITMA Cap. 372 Art. 19(5), deckt VAT Act Cap. 406 Art. 48(4) und Commercial Code Cap. 13 Art. 26), 12 Monate für Fotos und Freitext, 9 Jahre Protokoll: bestätigen. Companies Act Art. 163 bewusst nicht angewendet (nur für Gesellschaften).
 - [ ] **Abgrenzung Beschreibung/Freitext:** beide in `bookings.notes`; 12 Monate bei Angebotsanfragen (`price_type = 'quote'`), 3 Jahre bei Festpreis-Buchungen.
-- [ ] **E-Mail-Ausgang:** `email_outbox` speichert Mailinhalte; Frist ist nicht festgelegt. Vorschlag: nach 3 Jahren löschen (wie Buchungsdaten).
-- [ ] **Gewerbenachweise:** keine eigene Frist festgelegt.
+- [x] **E-Mail-Ausgang:** 3 Jahre ab Ende des Versandjahres (festgelegt 20.11.2026, umgesetzt).
+- [x] **Gewerbenachweise:** 6 Monate nach Ablehnung, sonst bis zur Löschung des Betriebskontos (festgelegt 20.11.2026, umgesetzt).
 - [ ] **DAC7:** Anwendbarkeit von S.L. 123.127 auf einen Einzelunternehmer (natürliche Person) als meldenden Plattformbetreiber, ab wann, und ob die Ausnahme für kleine Plattformen greift. Reg. 13(12)(i) (5 Jahre) bestätigen. Das deutsche PStTG gilt für Plattformbetreiber mit Sitz in Deutschland; Bezug für Malta prüfen.
 - [ ] **Aufsicht:** IDPC Malta als federführende Behörde bestätigen.
 - [ ] **Datenschutzbeauftragter:** Pflicht verneint (Einzelunternehmer, keine umfangreiche Verarbeitung besonderer Kategorien); bestätigen.
