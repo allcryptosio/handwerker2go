@@ -12,7 +12,8 @@ Rechtsanwältin bzw. ein Datenschutzberater und die Steuerberatung prüfen. Dies
 - [ ] **Drittland:** DPF-Zertifizierung von Cloudflare, Stripe und Google sowie die SCC in deren Verträgen bestätigen.
 - [ ] **Cloudflare:** Bei aktivem Bot-Schutz kann Cloudflare das Cookie `__cf_bm` setzen; derzeit beim ersten Aufruf kein Cookie beobachtet. Bei Änderung in die Cookie-Tabelle aufnehmen.
 - [ ] **Login-Cookie:** Name `__Secure-better-auth.session_token`, 30 Tage, technisch geprüft am 20.11.2026; Einordnung unter § 25 Abs. 2 Nr. 2 TDDDG bestätigen.
-- [ ] **Bewertungen:** Die Bewertungsfunktion ist im Datenmodell vorhanden, die Eingabe für Kunden noch nicht gebaut. Die DSE beschreibt sie bereits; beim Bau so umsetzen (nur Sterne, Text, Datum öffentlich).
+- [x] **Bewertungen:** Eingabe gebaut (20.11.2026). Öffentlich nur Sterne, Text, Datum und Leistung; kein Name.
+- [ ] **Bewertungsanfrage per E-Mail:** gilt nach BGH VI ZR 225/17 als Werbung. Umgesetzt nach § 7 Abs. 3 UWG: Hinweis bei der Registrierung, Abmeldelink in jeder Anfrage, DSE Abschnitt 11, eine Anfrage pro Buchung. Prüfen, ob die Voraussetzungen (eigene ähnliche Leistungen, Adresse aus dem Verkauf) hier tragen, weil der Vertrag mit dem Betrieb zustande kommt.
 - [ ] **Speicherfristen:** 3 Jahre (§§ 195, 199 BGB, Art. 6 Rom I), 9 Jahre (ITMA Cap. 372 Art. 19(5), deckt VAT Act Cap. 406 Art. 48(4) und Commercial Code Cap. 13 Art. 26), 12 Monate für Fotos und Freitext, 9 Jahre Protokoll: bestätigen. Companies Act Art. 163 bewusst nicht angewendet (nur für Gesellschaften).
 - [ ] **Abgrenzung Beschreibung/Freitext:** beide in `bookings.notes`; 12 Monate bei Angebotsanfragen (`price_type = 'quote'`), 3 Jahre bei Festpreis-Buchungen.
 - [x] **E-Mail-Ausgang:** 3 Jahre ab Ende des Versandjahres (festgelegt 20.11.2026, umgesetzt).

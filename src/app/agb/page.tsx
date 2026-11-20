@@ -115,7 +115,7 @@ export default function Page() {
         und das Muster-Widerrufsformular stehen in der <Link href="/widerruf" className="underline">Widerrufsbelehrung</Link>.
       </p>
 
-      <h2>§ 7 Bewertungen</h2>
+      <h2 id="bewertungen">§ 7 Bewertungen</h2>
       <p>
         (1) Nur Kunden mit einer über handwerker2go gebuchten und abgeschlossenen Leistung können den Betrieb bewerten (1 bis 5
         Sterne und Text). Jede Bewertung ist mit der zugrunde liegenden Buchung verknüpft.

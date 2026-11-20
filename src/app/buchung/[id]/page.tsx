@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { CustomerCancelButton } from "@/components/booking/cancel-button";
+import { ReviewForm } from "@/components/booking/review-form";
 import { Container } from "@/components/ui/container";
 import { legal } from "@/config/legal";
 import { providerBookingAction, syncCheckoutReturn } from "@/lib/actions/booking-actions";
@@ -42,15 +43,19 @@ async function Detail({ params, searchParams }: PageProps<"/buchung/[id]">) {
     )).rows[0];
     if (!b) return null;
     const photos = (await db.query("select id from booking_photos where booking_id = $1 order by created_at", [id])).rows.map((r) => r.id as string);
-    return { b, photos };
+    const review = (await db.query("select rating, body, created_at, visible from reviews where booking_id = $1", [id])).rows[0] as
+      | { rating: number; body: string | null; created_at: Date; visible: boolean }
+      | undefined;
+    return { b, photos, review };
   });
   if (!data) notFound();
-  const { b, photos } = data;
+  const { b, photos, review } = data;
   const isProvider = b.p_user === u.id;
   const isCustomer = b.customer_id === u.id;
   const start = new Date(b.starts_at);
   const s = statusInfo[b.status];
   const freeUntil = freeCancellationUntil(start);
+  const canReview = isCustomer && !review && (b.status === "completed" || (b.status === "confirmed" && new Date(b.ends_at) < new Date()));
   const canCancelFree = isCustomer && ["confirmed", "requested"].includes(b.status) && new Date() < freeUntil;
 
   return (
@@ -105,6 +110,25 @@ async function Detail({ params, searchParams }: PageProps<"/buchung/[id]">) {
 
       {isCustomer && b.early_start_consent_at && (
         <p className="text-[13px] text-muted">{earlyStartConfirmationParagraph(new Date(b.early_start_consent_at))}</p>
+      )}
+
+      {canReview && (
+        <section id="bewerten" className="flex scroll-mt-6 flex-col gap-3 rounded-panel border-[1.5px] border-brand p-6">
+          <h2 className="text-lg font-bold">Wie war&apos;s? Bewerte den Betrieb</h2>
+          <ReviewForm bookingId={b.id} companyName={b.company_name} />
+        </section>
+      )}
+
+      {review && (isCustomer || isProvider) && (
+        <section id="bewerten" className="flex scroll-mt-6 flex-col gap-2 rounded-panel border border-line p-6">
+          <h2 className="text-lg font-bold">{isCustomer ? "Deine Bewertung" : "Bewertung des Kunden"}</h2>
+          <div className="text-[22px] leading-none text-star" aria-label={`${review.rating} von 5 Sternen`}>
+            {"★".repeat(review.rating)}<span className="text-line-strong">{"★".repeat(5 - review.rating)}</span>
+          </div>
+          {review.body && <p className="whitespace-pre-line text-[15px]">{review.body}</p>}
+          {!review.visible && <p className="text-[13px] text-muted">Diese Bewertung ist derzeit nicht öffentlich sichtbar.</p>}
+          {isCustomer && review.visible && <p className="text-[13px] text-muted">Danke! Deine Bewertung hilft anderen Kunden bei der Wahl.</p>}
+        </section>
       )}
 
       {isCustomer && ["confirmed", "requested"].includes(b.status) && (

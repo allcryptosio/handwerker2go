@@ -162,11 +162,17 @@ export default function Page() {
         Bewertungen; Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Bewertungen speichern wir, solange das Profil des Betriebs
         besteht oder bis du sie löschen lässt.
       </p>
+      <p>
+        Nach einem Termin bitten wir dich einmal per E-Mail um eine Bewertung. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO
+        mit unserem berechtigten Interesse an echten Bewertungen; wir nutzen dafür die E-Mail-Adresse aus deiner Buchung
+        (§ 7 Abs. 3 UWG). Du kannst dem jederzeit widersprechen, über den Link in jeder dieser E-Mails oder per E-Mail an uns,
+        ohne dass dafür andere Kosten als die Übermittlungskosten nach den Basistarifen entstehen.
+      </p>
 
       <h2>12. E-Mails</h2>
       <p>
         Wir schicken dir E-Mails, die für dein Konto und deine Buchungen nötig sind, zum Beispiel zur Bestätigung deiner Adresse,
-        Buchungsbestätigungen, Absagen und Erstattungen. Werbe-Newsletter verschicken wir nicht. Unsere Postfächer und der Versand
+        Buchungsbestätigungen, Terminerinnerungen, Absagen und Erstattungen. Werbe-Newsletter verschicken wir nicht. Unsere Postfächer und der Versand
         laufen über Google Workspace der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland, die die Daten in
         unserem Auftrag verarbeitet (Art. 28 DSGVO). Wenn du uns schreibst, verarbeiten wir deine Angaben zur Bearbeitung deiner
         Anfrage (Art. 6 Abs. 1 lit. b DSGVO, sonst lit. f mit dem berechtigten Interesse, Anfragen zu beantworten).

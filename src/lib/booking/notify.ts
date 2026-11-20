@@ -3,13 +3,14 @@ import { asSystem } from "@/lib/db";
 import { legal, operatorLine } from "@/config/legal";
 import { earlyStartConfirmationParagraph } from "@/lib/legal/early-start";
 import { sendMail } from "@/lib/mail";
+import { reviewOptOutUrl } from "@/lib/review-optout";
 
 const base = () => process.env.BETTER_AUTH_URL ?? "https://handwerker2go.com";
 const eur = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
 const when = (d: Date) =>
   new Intl.DateTimeFormat("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" }).format(d) + " Uhr";
 
-export type BookingEvent = "confirmed" | "requested" | "provider_confirmed" | "declined" | "cancelled_by_customer" | "cancelled_by_provider" | "reminder";
+export type BookingEvent = "confirmed" | "requested" | "provider_confirmed" | "declined" | "cancelled_by_customer" | "cancelled_by_provider" | "reminder" | "review_request";
 
 /** Lädt die Buchung und schickt passende Mails an Kunde und Betrieb */
 export async function notifyBooking(bookingId: string, event: BookingEvent) {
@@ -87,6 +88,20 @@ export async function notifyBooking(bookingId: string, event: BookingEvent) {
       toProvider(`Erinnerung: ${b.service_name} ${rel} um ${time} Uhr`, `${Rel} steht ein Auftrag an`, [`Kurze Erinnerung an deinen Termin am ${day} um ${time} Uhr.`]);
       break;
     }
+    case "review_request":
+      sends.push(sendMail({
+        to: b.contact_email,
+        template: "review_request_customer",
+        subject: `Wie war's mit ${b.company_name}?`,
+        heading: "Wie zufrieden warst du?",
+        paragraphs: [
+          `${b.company_name} war für „${b.service_name}“ bei dir. Wie lief es? Deine Bewertung dauert eine Minute und hilft anderen Kunden bei der Wahl.`,
+          "Bewerten können nur Kunden, die über handwerker2go gebucht haben. Öffentlich sichtbar sind nur Sterne, Text und Datum, nicht dein Name.",
+          `Du möchtest keine Bitten um Bewertung mehr bekommen? Hier abbestellen: ${reviewOptOutUrl(b.customer_id)}`,
+        ],
+        button: { label: "Jetzt bewerten", url: `${link}#bewerten` },
+      }));
+      break;
     case "cancelled_by_provider":
       toCustomer(`Abgesagt: ${b.service_name}`, "Der Betrieb hat abgesagt", [`${b.company_name} musste den Termin absagen.${b.price_type === "fixed" ? " Du bekommst den vollen Betrag über Stripe zurück." : ""}`]);
       break;

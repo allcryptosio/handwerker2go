@@ -18,6 +18,9 @@ export function CustomerRegisterForm() {
       <Field name="phone" label="Telefonnummer" type="tel" autoComplete="tel" inputMode="tel" required={false} error={e.phone}
         hint="Hilft dem Betrieb, dich bei Rückfragen zu erreichen" />
       <TermsCheckbox error={e.terms} />
+      <p className="text-[13px] leading-snug text-muted">
+        Nach einem Termin bitten wir dich per E-Mail, den Betrieb zu bewerten. Dem kannst du jederzeit widersprechen, zum Beispiel über den Link in jeder dieser E-Mails.
+      </p>
       <SubmitButton>Konto erstellen</SubmitButton>
       <p className="text-[15px] text-ink-soft">
         Schon ein Konto? <Link href="/anmelden" className="font-semibold text-brand underline">Anmelden</Link>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { BookingForm } from "@/components/booking/booking-form";
+import { ProviderReviews } from "@/components/booking/provider-reviews";
 import { formatDateLong } from "@/lib/booking/format";
 import { Container } from "@/components/ui/container";
 import { currentUser } from "@/lib/auth";
@@ -69,6 +70,7 @@ async function Booking({ params, searchParams }: PageProps<"/buchen/[providerId]
             priceText={priceText}
           />
         )}
+        <ProviderReviews providerId={providerId} />
       </div>
 
       <aside className="order-1 lg:order-2">
