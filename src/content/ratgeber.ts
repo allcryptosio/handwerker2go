@@ -34,9 +34,9 @@ export const articles: Article[] = [
   {
     slug: "ueber-handwerker2go",
     title: "Über handwerker2go: Wir machen Handwerker-Buchen so einfach wie Essen bestellen",
-    metaTitle: "Über uns: Handwerker online buchen in Hamburg",
+    metaTitle: "Über uns: Handwerker einfach online buchen",
     description:
-      "Warum es handwerker2go gibt: Wir wollen das Leben einfacher machen. Geprüfte Handwerker in Hamburg finden, freie Termine in Echtzeit sehen und online buchen.",
+      "Warum es handwerker2go gibt: Wir machen das Leben einfacher. Geprüfte Handwerker in Hamburg finden, freie Termine in Echtzeit sehen, online buchen.",
     kicker: "Über uns",
     categorySlug: "",
     service: { slug: "", label: "Freien Handwerker finden" },
@@ -125,9 +125,9 @@ export const articles: Article[] = [
   {
     slug: "lampe-anschliessen-elektriker",
     title: "Lampe anschließen: Selbst machen oder Elektriker holen?",
-    metaTitle: "Lampe anschließen lassen: Elektriker oder selbst?",
+    metaTitle: "Lampe anschließen: Selbst oder Elektriker?",
     description:
-      "Neue Deckenlampe, aber keine Lust auf Stromschlag? Was du bei Lampen selbst machen darfst, wann ein Elektriker ran muss und wie schnell du einen in Hamburg findest.",
+      "Neue Deckenlampe? Was du bei Lampen selbst machen darfst, wann ein Elektriker ran muss und wie du in Hamburg schnell einen Termin bekommst.",
     kicker: "Elektro",
     categorySlug: "elektriker",
     service: { slug: "lampe-anschliessen", label: "Elektriker buchen" },
@@ -220,7 +220,7 @@ export const articles: Article[] = [
     title: "Wohnung streichen lassen: Kosten, Dauer und die perfekte Vorbereitung",
     metaTitle: "Wohnung streichen lassen: Kosten und Tipps",
     description:
-      "Frische Wände ohne Farbflecken auf dem Sofa: Wovon die Kosten beim Maler abhängen, wie lange das Streichen dauert und was beim Auszug aus der Mietwohnung wirklich gilt.",
+      "Wovon die Kosten beim Maler abhängen, wie lange das Streichen dauert und was beim Auszug aus der Mietwohnung wirklich gilt. Mit Tipps zur Vorbereitung.",
     kicker: "Maler",
     categorySlug: "maler",
     service: { slug: "zimmer-streichen", label: "Maler buchen" },

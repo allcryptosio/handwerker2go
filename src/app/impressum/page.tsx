@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { Email } from "@/components/legal/email";
 import { LegalPage } from "@/components/legal/legal-page";
 
-export const metadata: Metadata = { title: "Impressum", alternates: { canonical: "/impressum" }, robots: { index: false } };
+export const metadata: Metadata = pageMeta({
+  title: "Impressum",
+  description: "Impressum und Anbieterkennzeichnung von handwerker2go, dem Online-Marktplatz für Handwerkerleistungen in Hamburg.",
+  path: "/impressum",
+  robots: { index: false },
+});
 
 export default function Page() {
   return (

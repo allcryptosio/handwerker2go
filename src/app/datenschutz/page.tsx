@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { Email } from "@/components/legal/email";
 import { LegalPage } from "@/components/legal/legal-page";
 import { legal, operatorLine, termsDate } from "@/config/legal";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Datenschutzerklärung",
   description: "Wie handwerker2go personenbezogene Daten verarbeitet: Konto, Buchungen, Zahlung über Stripe, Cookies, Speicherdauer und deine Rechte.",
-  alternates: { canonical: "/datenschutz" },
-};
+  path: "/datenschutz",
+});
 
 /**
  * Datenschutzerklärung nach Art. 13 DSGVO. Beschreibt nur Verarbeitungen, die tatsächlich stattfinden.

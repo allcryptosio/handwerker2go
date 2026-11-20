@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { legal } from "@/config/legal";
 import { rankingCriteria } from "@/config/ranking";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "So sortieren wir die Suchergebnisse",
-  description: "Nach welchen Kriterien handwerker2go die Reihenfolge der Handwerksbetriebe in den Suchergebnissen festlegt.",
-  alternates: { canonical: "/ranking" },
-};
+  description: "Transparent erklärt: Nach welchen Kriterien handwerker2go die Reihenfolge der Handwerksbetriebe in den Suchergebnissen festlegt.",
+  path: "/ranking",
+});
 
 /** Transparenz zum Ranking nach Art. 5 der P2B-Verordnung (EU) 2019/1150 und § 5b Abs. 2 UWG. */
 export default function RankingPage() {

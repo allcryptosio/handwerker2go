@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { Email } from "@/components/legal/email";
 import { LegalPage } from "@/components/legal/legal-page";
 import { legal, operatorLine, termsDate } from "@/config/legal";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Widerrufsbelehrung",
   description: "Widerrufsbelehrung für Handwerkerleistungen, die du über handwerker2go bei einem Handwerksbetrieb buchst, mit Muster-Widerrufsformular.",
-  alternates: { canonical: "/widerruf" },
-};
+  path: "/widerruf",
+});
 
 /**
  * Nach Muster-Widerrufsbelehrung für Dienstleistungen (Anlage 1 zu Art. 246a § 1 Abs. 2 S. 2 EGBGB) und

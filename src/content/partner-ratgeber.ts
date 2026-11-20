@@ -20,7 +20,7 @@ export const partnerArticles: Article[] = [
     title: "Neue Kunden gewinnen als Handwerker: 7 Wege, die wirklich funktionieren",
     metaTitle: "Neue Kunden gewinnen als Handwerker: 7 Wege",
     description:
-      "Mehr Aufträge für deinen Handwerksbetrieb: Google-Profil, Bewertungen, Empfehlungen, Online-Buchung und Plattformen. Was wirklich Kunden bringt und was du lassen solltest.",
+      "Mehr Aufträge für deinen Handwerksbetrieb: Google-Profil, Bewertungen, Empfehlungen, Online-Buchung und Plattformen. Was wirklich neue Kunden bringt.",
     kicker: "Kunden gewinnen",
     categorySlug: "",
     service: { slug: "", label: "Jetzt Partner werden" },
@@ -103,7 +103,7 @@ export const partnerArticles: Article[] = [
   {
     slug: "handwerkerportale-provision-abo-leads",
     title: "Handwerkerportale im Vergleich: Provision, Abo oder Lead-Kauf?",
-    metaTitle: "Handwerkerportale: Provision, Abo oder Leads?",
+    metaTitle: "Handwerkerportale: Provision, Abo, Leads?",
     description:
       "Wie Handwerkerportale abrechnen und was sich für deinen Betrieb rechnet: Pay-per-Lead, Abo oder Provision im Vergleich, mit Rechenbeispiel und Checkliste.",
     kicker: "Kosten und Modelle",

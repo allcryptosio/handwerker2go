@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: absoluteUrl("/"), changeFrequency: "weekly", priority: 1 },
     { url: absoluteUrl("/partner"), changeFrequency: "monthly", priority: 0.7 },
     { url: absoluteUrl("/ranking"), changeFrequency: "yearly", priority: 0.2 },
+    ...["/agb", "/agb-betriebe", "/datenschutz", "/widerruf"].map((p) => ({ url: absoluteUrl(p), changeFrequency: "yearly" as const, priority: 0.1 })),
     { url: absoluteUrl("/ratgeber"), changeFrequency: "weekly", priority: 0.7 },
     { url: absoluteUrl("/partner/registrieren"), changeFrequency: "monthly", priority: 0.6 },
     { url: absoluteUrl("/partner/ratgeber"), changeFrequency: "weekly", priority: 0.6 },

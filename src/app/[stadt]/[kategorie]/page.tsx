@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogFromPhoto, pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { activeCities, categories, getCategory, getCity } from "@/lib/catalog";
@@ -26,17 +27,18 @@ export async function generateMetadata({ params }: PageProps<"/[stadt]/[kategori
   const data = await load(params);
   if (!data) return {};
   const { city, category } = data;
-  const title = `${category.trade} in ${city.name}: Festpreis und Termin online`;
+  const title = `${category.trade} ${city.name}: Festpreis & Termin`;
   const description = `${category.trade} in ${city.name} finden: ${category.services
     .slice(0, 3)
     .map((s) => s.name)
     .join(", ")} und mehr. Geprüfte Betriebe, freie Termine, sichere Zahlung.`;
-  return {
+  return pageMeta({
     title,
+    socialTitle: `${category.trade} in ${city.name}: Festpreis und Termin online`,
     description,
-    alternates: { canonical: `/${city.slug}/${category.slug}` },
-    openGraph: { title, description, url: `/${city.slug}/${category.slug}` },
-  };
+    path: `/${city.slug}/${category.slug}`,
+    image: ogFromPhoto(category.photoFile),
+  });
 }
 
 export default async function CategoryCityPage({ params }: PageProps<"/[stadt]/[kategorie]">) {

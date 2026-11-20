@@ -7,6 +7,7 @@ import { ChromeSwitch } from "@/components/layout/chrome-switch";
 import { PartnerFooter } from "@/components/layout/partner-footer";
 import { PartnerHeader } from "@/components/layout/partner-header";
 import { site } from "@/lib/site";
+import { defaultOgImage } from "@/lib/seo";
 import "./globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
@@ -14,10 +15,10 @@ const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "sw
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "handwerker2go: Handwerker in deiner Nähe online buchen",
+    default: "Handwerker online buchen mit Festpreis | handwerker2go",
     template: "%s | handwerker2go",
   },
-  description: site.description,
+  description: "Handwerker in Hamburg online buchen: geprüfte Betriebe, freie Termine in Echtzeit, Festpreis vorab, sicher bezahlt. Elektriker, Maler, Montage und mehr.",
   applicationName: site.name,
   alternates: { canonical: "/" },
   openGraph: {
@@ -25,9 +26,11 @@ export const metadata: Metadata = {
     locale: site.locale,
     siteName: site.name,
     title: "handwerker2go: Handwerker in deiner Nähe online buchen",
-    description: site.description,
+    description: "Geprüfte Handwerksbetriebe in Hamburg: freie Termine in Echtzeit sehen, Festpreis vorab, online buchen und sicher bezahlen.",
     url: "/",
+    images: [{ url: defaultOgImage, width: 1200, height: 630 }],
   },
+  twitter: { card: "summary_large_image", images: [defaultOgImage] },
   robots: process.env.NEXT_PUBLIC_NOINDEX === "1" ? { index: false, follow: false } : undefined,
 };
 

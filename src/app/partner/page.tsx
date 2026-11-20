@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogFromPhoto, pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { ArticleCard } from "@/components/ratgeber/article-card";
 import { Container } from "@/components/ui/container";
@@ -13,15 +14,16 @@ import {
   yearlySavingsPercent,
 } from "@/lib/pricing";
 
-const metaTitle = "Partner werden: Aufträge für Handwerksbetriebe in Hamburg";
-const metaDescription = `Mehr Aufträge aus deiner Nachbarschaft: Kunden buchen deinen Betrieb direkt in freie Termine, bezahlen online, du bekommst das Geld über Stripe. Die ersten ${p.introMonths} Monate ohne Grundgebühr.`;
+const metaTitle = "Mehr Aufträge für Handwerker in Hamburg";
+const metaDescription = `Kunden aus Hamburg buchen deinen Handwerksbetrieb direkt in freie Termine und zahlen vorab online. Die ersten ${p.introMonths} Monate ohne Grundgebühr.`;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: metaTitle,
+  socialTitle: "Partner werden: Mehr Aufträge für deinen Handwerksbetrieb",
   description: metaDescription,
-  alternates: { canonical: "/partner" },
-  openGraph: { title: metaTitle, description: metaDescription, url: "/partner", type: "website", images: [{ url: "/bilder/vertrauen-uebergabe.webp" }] },
-};
+  path: "/partner",
+  image: ogFromPhoto("vertrauen-uebergabe.webp"),
+});
 
 const h2 = "text-[clamp(30px,3.6vw,46px)] font-extrabold leading-[1.08] tracking-[-0.03em] text-brand-dark";
 

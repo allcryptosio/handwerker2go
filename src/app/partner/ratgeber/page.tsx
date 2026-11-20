@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
+import { ogFromPhoto, pageMeta } from "@/lib/seo";
 import { ArticleCard } from "@/components/ratgeber/article-card";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Container } from "@/components/ui/container";
 import { partnerArticles } from "@/content/partner-ratgeber";
 
-const title = "Ratgeber für Handwerksbetriebe: Kunden, Kosten, Planung";
+const title = "Ratgeber für Handwerksbetriebe";
 const description = "Praxiswissen für Handwerksbetriebe: neue Kunden gewinnen, Handwerkerportale richtig vergleichen und Termine ohne Leerlauf planen.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title,
+  socialTitle: "Ratgeber für Handwerksbetriebe: Kunden, Kosten, Planung",
   description,
-  alternates: { canonical: "/partner/ratgeber" },
-  openGraph: { title, description, url: "/partner/ratgeber", type: "website" },
-};
+  path: "/partner/ratgeber",
+  image: ogFromPhoto("vertrauen-uebergabe.webp"),
+});
 
 export default function PartnerRatgeberPage() {
   return (

@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { Email } from "@/components/legal/email";
 import { LegalPage } from "@/components/legal/legal-page";
 import { legal, operatorLine, termsDate } from "@/config/legal";
 import { formatCents, formatPercent, providerPricing as p, yearlyPerMonthCents } from "@/lib/pricing";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "AGB für Betriebe",
   description: "Allgemeine Geschäftsbedingungen für Handwerksbetriebe auf dem Marktplatz handwerker2go: Mitgliedschaft, Provision, Zahlung über Stripe.",
-  alternates: { canonical: "/agb-betriebe" },
-};
+  path: "/agb-betriebe",
+});
 
 /**
  * AGB für Handwerksbetriebe (Unternehmer, § 14 BGB), ausgerichtet an der P2B-Verordnung (EU) 2019/1150.

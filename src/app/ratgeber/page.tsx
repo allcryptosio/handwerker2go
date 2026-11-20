@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { ArticleCard } from "@/components/ratgeber/article-card";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Container } from "@/components/ui/container";
 import { articles } from "@/content/ratgeber";
 
-export const metadata: Metadata = {
-  title: "Ratgeber: Tipps rund um Handwerker, Kosten und Ablauf",
+export const metadata: Metadata = pageMeta({
+  title: "Handwerker-Ratgeber: Kosten, Ablauf, Tipps",
+  socialTitle: "Ratgeber: Tipps rund um Handwerker, Kosten und Ablauf",
   description: "Kosten, Ablauf, Tipps: Unser Ratgeber erklärt kurz und ehrlich, was du vor dem Handwerker-Termin wissen musst. Von Entrümpelung bis Maler.",
-  alternates: { canonical: "/ratgeber" },
-  openGraph: {
-    title: "Ratgeber: Tipps rund um Handwerker, Kosten und Ablauf",
-    description: "Kosten, Ablauf, Tipps: kurz und ehrlich erklärt, bevor der Handwerker klingelt.",
-    url: "/ratgeber",
-    type: "website",
-  },
-};
+  path: "/ratgeber",
+});
 
 export default function RatgeberPage() {
   return (

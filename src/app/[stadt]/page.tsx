@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { activeCities, categories, getCity } from "@/lib/catalog";
@@ -17,11 +18,11 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/[stadt]">): Promise<Metadata> {
   const city = getCity((await params).stadt);
   if (!city) return {};
-  return {
+  return pageMeta({
     title: `Handwerker in ${city.name} online buchen`,
     description: `Geprüfte Handwerksbetriebe in ${city.name}: Elektriker, Sanitär, Maler, Montage und mehr. Festpreise, freie Termine, sichere Zahlung.`,
-    alternates: { canonical: `/${city.slug}` },
-  };
+    path: `/${city.slug}`,
+  });
 }
 
 export default async function CityPage({ params }: PageProps<"/[stadt]">) {

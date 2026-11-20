@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { Email } from "@/components/legal/email";
 import { LegalPage } from "@/components/legal/legal-page";
 import { legal, operatorLine, termsDate } from "@/config/legal";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "AGB für Kunden",
   description: "Allgemeine Geschäftsbedingungen für Kundinnen und Kunden des Handwerker-Marktplatzes handwerker2go.",
-  alternates: { canonical: "/agb" },
-};
+  path: "/agb",
+});
 
 /** AGB für Kunden (Verbraucher). Betreiberangaben aus src/config/legal.ts. Offene Prüfpunkte: docs/RECHTLICHE-PRUEFUNGEN.md. */
 export default function Page() {

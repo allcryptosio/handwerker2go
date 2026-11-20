@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogFromPhoto, pageMeta } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { ArticleView } from "@/components/ratgeber/article-view";
 import { getPartnerArticle, partnerArticles } from "@/content/partner-ratgeber";
@@ -15,12 +16,16 @@ export async function generateMetadata({ params }: PageProps<"/partner/ratgeber/
   const a = getPartnerArticle((await params).slug);
   if (!a) return {};
   const url = `/partner/ratgeber/${a.slug}`;
-  return {
+  return pageMeta({
     title: a.metaTitle,
+    socialTitle: a.title,
     description: a.description,
-    alternates: { canonical: url },
-    openGraph: { type: "article", title: a.title, description: a.description, url, publishedTime: a.published, modifiedTime: a.updated, images: [{ url: `/bilder/${a.image}` }] },
-  };
+    path: url,
+    type: "article",
+    publishedTime: a.published,
+    modifiedTime: a.updated,
+    image: ogFromPhoto(a.image),
+  });
 }
 
 export default async function PartnerArticlePage({ params }: PageProps<"/partner/ratgeber/[slug]">) {
