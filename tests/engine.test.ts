@@ -88,7 +88,7 @@ test("Bundesweite Feiertage sind frei", () => {
 
 test("Ranking: Entfernung wiegt am meisten, Abo/Provision kommen nicht vor", async () => {
   const { rankScore, RANK_WEIGHTS } = await import("../src/lib/booking/engine");
-  const base = { distanceKm: 5, radiusKm: 25, delayMin: 0, windowMin: 0, rating: null, reviewCount: 0, providerCancelRate: null, hasLogo: false, offeredServices: 1 };
+  const base = { distanceKm: 5, radiusKm: 25, delayMin: 0, windowMin: 0, rating: null, reviewCount: 0, providerCancelRate: null, avgResponseHours: null, hasLogo: false, offeredServices: 1 };
   const near = rankScore({ ...base, distanceKm: 2 });
   const farButGreatReviews = rankScore({ ...base, distanceKm: 15, rating: 5, reviewCount: 20 });
   assert.ok(near > farButGreatReviews, "näher schlägt bessere Bewertung bei großem Entfernungsunterschied");
@@ -97,4 +97,15 @@ test("Ranking: Entfernung wiegt am meisten, Abo/Provision kommen nicht vor", asy
   const ws = Object.values(RANK_WEIGHTS);
   assert.deepEqual([...ws].sort((a, b) => b - a), ws, "Gewichte absteigend wie auf /ranking");
   assert.equal(Object.keys(RANK_WEIGHTS).join(), "distance,availability,reviews,reliability,profile");
+});
+
+test("Ranking: schnelle Antwort ist besser als langsame, ohne Daten neutral", async () => {
+  const { rankScore } = await import("../src/lib/booking/engine");
+  const base = { distanceKm: 5, radiusKm: 25, delayMin: 0, windowMin: 0, rating: null, reviewCount: 0, providerCancelRate: null, avgResponseHours: null, hasLogo: false, offeredServices: 1 };
+  const fast = rankScore({ ...base, avgResponseHours: 1 });
+  const slow = rankScore({ ...base, avgResponseHours: 30 });
+  const never = rankScore({ ...base, avgResponseHours: 72 });
+  assert.ok(fast > slow && slow > never);
+  assert.equal(fast, rankScore(base), "bis 2 Stunden = volle Punktzahl wie ohne Daten");
+  assert.ok(Math.abs(fast - never - 0.1 * 0.3) < 1e-9, "Antwortzeit wirkt mit 30 % der Zuverlässigkeit (10 %)");
 });

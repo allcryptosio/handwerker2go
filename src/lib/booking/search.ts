@@ -100,6 +100,7 @@ export interface ProviderInfo {
   radiusKm: number;
   providerCancelRate: number | null;
   offeredServices: number;
+  avgResponseHours: number | null;
   approvedAt: string;
 }
 
@@ -126,7 +127,9 @@ async function loadCandidates(opts: { templateId: string; lat: number; lon: numb
               (select count(*) from bookings b where b.provider_id = p.id and b.status = 'completed') job_count,
               (select count(*) from bookings b where b.provider_id = p.id and b.status in ('confirmed', 'completed', 'declined', 'cancelled')) decided_count,
               (select count(*) from bookings b where b.provider_id = p.id and (b.status = 'declined' or (b.status = 'cancelled' and coalesce(b.cancel_reason, '') not in ('Storniert durch Kunden', 'Termin bereits vergeben')))) provider_cancel_count,
-              (select count(*) from provider_services s2 where s2.provider_id = p.id and s2.active) offered_services
+              (select count(*) from provider_services s2 where s2.provider_id = p.id and s2.active) offered_services,
+              (select avg(extract(epoch from (b.responded_at - b.created_at)) / 3600) from bookings b
+                 where b.provider_id = p.id and b.responded_at is not null and b.created_at > now() - interval '12 months') avg_response_hours
          from service_templates t
          join provider_categories pc on pc.category_id = t.category_id
          join provider_profiles p on p.id = pc.provider_id
@@ -187,6 +190,7 @@ async function loadCandidates(opts: { templateId: string; lat: number; lon: numb
         radiusKm: Number(r.radius_km),
         providerCancelRate: Number(r.decided_count) > 0 ? Number(r.provider_cancel_count) / Number(r.decided_count) : null,
         offeredServices: Number(r.offered_services),
+        avgResponseHours: r.avg_response_hours === null ? null : Number(r.avg_response_hours),
         approvedAt: new Date(r.approved_at).toISOString(),
       };
       return { info, candidate };
@@ -232,7 +236,7 @@ export async function searchAvailability(input: SearchInput, providerId?: string
       const score = rankScore({
         distanceKm: info.distanceKm, radiusKm: info.radiusKm, delayMin: minutesOf(arrival) - wish, windowMin,
         rating: info.rating, reviewCount: info.reviewCount, providerCancelRate: info.providerCancelRate,
-        hasLogo: !!info.logoKey, offeredServices: info.offeredServices,
+        hasLogo: !!info.logoKey, offeredServices: info.offeredServices, avgResponseHours: info.avgResponseHours,
       });
       hits.push({ ...info, score, start: r.start.toISOString(), end: r.end.toISOString(), arrival, travelMin: r.travelMin });
     } else {

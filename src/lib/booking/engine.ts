@@ -139,6 +139,8 @@ export interface RankInput {
   reviewCount: number;
   /** Anteil vom Betrieb abgelehnter oder abgesagter Buchungen (0–1), null = noch keine Buchungen */
   providerCancelRate: number | null;
+  /** Durchschnittliche Antwortzeit auf Anfragen in Stunden, null = noch keine Anfragen beantwortet */
+  avgResponseHours: number | null;
   hasLogo: boolean;
   offeredServices: number;
 }
@@ -148,7 +150,10 @@ export function rankScore(r: RankInput): number {
   const availability = r.windowMin > 0 ? Math.max(0, 1 - r.delayMin / r.windowMin) : 1;
   // Neue Betriebe ohne Bewertung starten neutral, damit sie nicht benachteiligt werden
   const reviews = r.rating === null || r.reviewCount === 0 ? 0.6 : (r.rating / 5) * Math.min(1, 0.5 + r.reviewCount / 10);
-  const reliability = r.providerCancelRate === null ? 1 : 1 - Math.min(1, r.providerCancelRate);
+  // Zuverlässigkeit: 70 % Absagequote, 30 % Antwortzeit (bis 2 h voll, ab 48 h null; ohne Daten neutral voll)
+  const cancelScore = r.providerCancelRate === null ? 1 : 1 - Math.min(1, r.providerCancelRate);
+  const responseScore = r.avgResponseHours === null ? 1 : Math.max(0, Math.min(1, 1 - (r.avgResponseHours - 2) / 46));
+  const reliability = 0.7 * cancelScore + 0.3 * responseScore;
   const profile = (r.hasLogo ? 0.5 : 0) + Math.min(0.5, r.offeredServices / 6);
   const w = RANK_WEIGHTS;
   return w.distance * distance + w.availability * availability + w.reviews * reviews + w.reliability * reliability + w.profile * profile;

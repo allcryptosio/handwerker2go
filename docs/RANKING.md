@@ -42,11 +42,11 @@ Die Standard-Sortierung „Empfohlen“ setzt die fünf Kriterien von `/ranking`
 | Entfernung | 40 % | 1 − Entfernung / Radius des Einsatzgebiets |
 | Freier Termin | 25 % | wie nah die früheste Ankunft am Wunschbeginn liegt (bei exakter Uhrzeit immer voll) |
 | Bewertungen | 20 % | Durchschnitt und Anzahl; ohne Bewertungen neutraler Startwert 0,6 |
-| Zuverlässigkeit | 10 % | Anteil vom Betrieb abgelehnter oder abgesagter Buchungen (Antwortzeit noch nicht gemessen) |
+| Zuverlässigkeit | 10 % | 70 % Absagequote (abgelehnte oder vom Betrieb abgesagte Buchungen), 30 % durchschnittliche Antwortzeit auf Anfragen der letzten 12 Monate (`bookings.responded_at − created_at`; bis 2 h volle Punkte, ab 48 h null); ohne Daten neutral |
 | Vollständiges Profil | 5 % | Logo vorhanden, Anzahl angebotener Leistungen mit Preis |
 
 Abo-Modell, Provision und Zahlungen an uns fließen nicht ein. Kunden können zusätzlich selbst nach früheste Ankunft,
 Entfernung, Bewertung oder Preis sortieren.
 
-Offene Abweichung: „wie schnell der Betrieb auf Anfragen antwortet“ (Text auf /ranking) wird noch nicht gemessen.
-Entweder Antwortzeit ergänzen (Zeit von `requested` bis `confirmed`) oder den Satz auf /ranking anpassen.
+Die Antwortzeit wird seit 20.11.2026 gemessen (Migration `20261120100000_response_time.sql`). Damit setzt die
+Sortierung alle Kriterien von /ranking um; es gibt keine offene Abweichung mehr.

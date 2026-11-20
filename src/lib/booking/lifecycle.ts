@@ -63,7 +63,7 @@ async function refundIfPaid(b: { price_type: string; stripe_payment_intent_id: s
 
 export async function providerConfirm(bookingId: string, actorId: string) {
   const ok = await asSystem(async (db) => {
-    const r = await db.query(`update bookings set status = 'confirmed', confirmed_at = now() where id = $1 and status = 'requested' returning id`, [bookingId]);
+    const r = await db.query(`update bookings set status = 'confirmed', confirmed_at = now(), responded_at = now() where id = $1 and status = 'requested' returning id`, [bookingId]);
     if (r.rowCount) await audit(db, { actorId, actorRole: "provider", action: "booking.confirm", entity: "bookings", entityId: bookingId });
     return r.rowCount === 1;
   });
@@ -76,7 +76,7 @@ export async function providerDecline(bookingId: string, actorId: string) {
   if (!b || b.status !== "requested") return false;
   const refunded = await refundIfPaid(b, "declined");
   await asSystem(async (db) => {
-    await db.query(`update bookings set status = 'declined', refunded_cents = $2, cancelled_at = now() where id = $1 and status = 'requested'`, [bookingId, refunded]);
+    await db.query(`update bookings set status = 'declined', refunded_cents = $2, cancelled_at = now(), responded_at = now() where id = $1 and status = 'requested'`, [bookingId, refunded]);
     await audit(db, { actorId, actorRole: "provider", action: "booking.decline", entity: "bookings", entityId: bookingId, after: { refunded } });
   });
   await notifyBooking(bookingId, "declined");

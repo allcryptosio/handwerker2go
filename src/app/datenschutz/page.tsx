@@ -65,8 +65,8 @@ export default function Page() {
         Für ein Kundenkonto verarbeiten wir Name, E-Mail-Adresse, Passwort (nur verschlüsselt als Hash gespeichert) und
         freiwillig deine Telefonnummer sowie den Zeitpunkt, zu dem du den AGB zugestimmt hast. Zweck ist die Bereitstellung des
         Kontos und die Vermittlung von Aufträgen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Nach der Registrierung
-        schicken wir dir eine E-Mail zur Bestätigung deiner Adresse. Die Daten werden gelöscht, wenn du dein Konto löschen lässt,
-        soweit keine gesetzlichen Aufbewahrungspflichten bestehen.
+        schicken wir dir eine E-Mail zur Bestätigung deiner Adresse. Die Kontodaten speichern wir, bis du dein Konto löschen
+        lässt. Danach gelten nur noch die Restfristen für Buchungs- und Abrechnungsdaten aus Abschnitt 16.
       </p>
 
       <h2>8. Registrierung von Handwerksbetrieben</h2>
@@ -89,8 +89,8 @@ export default function Page() {
         Hinweise und freiwillig hochgeladene Fotos sowie, falls erforderlich, deine Erklärung zum Beginn der Leistung vor Ablauf
         der Widerrufsfrist mit Zeitpunkt. Diese Angaben erhält der gebuchte Betrieb, damit er den Auftrag ausführen kann. Fotos
         sind nur für dich, den Betrieb und unser Supportteam sichtbar. Zweck ist die Vermittlung und Abwicklung des Auftrags,
-        Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, für die Aufbewahrung von Buchungs- und Abrechnungsdaten Art. 6 Abs. 1
-        lit. c DSGVO. Buchungsdaten bewahren wir bis zum Ende der gesetzlichen Aufbewahrungsfristen auf. [Fristen prüfen.]
+        Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Wie lange wir Buchungsdaten, Fotos und Abrechnungsdaten nach Abschluss
+        aufbewahren, steht gestaffelt in Abschnitt 16.
       </p>
 
       <h2>10. Online-Zahlung über Stripe</h2>
@@ -144,7 +144,91 @@ export default function Page() {
         nur an die oben genannten Dienstleister oder an Behörden weiter, wenn wir dazu gesetzlich verpflichtet sind.
       </p>
 
-      <h2>16. Deine Rechte</h2>
+      <h2 id="speicherdauer">16. Speicherdauer</h2>
+      <p>
+        Wir speichern deine Daten nur so lange, wie wir sie für den jeweiligen Zweck brauchen oder gesetzlich aufbewahren müssen.
+        Bei Buchungen geht das in Stufen: Während die Buchung läuft, brauchen wir alle Angaben. Nach dem Abschluss behalten wir
+        die Angaben zur Buchung so lange, wie noch Ansprüche geltend gemacht werden können. Abrechnungsdaten müssen wir länger
+        aufbewahren, weil das Steuerrecht es verlangt. Danach löschen oder anonymisieren wir die Daten.
+      </p>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[720px] border-collapse text-left text-[14px] leading-snug">
+          <thead>
+            <tr className="border-b-2 border-line-strong align-bottom">
+              <th className="py-2 pr-3">Datenkategorie</th>
+              <th className="py-2 pr-3">Zweck</th>
+              <th className="py-2 pr-3">Rechtsgrundlage</th>
+              <th className="py-2 pr-3">Speicherdauer</th>
+              <th className="py-2">Quelle</th>
+            </tr>
+          </thead>
+          <tbody className="align-top">
+            <tr className="border-b border-line">
+              <td className="py-2 pr-3">(a) Laufende Buchung: alle Angaben zur Buchung</td>
+              <td className="py-2 pr-3">Vermittlung und Durchführung der Buchung</td>
+              <td className="py-2 pr-3">Art. 6 Abs. 1 lit. b DSGVO</td>
+              <td className="py-2 pr-3">solange die Buchung läuft und abgewickelt wird</td>
+              <td className="py-2">Vertrag</td>
+            </tr>
+            <tr className="border-b border-line">
+              <td className="py-2 pr-3">(b) Buchungsdaten nach Abschluss: Kontaktdaten, Einsatzadresse, Beschreibung, Erklärung zum vorzeitigen Leistungsbeginn</td>
+              <td className="py-2 pr-3">Abwehr von Ansprüchen, z. B. bei Stornierung, Erstattung, Rückbuchung (Chargeback) oder Beschwerde</td>
+              <td className="py-2 pr-3">Art. 6 Abs. 1 lit. f DSGVO</td>
+              <td className="py-2 pr-3">3 Jahre ab Ende des Kalenderjahres, in dem die Buchung abgeschlossen wurde; bei einem anhängigen Streit bis zu dessen Erledigung zuzüglich der restlichen Verjährungsfrist</td>
+              <td className="py-2">§§ 195, 199 BGB; Art. 6 Rom-I-Verordnung</td>
+            </tr>
+            <tr className="border-b border-line">
+              <td className="py-2 pr-3">(c) Abrechnungsdaten: Provisionsrechnungen, Abo-Rechnungen, Belege zu Auszahlungen und Provisionen über Stripe, Buchhaltung</td>
+              <td className="py-2 pr-3">Gesetzliche Aufbewahrung</td>
+              <td className="py-2 pr-3">Art. 6 Abs. 1 lit. c DSGVO</td>
+              <td className="py-2 pr-3">9 Jahre nach Abschluss des jeweiligen Vorgangs</td>
+              <td className="py-2">Income Tax Management Act (Malta), Cap. 372, Art. 19 Abs. 5; damit abgedeckt: VAT Act, Cap. 406, Art. 48 Abs. 4 (mindestens 6 Jahre ab Jahresende) und Commercial Code, Cap. 13, Art. 26 (5 Jahre)</td>
+            </tr>
+            <tr className="border-b border-line">
+              <td className="py-2 pr-3">(d) Meldedaten zu Handwerksbetrieben nach DAC7 (nur falls anwendbar)</td>
+              <td className="py-2 pr-3">Erfüllung von Meldepflichten als Plattformbetreiber</td>
+              <td className="py-2 pr-3">Art. 6 Abs. 1 lit. c DSGVO</td>
+              <td className="py-2 pr-3">mindestens 5 Jahre ab Ende des betreffenden Jahres; soweit es zugleich Steuerunterlagen sind, 9 Jahre</td>
+              <td className="py-2">S.L. 123.127 (Malta), Reg. 13(12)(i) [prüfen: Anwendbarkeit auf Einzelunternehmer als natürliche Person]</td>
+            </tr>
+            <tr className="border-b border-line">
+              <td className="py-2 pr-3">(e) Fotos und Freitext aus Angebotsanfragen</td>
+              <td className="py-2 pr-3">Vorbereitung und Durchführung des Auftrags</td>
+              <td className="py-2 pr-3">Art. 6 Abs. 1 lit. b DSGVO; Datenminimierung nach Art. 5 Abs. 1 lit. e DSGVO</td>
+              <td className="py-2 pr-3">Löschung 12 Monate nach Abschluss der Buchung; bei einem anhängigen Streit wie (b)</td>
+              <td className="py-2">keine gesetzliche Mindestfrist</td>
+            </tr>
+            <tr className="border-b border-line">
+              <td className="py-2 pr-3">(f) Server-Protokolle</td>
+              <td className="py-2 pr-3">Sicherer und stabiler Betrieb (siehe Abschnitt 3)</td>
+              <td className="py-2 pr-3">Art. 6 Abs. 1 lit. f DSGVO</td>
+              <td className="py-2 pr-3">14 Tage</td>
+              <td className="py-2">berechtigtes Interesse</td>
+            </tr>
+            <tr>
+              <td className="py-2 pr-3">(f) Kontodaten von Kunden und Betrieben</td>
+              <td className="py-2 pr-3">Bereitstellung des Kontos</td>
+              <td className="py-2 pr-3">Art. 6 Abs. 1 lit. b DSGVO</td>
+              <td className="py-2 pr-3">bis zur Löschung des Kontos; danach nur noch die Restfristen aus (b) bis (e)</td>
+              <td className="py-2">Vertrag</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Den Streitfall regeln wir so: Ist zu einer Buchung ein Streit anhängig, etwa eine Rückbuchung, eine Beschwerde oder ein
+        Verfahren, bewahren wir die Angaben aus (b) und (e) bis zur Erledigung und danach für die restliche Verjährungsfrist auf.
+        Ansprüche wegen Mängeln an der Handwerkerleistung richtest du an den Betrieb, der dein Vertragspartner ist.
+      </p>
+      <p>
+        Nach Ablauf der Fristen löschen oder anonymisieren wir die Daten. Von einer Buchung bleibt dann nur der Teil, den wir
+        für die Abrechnung brauchen (zum Beispiel Buchungsnummer, Datum, Betrag, Provision, Betrieb), für 9 Jahre gespeichert.
+        In Sicherungskopien können gelöschte Daten noch bis zu 12 Monate enthalten sein (Abschnitt 13). [prüfen: technische
+        Umsetzung der automatischen Löschung]
+      </p>
+      <p className="font-semibold">Keine Rechtsberatung, vor Livegang prüfen lassen.</p>
+
+      <h2>17. Deine Rechte</h2>
       <p>
         Du hast das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der
         Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch gegen Verarbeitungen auf Grundlage berechtigter
@@ -155,7 +239,7 @@ export default function Page() {
         Malta (Information and Data Protection Commissioner, idpc.org.mt) oder bei der Behörde deines Wohnorts.
       </p>
 
-      <h2>17. Änderungen</h2>
+      <h2>18. Änderungen</h2>
       <p>
         Wir passen diese Datenschutzerklärung an, wenn sich unsere Website oder die eingesetzten Dienste ändern. Es gilt die
         jeweils hier veröffentlichte Fassung.
