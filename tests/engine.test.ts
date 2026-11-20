@@ -109,3 +109,13 @@ test("Ranking: schnelle Antwort ist besser als langsame, ohne Daten neutral", as
   assert.equal(fast, rankScore(base), "bis 2 Stunden = volle Punktzahl wie ohne Daten");
   assert.ok(Math.abs(fast - never - 0.1 * 0.3) < 1e-9, "Antwortzeit wirkt mit 30 % der Zuverlässigkeit (10 %)");
 });
+
+test("Kontaktdaten in Betriebstexten werden erkannt", async () => {
+  const { findContactData } = await import("../src/lib/partner/guard");
+  for (const t of ["Ruf an: 0176 1234567", "Tel. +49 40 123456", "mail an info@betrieb.de", "info (at) betrieb (punkt) de", "www.betrieb.de", "Schreib per WhatsApp", "betrieb-hamburg.de"]) {
+    assert.ok(findContactData(t), t);
+  }
+  for (const t of ["Wir sind seit 2010 in Hamburg tätig und montieren Küchen, Lampen und Regale.", "Meisterbetrieb mit 3 Mitarbeitern, 24 Stunden erreichbar über die Plattform.", "Preise ab 49 Euro, Anfahrt 15 km inklusive."]) {
+    assert.equal(findContactData(t), null, t);
+  }
+});

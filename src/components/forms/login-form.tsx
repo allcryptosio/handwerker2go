@@ -22,7 +22,7 @@ export function LoginForm() {
       <SubmitButton>Anmelden</SubmitButton>
       <p className="text-[15px] text-ink-soft">
         Noch kein Konto? <Link href="/registrieren" className="font-semibold text-brand underline">Als Kunde registrieren</Link> oder{" "}
-        <Link href="/fuer-handwerker/registrieren" className="font-semibold text-brand underline">Betrieb anmelden</Link>
+        <Link href="/partner/registrieren" className="font-semibold text-brand underline">Betrieb anmelden</Link>
       </p>
     </form>
   );

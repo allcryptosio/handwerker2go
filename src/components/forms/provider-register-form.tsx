@@ -23,7 +23,7 @@ export function ProviderRegisterForm({ categories }: { categories: { slug: strin
           <Field name="postal_code" label="PLZ" inputMode="numeric" autoComplete="postal-code" error={e.postal_code} />
           <Field name="city" label="Ort" autoComplete="address-level2" error={e.city} />
         </div>
-        <Field name="vat_id" label="USt-IdNr." required={false} error={e.vat_id} hint="Wir rechnen Provision und Abo netto im Reverse-Charge-Verfahren ab. Bitte angeben, falls vorhanden." />
+        <Field name="vat_id" label="USt-IdNr." required={false} error={e.vat_id} hint="Format DE123456789. Für die Mitgliedschaft nach der Einführungsphase nötig, weil wir netto im Reverse-Charge-Verfahren abrechnen." />
       </fieldset>
 
       <fieldset className={section}>
@@ -55,27 +55,28 @@ export function ProviderRegisterForm({ categories }: { categories: { slug: strin
           <Field name="radius_km" label="Umkreis in km" type="number" inputMode="numeric" defaultValue="15" error={e.radius_km} />
         </div>
         <Field name="description" label="Beschreibung deines Betriebs" textarea error={e.description}
-          hint="Was macht ihr, seit wann, was zeichnet euch aus? Mindestens 40 Zeichen." />
+          hint="Was macht ihr, seit wann, was zeichnet euch aus? Mindestens 40 Zeichen. Bitte keine Telefonnummern, E-Mail-Adressen oder Links: Kunden bekommen deine Kontaktdaten nach der Buchung automatisch." />
       </fieldset>
 
       <fieldset className={section}>
-        <legend className={`${h} mb-1`}>4. Gewerblicher Nachweis</legend>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="f-document_kind" className="text-sm font-semibold">Art des Nachweises</label>
-          <select id="f-document_kind" name="document_kind" className="min-h-12 rounded-xl border-[1.5px] border-line-strong bg-white px-4 text-[16px]">
-            <option value="gewerbeanmeldung">Gewerbeanmeldung</option>
-            <option value="handwerksrolle">Eintragung in die Handwerksrolle</option>
-            <option value="versicherung">Betriebshaftpflicht</option>
-            <option value="sonstiges">Sonstiger Nachweis</option>
-          </select>
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="f-document" className="text-sm font-semibold">Datei</label>
-          <input id="f-document" name="document" type="file" accept="application/pdf,image/jpeg,image/png" required aria-invalid={!!e.document}
-            className="rounded-xl border-[1.5px] border-dashed border-line-strong bg-soft p-4 text-[15px]" />
-          <p className="text-[13px] text-muted">PDF, JPG oder PNG, höchstens 10 MB. Nur für unser Prüfteam sichtbar.</p>
-          {e.document && <p className="text-[13px] font-semibold text-[#b42318]">{e.document}</p>}
-        </div>
+        <legend className={`${h} mb-1`}>4. Nachweise</legend>
+        <p className="text-[15px] text-ink-soft">
+          PDF, JPG oder PNG, je Datei höchstens 5 MB. Die Nachweise sieht nur unser Prüfteam, sie werden nicht veröffentlicht.
+        </p>
+        {[
+          { name: "doc_gewerbe", label: "Gewerbeanmeldung", hint: "Pflicht" },
+          { name: "doc_versicherung", label: "Betriebshaftpflicht (Versicherungsbestätigung)", hint: "Pflicht" },
+          { name: "doc_handwerksrolle", label: "Eintragung in die Handwerksrolle (Handwerkskarte)", hint: "Pflicht für Elektro, Sanitär und Maler" },
+        ].map((f) => (
+          <div key={f.name} className="flex flex-col gap-1.5">
+            <label htmlFor={`f-${f.name}`} className="text-sm font-semibold">
+              {f.label} <span className="font-normal text-muted">({f.hint})</span>
+            </label>
+            <input id={`f-${f.name}`} name={f.name} type="file" accept="application/pdf,image/jpeg,image/png" aria-invalid={!!e[f.name]}
+              className="rounded-xl border-[1.5px] border-dashed border-line-strong bg-soft p-4 text-[15px]" />
+            {e[f.name] && <p className="text-[13px] font-semibold text-[#b42318]">{e[f.name]}</p>}
+          </div>
+        ))}
       </fieldset>
 
       <TermsCheckbox error={e.terms} termsHref="/agb-betriebe" termsLabel="AGB für Betriebe" />

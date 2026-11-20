@@ -1,7 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { Suspense } from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { ChromeSwitch } from "@/components/layout/chrome-switch";
+import { PartnerFooter } from "@/components/layout/partner-footer";
+import { PartnerHeader } from "@/components/layout/partner-header";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -53,11 +57,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-white focus:px-4 focus:py-2">
           Zum Inhalt springen
         </a>
-        <Header />
+        <Suspense fallback={<Header />}>
+          <ChromeSwitch customer={<Header />} partner={<PartnerHeader />} />
+        </Suspense>
         <main id="main" className="flex-1">
           {children}
         </main>
-        <Footer />
+        <Suspense fallback={<Footer />}>
+          <ChromeSwitch customer={<Footer />} partner={<PartnerFooter />} />
+        </Suspense>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       </body>
     </html>

@@ -9,7 +9,7 @@ export function RegistrationClosed({ who }: { who: "kunde" | "betrieb" }) {
           ? "Wir bereiten gerade den Start in Hamburg vor. In wenigen Tagen kannst du deinen Betrieb hier registrieren."
           : "Wir bereiten gerade den Start in Hamburg vor. In wenigen Tagen kannst du hier dein Konto erstellen und Handwerker buchen."}
       </p>
-      <Link href={who === "betrieb" ? "/fuer-handwerker" : "/hamburg"} className="self-start rounded-full bg-brand px-6 py-3 font-bold text-white hover:bg-brand-dark">
+      <Link href={who === "betrieb" ? "/partner" : "/hamburg"} className="self-start rounded-full bg-brand px-6 py-3 font-bold text-white hover:bg-brand-dark">
         {who === "betrieb" ? "Konditionen ansehen" : "Leistungen ansehen"}
       </Link>
     </div>

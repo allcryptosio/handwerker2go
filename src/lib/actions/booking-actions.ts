@@ -35,7 +35,7 @@ const schema = z.object({
 });
 
 const MAX_PHOTOS = 5;
-const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
+const MAX_PHOTO_BYTES = 4 * 1024 * 1024;
 
 export async function createBooking(_: BookingFormState, form: FormData): Promise<BookingFormState> {
   const u = await currentUser();
@@ -55,7 +55,7 @@ export async function createBooking(_: BookingFormState, form: FormData): Promis
   if (files.length > MAX_PHOTOS) return { fieldErrors: { photos: `Höchstens ${MAX_PHOTOS} Fotos` } };
   const photos: { buf: Buffer; ext: string; mime: string }[] = [];
   for (const f of files) {
-    if (f.size > MAX_PHOTO_BYTES) return { fieldErrors: { photos: "Ein Foto ist größer als 8 MB." } };
+    if (f.size > MAX_PHOTO_BYTES) return { fieldErrors: { photos: "Ein Foto ist größer als 4 MB." } };
     const buf = Buffer.from(await f.arrayBuffer());
     const t = detectImageType(buf);
     if (!t) return { fieldErrors: { photos: "Bitte nur Fotos als JPG, PNG oder WebP hochladen." } };

@@ -23,12 +23,12 @@ export function Footer() {
               ))}
             </nav>
           )}
-          <nav aria-label="Für Handwerker" className="flex flex-col gap-2.5">
-            <strong>Für Handwerker</strong>
+          <nav aria-label="Mehr" className="flex flex-col gap-2.5">
+            <strong>Mehr</strong>
             <Link href="/ratgeber" className="hover:text-brand">Ratgeber</Link>
-            <Link href="/fuer-handwerker" className="hover:text-brand">Betrieb anmelden</Link>
-            <Link href="/fuer-handwerker#konditionen" className="hover:text-brand">Konditionen</Link>
-            <Link href="/anmelden" className="hover:text-brand">Zum Dashboard</Link>
+            <Link href="/ratgeber/ueber-handwerker2go" className="hover:text-brand">Über uns</Link>
+            <Link href="/anmelden" className="hover:text-brand">Anmelden</Link>
+            <Link href="/partner" className="hover:text-brand">Für Handwerksbetriebe</Link>
           </nav>
           <nav aria-label="Rechtliches" className="flex flex-col gap-2.5">
             <strong>Rechtliches</strong>

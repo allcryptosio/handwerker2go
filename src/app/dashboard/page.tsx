@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
@@ -30,6 +31,44 @@ const statusText: Record<string, { label: string; text: string; tone: string }> 
   suspended: { label: "Gesperrt", text: "Dein Profil ist vorübergehend nicht sichtbar.", tone: "bg-[#fef3f2] border-[#b42318]" },
 };
 
+/** „Startklar“-Liste: zeigt dem Betrieb jeden Schritt bis zur Buchbarkeit */
+function SetupChecklist({ steps }: { steps: { t: string; done: boolean; hint?: string; href?: string }[] }) {
+  const done = steps.filter((x) => x.done).length;
+  if (done === steps.length) {
+    return (
+      <section className="flex items-center gap-3 rounded-panel border-[1.5px] border-brand bg-mint p-5">
+        <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-full bg-brand font-bold text-white">✓</span>
+        <p className="font-semibold text-brand-dark">Alles eingerichtet. Kunden können dich jetzt buchen.</p>
+      </section>
+    );
+  }
+  return (
+    <section className="flex flex-col gap-4 rounded-panel border border-line p-6">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <h2 className="text-lg font-bold">Startklar in {steps.length} Schritten</h2>
+        <span className="text-[14px] font-semibold text-muted">{done} von {steps.length} erledigt</span>
+      </div>
+      <div className="h-2 overflow-hidden rounded-full bg-soft" role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={done}>
+        <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${(done / steps.length) * 100}%` }} />
+      </div>
+      <ol className="flex flex-col gap-2">
+        {steps.map((x, i) => (
+          <li key={x.t} className={`flex items-start gap-3 rounded-card px-3 py-2.5 ${x.done ? "" : "bg-soft"}`}>
+            <span aria-hidden className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[13px] font-bold ${x.done ? "bg-brand text-white" : "border-[1.5px] border-line-strong text-muted"}`}>
+              {x.done ? "✓" : i + 1}
+            </span>
+            <span className="flex-1">
+              <span className={`block font-semibold ${x.done ? "text-muted line-through decoration-1" : ""}`}>{x.t}</span>
+              {!x.done && x.hint && <span className="block text-[14px] text-ink-soft">{x.hint}</span>}
+            </span>
+            {!x.done && x.href && <Link href={x.href} className="shrink-0 text-[14px] font-bold text-brand underline">Erledigen</Link>}
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 async function Dashboard() {
   const u = await currentUser();
   if (!u) redirect("/anmelden");
@@ -40,10 +79,17 @@ async function Dashboard() {
     const cats = (await db.query("select c.label from provider_categories pc join service_categories c on c.id = pc.category_id where pc.provider_id = $1 order by c.sort", [p.id])).rows.map((r) => r.label as string);
     const area = (await db.query("select label, radius_km from service_areas where provider_id = $1 limit 1", [p.id])).rows[0];
     const pricing = (await db.query("select * from pricing_settings where valid_from <= now() order by valid_from desc limit 1")).rows[0];
-    return { p, cats, area, pricing };
+    const setup = (await db.query(
+      `select (select count(*) from provider_services s where s.provider_id = $1 and s.active)::int services,
+              (select count(*) from provider_services s where s.provider_id = $1 and s.active and s.price_type = 'fixed')::int fixed_services,
+              (select count(*) from provider_working_hours h where h.provider_id = $1)::int hours,
+              (select "emailVerified" from "user" where id = $2) email_verified`,
+      [p.id, u.id],
+    )).rows[0] as { services: number; fixed_services: number; hours: number; email_verified: boolean };
+    return { p, cats, area, pricing, setup };
   });
-  if (!data) redirect("/fuer-handwerker/registrieren");
-  const { p, cats, area, pricing } = data;
+  if (!data) redirect("/partner/registrieren");
+  const { p, cats, area, pricing, setup } = data;
   if (p.stripe_account_id && !(p.stripe_charges_enabled && p.stripe_payouts_enabled) && stripeConfigured()) {
     const f = await syncConnectAccount(p.stripe_account_id).catch(() => null);
     if (f) Object.assign(p, { stripe_charges_enabled: f.charges, stripe_payouts_enabled: f.payouts, stripe_details_submitted: f.details });
@@ -58,6 +104,21 @@ async function Dashboard() {
         <SignOutButton />
       </div>
       <DashboardNav active="/dashboard" />
+      <SetupChecklist
+        steps={[
+          { t: "Betrieb registriert", done: true },
+          { t: "E-Mail-Adresse bestätigt", done: setup.email_verified, hint: "Klick auf den Link in unserer E-Mail." },
+          { t: "Prüfung durch handwerker2go", done: p.status === "approved", hint: p.status === "pending" ? "Wir prüfen deine Nachweise und melden uns per E-Mail." : statusText[p.status]?.text },
+          {
+            t: "Auszahlungen bei Stripe eingerichtet",
+            done: p.stripe_charges_enabled && p.stripe_payouts_enabled,
+            hint: setup.fixed_services === 0 ? "Nötig, sobald du Leistungen mit Festpreis anbietest." : "Ohne Stripe-Konto können Kunden deine Festpreis-Leistungen nicht buchen.",
+            href: p.status === "approved" ? "#stripe" : undefined,
+          },
+          { t: "Leistungen mit Preisen eingetragen", done: setup.services > 0, href: "/dashboard/kalender", hint: "Welche Leistungen, zu welchem Preis, wie lange." },
+          { t: "Arbeitszeiten festgelegt", done: setup.hours > 0, href: "/dashboard/kalender", hint: "Nur in diesen Zeiten können Kunden buchen." },
+        ]}
+      />
       <section className={`rounded-panel border-[1.5px] p-6 ${s.tone}`}>
         <h2 className="text-lg font-bold">Status: {s.label}</h2>
         <p className="mt-2 text-[15px]">{s.text}{p.status_reason ? ` Grund: ${p.status_reason}` : ""}</p>
@@ -70,7 +131,7 @@ async function Dashboard() {
         </section>
       )}
       {p.status === "approved" && (
-        <section className="flex flex-col gap-3 rounded-panel border border-line p-6">
+        <section id="stripe" className="flex scroll-mt-6 flex-col gap-3 rounded-panel border border-line p-6">
           <h2 className="text-lg font-bold">Auszahlungen über Stripe</h2>
           {!stripeConfigured() ? (
             <p className="text-[15px] text-ink-soft">Die Online-Zahlung wird gerade eingerichtet. Wir melden uns, sobald du dein Auszahlungskonto verbinden kannst.</p>

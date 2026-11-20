@@ -48,7 +48,7 @@ export function BookingForm({
         <Field name="notes" label="Hinweise für den Betrieb" textarea rows={4} required={false}
           hint="Zum Beispiel: Etage, Zugang, Material vorhanden, Besonderheiten." error={e.notes} />
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="f-photos" className="text-sm font-semibold">Fotos <span className="font-normal text-muted">(optional, bis zu 5)</span></label>
+          <label htmlFor="f-photos" className="text-sm font-semibold">Fotos <span className="font-normal text-muted">(optional, bis zu 5, je höchstens 4 MB)</span></label>
           <input id="f-photos" name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple
             onChange={(ev) => setPreviews([...(ev.target.files ?? [])].slice(0, 5).map((f) => URL.createObjectURL(f)))}
             className="text-[15px] file:mr-3 file:min-h-11 file:rounded-full file:border-0 file:bg-mint file:px-4 file:font-semibold file:text-brand-dark" />

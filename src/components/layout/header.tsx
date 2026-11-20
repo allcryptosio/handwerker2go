@@ -26,11 +26,8 @@ export function Header() {
               {l.label}
             </Link>
           ))}
-          <Link
-            href="/fuer-handwerker"
-            className="rounded-full border-[1.5px] border-brand px-[18px] py-2.5 text-brand transition-colors hover:bg-brand hover:text-white"
-          >
-            Als Handwerker anmelden
+          <Link href="/partner" className="text-muted hover:text-brand">
+            Für Betriebe
           </Link>
         </nav>
 
@@ -57,12 +54,8 @@ export function Header() {
               </li>
             ))}
           </ul>
-          <Link
-            href="/fuer-handwerker"
-            onClick={() => setOpen(false)}
-            className="mt-4 block rounded-full bg-brand px-5 py-3.5 text-center font-bold text-white"
-          >
-            Als Handwerker anmelden
+          <Link href="/partner" onClick={() => setOpen(false)} className="mt-4 block py-2 text-[15px] font-semibold text-muted">
+            Für Handwerksbetriebe
           </Link>
         </nav>
       )}

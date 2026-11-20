@@ -48,7 +48,9 @@ export default function Page() {
 
       <h2>§ 3 Registrierung, Prüfung und Freischaltung</h2>
       <p>
-        (1) Der Betrieb registriert sich mit seinen Unternehmensdaten und lädt einen gewerblichen Nachweis hoch. Wir prüfen die
+        (1) Der Betrieb registriert sich mit seinen Unternehmensdaten und lädt die Gewerbeanmeldung, den Nachweis seiner
+        Betriebshaftpflichtversicherung und, für zulassungspflichtige Gewerke wie Elektro, Sanitär und Maler, die Eintragung in die
+        Handwerksrolle hoch. Wir prüfen die
         Angaben und entscheiden über die Freischaltung. Ein Anspruch auf Freischaltung besteht nicht; eine Ablehnung begründen wir
         per E-Mail.
       </p>
@@ -151,7 +153,11 @@ export default function Page() {
         hält Kalender, Arbeitszeiten und freie Tage aktuell, nimmt vereinbarte Termine wahr, beantwortet Anfragen zügig und erfüllt
         seine steuerlichen Pflichten selbst. Änderungen an seinen Angaben teilt er uns unverzüglich mit.
       </p>
-      <p>(3) Der Betrieb wickelt über die Plattform vermittelte Aufträge nicht an der Plattform vorbei ab.</p>
+      <p>
+        (3) Der Betrieb wickelt über die Plattform vermittelte Aufträge nicht an der Plattform vorbei ab. In öffentlichen
+        Profilangaben sind Telefonnummern, E-Mail-Adressen, Links und Hinweise auf Kontakt außerhalb der Plattform nicht erlaubt;
+        Kontaktdaten erhalten Kunde und Betrieb nach der Buchung.
+      </p>
       <p>
         (4) Soweit wir als Plattformbetreiber zu Meldungen an Steuerbehörden verpflichtet sind (Richtlinie (EU) 2021/514, „DAC7“),
         stellt der Betrieb uns auf Anforderung die dafür nötigen Angaben wahrheitsgemäß zur Verfügung, etwa Steuer-

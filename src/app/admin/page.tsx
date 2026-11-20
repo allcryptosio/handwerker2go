@@ -5,12 +5,47 @@ import { Suspense } from "react";
 import { SignOutButton } from "@/components/layout/sign-out-button";
 import { Container } from "@/components/ui/container";
 import { decideProvider } from "@/lib/actions/auth-actions";
+import { MASTER_REQUIRED_CATEGORIES, findContactData } from "@/lib/partner/guard";
 import { currentUser } from "@/lib/auth";
 import { withDb } from "@/lib/db";
 
 export const metadata: Metadata = { title: "Admin", robots: { index: false, follow: false } };
 
 const label: Record<string, string> = { pending: "In Prüfung", approved: "Freigeschaltet", rejected: "Abgelehnt", suspended: "Gesperrt" };
+
+type FlagInput = {
+  description: string; company_name: string; needs_master: boolean; documents: { kind: string }[] | null;
+  bk_total: number; bk_done: number; bk_declined: number; bk_provider_cancel: number; bk_customer_cancel: number; bk_disputes: number;
+};
+
+/** Hinweise für die Prüfung: fehlende Nachweise, Kontaktdaten im Profil, auffällige Absagen und Rückbuchungen */
+function ProviderFlags({ p }: { p: FlagInput }) {
+  const kinds = new Set((p.documents ?? []).map((d) => d.kind));
+  const flags: string[] = [];
+  if (!kinds.has("gewerbeanmeldung")) flags.push("Gewerbeanmeldung fehlt");
+  if (!kinds.has("versicherung")) flags.push("Betriebshaftpflicht fehlt");
+  if (p.needs_master && !kinds.has("handwerksrolle")) flags.push("Handwerksrolle fehlt (zulassungspflichtiges Gewerk)");
+  const contact = findContactData(`${p.company_name} ${p.description}`);
+  if (contact) flags.push(`${contact} im Profiltext`);
+  const decided = p.bk_done + p.bk_declined + p.bk_provider_cancel;
+  if (decided >= 3 && (p.bk_declined + p.bk_provider_cancel) / decided > 0.3) flags.push("Lehnt viele Buchungen ab oder sagt ab");
+  if (p.bk_customer_cancel >= 3 && p.bk_customer_cancel / Math.max(1, p.bk_total) > 0.4) flags.push("Viele Kunden-Stornos (mögliche Abwicklung außerhalb der Plattform)");
+  if (p.bk_disputes > 0) flags.push(`${p.bk_disputes} Rückbuchung(en)`);
+  return (
+    <div className="flex flex-col gap-1">
+      <span>
+        Buchungen {p.bk_total}, erledigt {p.bk_done}, abgelehnt {p.bk_declined}, vom Betrieb abgesagt {p.bk_provider_cancel}, von Kunden storniert {p.bk_customer_cancel}
+      </span>
+      {flags.length === 0 ? (
+        <span className="font-semibold text-brand">Keine</span>
+      ) : (
+        <ul className="flex flex-wrap gap-2">
+          {flags.map((f) => <li key={f} className="rounded-full bg-[#fef3f2] px-2.5 py-0.5 text-[13px] font-semibold text-[#b42318]">{f}</li>)}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 async function Admin({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
@@ -22,9 +57,16 @@ async function Admin({ searchParams }: { searchParams: Promise<Record<string, st
       select p.*, us.email, us."emailVerified" as email_verified,
         (select string_agg(c.label, ', ' order by c.sort) from provider_categories pc join service_categories c on c.id = pc.category_id where pc.provider_id = p.id) as categories,
         (select label || ', ' || radius_km || ' km' from service_areas a where a.provider_id = p.id limit 1) as area,
-        (select json_agg(json_build_object('id', d.id, 'kind', d.kind, 'name', d.original_name)) from provider_documents d where d.provider_id = p.id) as documents
+        (select json_agg(json_build_object('id', d.id, 'kind', d.kind, 'name', d.original_name)) from provider_documents d where d.provider_id = p.id) as documents,
+        (select count(*) from bookings b where b.provider_id = p.id)::int as bk_total,
+        (select count(*) from bookings b where b.provider_id = p.id and b.status = 'completed')::int as bk_done,
+        (select count(*) from bookings b where b.provider_id = p.id and b.status = 'declined')::int as bk_declined,
+        (select count(*) from bookings b where b.provider_id = p.id and b.status = 'cancelled' and coalesce(b.cancel_reason, '') not in ('Storniert durch Kunden', 'Termin bereits vergeben'))::int as bk_provider_cancel,
+        (select count(*) from bookings b where b.provider_id = p.id and b.status = 'cancelled' and b.cancel_reason = 'Storniert durch Kunden')::int as bk_customer_cancel,
+        (select count(*) from bookings b where b.provider_id = p.id and b.legal_hold)::int as bk_disputes,
+        exists (select 1 from provider_categories pc join service_categories c on c.id = pc.category_id where pc.provider_id = p.id and c.slug = any($1)) as needs_master
       from provider_profiles p join "user" us on us.id = p.user_id
-      order by (p.status = 'pending') desc, p.created_at desc limit 200`)).rows;
+      order by (p.status = 'pending') desc, p.created_at desc limit 200`, [[...MASTER_REQUIRED_CATEGORIES]])).rows;
     const stats = (await db.query(`select
       (select count(*) from "user" where role = 'customer')::int as customers,
       (select count(*) from provider_profiles)::int as providers,
@@ -72,6 +114,7 @@ async function Admin({ searchParams }: { searchParams: Promise<Record<string, st
               <div><dt className="text-muted">Leistungen</dt><dd>{p.categories}</dd></div>
               <div><dt className="text-muted">Einsatzgebiet</dt><dd>{p.area}</dd></div>
               <div className="sm:col-span-2"><dt className="text-muted">Beschreibung</dt><dd className="whitespace-pre-line">{p.description}</dd></div>
+              <div className="sm:col-span-2"><dt className="text-muted">Auffälligkeiten</dt><dd><ProviderFlags p={p} /></dd></div>
               <div className="sm:col-span-2"><dt className="text-muted">Nachweise</dt><dd className="flex flex-wrap gap-3">
                 {(p.documents ?? []).map((d: { id: string; kind: string; name: string }) => (
                   <a key={d.id} href={`/admin/nachweis/${d.id}`} className="font-semibold text-brand underline">{d.kind}: {d.name}</a>

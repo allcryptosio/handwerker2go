@@ -8,6 +8,7 @@ import { auth, currentUser } from "@/lib/auth";
 import { asSystem, audit, withDb } from "@/lib/db";
 import { mailReady, sendMail } from "@/lib/mail";
 import { detectDocumentType, storage } from "@/lib/storage";
+import { MASTER_REQUIRED_CATEGORIES, findContactData, normalizePhone, normalizeVatId } from "@/lib/partner/guard";
 
 export type FormState = { ok?: boolean; error?: string; fieldErrors?: Record<string, string>; message?: string };
 
@@ -97,27 +98,63 @@ const providerSchema = z.object({
   description: z.string().trim().min(40, "Bitte beschreibe deinen Betrieb in mindestens 40 Zeichen").max(2000),
   area_label: z.string().trim().min(2, "Bitte gib den Mittelpunkt deines Einsatzgebiets an").max(120),
   radius_km: z.coerce.number().min(1, "Mindestens 1 km").max(200, "Höchstens 200 km"),
-  document_kind: z.enum(["gewerbeanmeldung", "handwerksrolle", "versicherung", "sonstiges"]),
   terms,
 });
+
+/** Pflicht-Nachweise je Betrieb; Handwerksrolle nur für zulassungspflichtige Gewerke */
+const DOCS = [
+  { field: "doc_gewerbe", kind: "gewerbeanmeldung", label: "die Gewerbeanmeldung" },
+  { field: "doc_versicherung", kind: "versicherung", label: "den Nachweis der Betriebshaftpflicht" },
+  { field: "doc_handwerksrolle", kind: "handwerksrolle", label: "die Eintragung in die Handwerksrolle" },
+] as const;
+const MAX_DOC_BYTES = 5 * 1024 * 1024;
 
 export async function registerProvider(_: FormState, form: FormData): Promise<FormState> {
   if (!mailReady()) return { error: "Die Registrierung startet in Kürze." };
   const parsed = providerSchema.safeParse(Object.fromEntries(form));
   const categories = form.getAll("categories").map(String);
-  const file = form.get("document");
   const errors: Record<string, string> = parsed.success ? {} : fieldErrors(parsed.error);
   if (categories.length === 0) errors.categories = "Bitte wähle mindestens eine Leistung";
-  let doc: { buf: Buffer; type: { ext: string; mime: string }; name: string } | null = null;
-  if (!(file instanceof File) || file.size === 0) errors.document = "Bitte lade einen gewerblichen Nachweis hoch";
-  else if (file.size > 10 * 1024 * 1024) errors.document = "Die Datei ist größer als 10 MB";
-  else {
+
+  // Keine Kontaktdaten in öffentlichen Texten (Schutz vor Umgehung der Plattform)
+  for (const f of ["company_name", "description"] as const) {
+    const v = String(form.get(f) ?? "");
+    const found = findContactData(v);
+    if (found && !errors[f]) errors[f] = `Bitte keine ${found} angeben. Kunden erhalten deine Kontaktdaten nach der Buchung automatisch.`;
+  }
+
+  // Nachweise: Gewerbeanmeldung und Haftpflicht immer, Handwerksrolle für zulassungspflichtige Gewerke
+  const needsMaster = categories.some((c) => (MASTER_REQUIRED_CATEGORIES as readonly string[]).includes(c));
+  const docs: { kind: string; buf: Buffer; type: { ext: string; mime: string }; name: string }[] = [];
+  for (const dd of DOCS) {
+    const file = form.get(dd.field);
+    const required = dd.kind !== "handwerksrolle" || needsMaster;
+    if (!(file instanceof File) || file.size === 0) {
+      if (required) errors[dd.field] = `Bitte lade ${dd.label} hoch`;
+      continue;
+    }
+    if (file.size > MAX_DOC_BYTES) { errors[dd.field] = "Die Datei ist größer als 5 MB"; continue; }
     const buf = Buffer.from(await file.arrayBuffer());
     const type = detectDocumentType(buf);
-    if (!type) errors.document = "Bitte als PDF, JPG oder PNG hochladen";
-    else doc = { buf, type, name: file.name.slice(0, 200) };
+    if (!type) { errors[dd.field] = "Bitte als PDF, JPG oder PNG hochladen"; continue; }
+    docs.push({ kind: dd.kind, buf, type, name: file.name.slice(0, 200) });
   }
-  if (!parsed.success || Object.keys(errors).length || !doc) return { fieldErrors: errors };
+
+  // Doppelte Registrierung verhindern (gleiche USt-IdNr. oder Telefonnummer)
+  if (parsed.success) {
+    const vat = parsed.data.vat_id ? normalizeVatId(parsed.data.vat_id) : "";
+    if (vat && !/^DE\d{9}$/.test(vat)) errors.vat_id = "Bitte eine deutsche USt-IdNr. im Format DE123456789 angeben";
+    const phone = normalizePhone(parsed.data.phone);
+    const dup = await asSystem(async (db) =>
+      (await db.query(
+        `select 1 from provider_profiles where ($1 <> '' and upper(regexp_replace(coalesce(vat_id, ''), '[^A-Za-z0-9]', '', 'g')) = $1)
+            or regexp_replace(regexp_replace(regexp_replace(phone, '[^0-9]', '', 'g'), '^00', ''), '^0', '49') = $2 limit 1`,
+        [vat, phone],
+      )).rowCount,
+    );
+    if (dup) errors.vat_id = errors.vat_id ?? "Zu dieser USt-IdNr. oder Telefonnummer gibt es schon einen Betrieb. Bitte melde dich an oder schreib uns.";
+  }
+  if (!parsed.success || Object.keys(errors).length) return { fieldErrors: errors };
   const d = parsed.data;
 
   let userId: string;
@@ -134,13 +171,13 @@ export async function registerProvider(_: FormState, form: FormData): Promise<Fo
   }
 
   try {
-    const key = await storage.put("nachweise", doc.buf, doc.type.ext);
+    const keys = await Promise.all(docs.map(async (x) => ({ ...x, key: await storage.put("nachweise", x.buf, x.type.ext) })));
     await asSystem((db) => db.query(`update "user" set role = 'provider' where id = $1`, [userId]));
     await withDb({ userId, role: "provider" }, async (db) => {
       const p = await db.query(
         `insert into provider_profiles (user_id, company_name, legal_form, contact_name, phone, street, postal_code, city, vat_id, description, accepted_terms_at)
          values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10, now()) returning id`,
-        [userId, d.company_name, d.legal_form || null, d.contact_name, d.phone, d.street, d.postal_code, d.city, d.vat_id || null, d.description],
+        [userId, d.company_name, d.legal_form || null, d.contact_name, d.phone, d.street, d.postal_code, d.city, d.vat_id ? normalizeVatId(d.vat_id) : null, d.description],
       );
       const pid: string = p.rows[0].id;
       await db.query(
@@ -159,10 +196,12 @@ export async function registerProvider(_: FormState, form: FormData): Promise<Fo
         "insert into provider_working_hours (provider_id, weekday, starts, ends) select $1, wd, '08:00', '17:00' from generate_series(1, 5) wd",
         [pid],
       );
-      await db.query(
-        "insert into provider_documents (provider_id, kind, storage_key, original_name, mime_type, size_bytes) values ($1,$2,$3,$4,$5,$6)",
-        [pid, d.document_kind, key, doc!.name, doc!.type.mime, doc!.buf.length],
-      );
+      for (const x of keys) {
+        await db.query(
+          "insert into provider_documents (provider_id, kind, storage_key, original_name, mime_type, size_bytes) values ($1,$2,$3,$4,$5,$6)",
+          [pid, x.kind, x.key, x.name, x.type.mime, x.buf.length],
+        );
+      }
       await audit(db, { actorId: userId, actorRole: "provider", action: "register", entity: "provider_profiles", entityId: pid, after: { company: d.company_name, categories } });
     });
   } catch (e) {

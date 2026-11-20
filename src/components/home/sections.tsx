@@ -1,14 +1,6 @@
 import Link from "next/link";
 import { popularProjects } from "@/lib/catalog";
 import { photoSrc } from "@/lib/photos";
-import {
-  formatCents,
-  formatPercent,
-  providerPricing as p,
-  providerVatNote,
-  yearlyPerMonthCents,
-  yearlySavingsPercent,
-} from "@/lib/pricing";
 import { Container } from "@/components/ui/container";
 import { Icon } from "@/components/ui/icon";
 import { PhotoSlot } from "@/components/ui/photo-slot";
@@ -144,45 +136,22 @@ export function HowItWorks() {
   );
 }
 
+/** Dezenter Hinweis für Betriebe. Preise und Konditionen stehen nur im Partner-Bereich (/partner). */
 export function ProviderCta() {
-  const cards = [
-    { label: `Monat 1 bis ${p.introMonths}`, price: formatCents(p.introMonthlyFeeCents), note: `${formatPercent(p.introCommissionBps)} Provision` },
-    { label: "Monatlich", price: formatCents(p.monthly.feeCents), note: `${formatPercent(p.monthly.commissionBps)} Provision` },
-    {
-      label: "Jährlich",
-      price: formatCents(yearlyPerMonthCents()),
-      note: `pro Monat, ${formatCents(p.yearly.feeCents)} im Jahr`,
-      highlight: true,
-    },
-  ];
   return (
-    <section aria-labelledby="betriebe-titel" className="bg-brand-dark text-white">
-      <Container className="flex flex-wrap items-center gap-12 py-20">
-        <div className="flex min-w-0 flex-[1_1_460px] flex-col gap-[18px]">
-          <h2 id="betriebe-titel" className="text-[clamp(30px,3.6vw,46px)] font-extrabold leading-[1.1] tracking-[-0.03em]">
-            Du bist Handwerker? Gewinne neue Kunden in deiner Nähe.
+    <section aria-labelledby="betriebe-titel" className="border-t border-line bg-soft">
+      <Container className="flex flex-wrap items-center justify-between gap-6 py-12">
+        <div className="flex max-w-[640px] flex-col gap-2">
+          <h2 id="betriebe-titel" className="text-[clamp(22px,2.4vw,28px)] font-extrabold tracking-[-0.02em] text-brand-dark">
+            Du führst einen Handwerksbetrieb?
           </h2>
-          <p className="text-[17px] leading-relaxed text-[#cfe3d7]">
-            Eigenes Profil, Kalender, Buchungen und Auszahlungen an einem Ort. Die ersten {p.introMonths} Monate ohne
-            Grundgebühr. Das Jahresabo ist rund {yearlySavingsPercent()} % günstiger als monatlich.
+          <p className="text-[16px] leading-relaxed text-ink-soft">
+            Werde Partner von handwerker2go und bekomm Aufträge aus deiner Nachbarschaft, direkt in deinen Kalender.
           </p>
-          <Link
-            href="/fuer-handwerker"
-            className="self-start rounded-full bg-white px-[26px] py-[15px] font-bold text-brand-dark transition-colors hover:bg-mint"
-          >
-            Jetzt als Handwerker anmelden
-          </Link>
         </div>
-        <dl className="grid min-w-0 flex-[1_1_420px] grid-cols-1 gap-3 sm:grid-cols-3">
-          {cards.map((c) => (
-            <div key={c.label} className={`rounded-card bg-brand-deep p-5 ${c.highlight ? "outline-2 outline-brand-light" : ""}`}>
-              <dt className="text-xs font-semibold text-[#cfe3d7]">{c.label}</dt>
-              <dd className="mt-2 text-[30px] font-extrabold">{c.price}</dd>
-              <dd className="mt-1 text-[13px] text-[#cfe3d7]">{c.note}</dd>
-            </div>
-          ))}
-        </dl>
-        <p className="w-full text-[13px] text-[#cfe3d7]">{providerVatNote}</p>
+        <Link href="/partner" className="rounded-full border-[1.5px] border-brand-dark px-6 py-3 font-bold text-brand-dark transition-colors hover:bg-brand-dark hover:text-white">
+          Mehr für Betriebe
+        </Link>
       </Container>
     </section>
   );

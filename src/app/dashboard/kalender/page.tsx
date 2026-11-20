@@ -32,7 +32,7 @@ async function Calendar() {
     )).rows;
     return { p, hours, off, services };
   });
-  if (!data) redirect("/fuer-handwerker/registrieren");
+  if (!data) redirect("/partner/registrieren");
   const { p, hours, off, services } = data;
   const hourMap: Record<number, { from: string; to: string }> = {};
   for (const h of hours) hourMap[h.weekday] ??= { from: h.f, to: h.t };
