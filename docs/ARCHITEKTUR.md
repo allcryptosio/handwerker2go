@@ -175,4 +175,4 @@ prüfen, ob sie über Stripe oder eine eigene Rechnungsstellung laufen. DAC7-Mel
 - Supabase: neues Projekt in Frankfurt. Blockiert, weil das Supabase-Konto das Limit von 2 kostenlosen Projekten erreicht hat (Upgrade auf Pro oder ein Projekt pausieren).
 - Domain: handwerker2go.com (DNS auf Cloudflare legen, dann nginx-vhost und SSL einrichten).
 - Absenderadresse für E-Mails (für Resend ab Phase 5, für Auth-Mails schon in Phase 2 über Supabase SMTP).
-- Impressum: Anschrift, E-Mail und Telefon fehlen noch (Betreiber Joe Becker, Sole Trader, MT33258727 sind eingetragen).
+- Impressum: Betreiberdaten kommen aus src/config/legal-data.json (LEGAL).

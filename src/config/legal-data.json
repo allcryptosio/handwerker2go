@@ -1,0 +1,14 @@
+{
+  "operatorName": "Joe Becker",
+  "vatRegistration": "Malta VAT Act Art. 12 (MT33258727) – nur innergemeinschaftliche B2B-Leistungen, keine maltesische USt in Rechnungen",
+  "tradingName": "handwerker2go",
+  "address": "157 - 69 Patri Felicjan Bilocca St, MRS 1521 Marsa, Malta",
+  "addressLines": ["157 - 69 Patri Felicjan Bilocca St", "MRS 1521 Marsa", "Malta"],
+  "email": "info@handwerker2go.com",
+  "phone": "+49 177 8879538",
+  "vatId": "MT33258727",
+  "dsaContactEmail": "info@handwerker2go.com",
+  "jurisdictionCourt": "Hamburg",
+  "withdrawalUrl": "https://handwerker2go.com/vertrag-widerrufen",
+  "legalVersion": "2026-11-21"
+}

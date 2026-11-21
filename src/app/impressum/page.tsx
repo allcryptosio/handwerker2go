@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { legal } from "@/config/legal";
+import { LEGAL } from "@/config/legal";
 import { pageMeta } from "@/lib/seo";
 import { Email } from "@/components/legal/email";
 import { LegalPage } from "@/components/legal/legal-page";
@@ -16,24 +16,30 @@ export default function Page() {
     <LegalPage title="Impressum" draft={false}>
       <h2>Angaben gemäß § 5 DDG</h2>
       <p>
-        Joe Becker
+        {LEGAL.operatorName}, handelnd unter „{LEGAL.tradingName}“
         <br />
-        157 - 69 Patri Felicjan Bilocca St
+        {LEGAL.addressLines[0]}
         <br />
-        MRS 1521 Marsa
+        {LEGAL.addressLines[1]}
         <br />
-        Malta
+        {LEGAL.addressLines[2]}
       </p>
       <h2>Kontakt</h2>
       <p>
         E-Mail: <Email />
         <br />
-        Telefon: <a href={`tel:${legal.phone.replace(/\s/g, "")}`} className="underline">{legal.phone}</a>
+        Telefon: <a href={`tel:${LEGAL.phone.replace(/\s/g, "")}`} className="underline">{LEGAL.phone}</a>
       </p>
       <h2>Umsatzsteuer-Identifikationsnummer</h2>
-      <p>MT33258727</p>
+      <p>{LEGAL.vatId}</p>
       <h2>Verantwortlich für den Inhalt</h2>
-      <p>Joe Becker, Anschrift wie oben</p>
+      <p>{LEGAL.operatorName}, Anschrift wie oben</p>
+      <h2>Kontaktstelle nach Art. 11 und 12 DSA</h2>
+      <p>
+        Kontaktstelle nach Art. 11 und 12 der Verordnung (EU) 2022/2065 (Digital Services Act): {LEGAL.dsaContactEmail} (Deutsch, Englisch).
+        Für Behörden der Mitgliedstaaten, die EU-Kommission und Nutzerinnen und Nutzer. Rechtswidrige Inhalte melden Sie am schnellsten über
+        den Link „Inhalt melden“ am jeweiligen Inhalt.
+      </p>
       <h2>Verbraucherstreitbeilegung</h2>
       <p>Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
       <h2>Datenquellen</h2>

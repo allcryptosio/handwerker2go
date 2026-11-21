@@ -4,6 +4,7 @@
 // Nutzung: node --env-file=.env.local scripts/stripe-setup.mjs
 import { readFileSync } from "node:fs";
 import Stripe from "stripe";
+import LEGAL from "../src/config/legal-data.json" with { type: "json" };
 
 const key = process.env.STRIPE_SECRET_KEY;
 if (!key) throw new Error("STRIPE_SECRET_KEY fehlt");
@@ -16,7 +17,8 @@ const num = (re) => Number(src.match(re)[1]);
 const monthlyCents = num(/monthly:\s*\{\s*feeCents:\s*(\d+)/);
 const yearlyCents = num(/yearly:\s*\{\s*feeCents:\s*(\d+)/);
 
-const legal = { line1: "157 - 69 Patri Felicjan Bilocca St", postal_code: "MRS 1521", city: "Marsa", country: "MT" };
+// Anschrift aus der zentralen Betreiber-Config (src/config/legal-data.json)
+const legal = { line1: LEGAL.addressLines[0], postal_code: LEGAL.addressLines[1].split(" ").slice(0, 2).join(" "), city: LEGAL.addressLines[1].split(" ").slice(2).join(" "), country: "MT" };
 await s.tax.settings.update({ head_office: { address: legal }, defaults: { tax_behavior: "exclusive", tax_code: "txcd_10000000" } });
 const regs = await s.tax.registrations.list({ limit: 50 });
 if (!regs.data.some((r) => r.country === "MT" && r.status === "active")) {

@@ -236,7 +236,7 @@ export default function Page() {
       <p>(1) Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts (CISG).</p>
       <p>
         (2) Ist der Betrieb Kaufmann, juristische Person des öffentlichen Rechts oder öffentlich-rechtliches Sondervermögen, ist
-        ausschließlicher Gerichtsstand der Sitz des Plattformbetreibers in {legal.operatorCity}. Im Übrigen gelten die
+        ausschließlicher Gerichtsstand der Sitz des Plattformbetreibers in Malta. Im Übrigen gelten die
         gesetzlichen Regeln.
       </p>
       <p>(3) Sollten einzelne Bestimmungen unwirksam sein, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.</p>
