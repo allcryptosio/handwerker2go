@@ -253,9 +253,12 @@ export function BookingSearch({
   );
 }
 
-function Chevron() {
+/** Auswahl als Balken: ganze Zeile tippbar, klare Kante */
+const bar = "flex min-h-[54px] w-full items-center gap-3 rounded-2xl border border-line bg-white px-4 text-left text-[16px] text-ink transition-colors hover:border-brand hover:bg-mint active:bg-mint sm:min-h-[48px] sm:text-[15px]";
+
+function Chevron({ always = false }: { always?: boolean }) {
   return (
-    <svg aria-hidden viewBox="0 0 16 16" className="h-4 w-4 shrink-0 text-muted sm:hidden" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg aria-hidden viewBox="0 0 16 16" className={`h-4 w-4 shrink-0 text-muted ${always ? "" : "sm:hidden"}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M6 3.5 10.5 8 6 12.5" />
     </svg>
   );
@@ -312,7 +315,7 @@ function Popover({ children, title, onClose, wide = false, search, inputRef }: {
   return createPortal(
     search ? (
       <div data-bs-sheet role="dialog" aria-label={title} className="fixed inset-0 z-[60] flex flex-col bg-white">
-        <div className="shrink-0 border-b border-line px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))]">
+        <div className="shrink-0 border-b border-line bg-white px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))]">
           {header}
           <div className="mt-2 flex items-center gap-2 rounded-xl border-[1.5px] border-line-strong bg-white px-3 focus-within:border-brand">
             <Icon name="suche" size={17} strokeWidth={2.4} />
@@ -325,7 +328,7 @@ function Popover({ children, title, onClose, wide = false, search, inputRef }: {
             )}
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(24px,env(safe-area-inset-bottom))] pt-2">{children}</div>
+        <div className="flex-1 overflow-y-auto overscroll-contain bg-soft px-4 pb-[max(24px,env(safe-area-inset-bottom))] pt-4">{children}</div>
       </div>
     ) : (
       <div data-bs-sheet>
@@ -352,19 +355,19 @@ function ServicePanel({ services, query, onPick, onClose, search, inputRef }: { 
   return (
     <Popover title="Leistung wählen" wide onClose={onClose} search={search} inputRef={inputRef}>
       {groups.length === 0 && <p className="text-[15px] text-muted">Keine passende Leistung gefunden.</p>}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5">
         {groups.map(([cat, items]) => (
           <div key={cat}>
-            <div className="mb-1 text-[12px] font-bold uppercase tracking-[0.06em] text-muted">{cat}</div>
-            <ul className="flex flex-col">
+            <div className="mb-2 px-1 text-[12px] font-bold uppercase tracking-[0.06em] text-muted">{cat}</div>
+            <ul className="flex flex-col gap-2">
               {items.map((s) => (
                 <li key={s.slug}>
-                  <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => onPick(s)}
-                    className="flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-[15px] hover:bg-mint">
-                    <span>{s.name}</span>
-                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${s.mode === "festpreis" ? "bg-mint text-brand-dark" : "bg-soft text-muted"}`}>
+                  <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => onPick(s)} className={bar}>
+                    <span className="min-w-0 flex-1 truncate font-semibold">{s.name}</span>
+                    <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${s.mode === "festpreis" ? "bg-mint text-brand-dark" : "bg-soft text-muted"}`}>
                       {s.mode === "festpreis" ? "Festpreis" : "Angebot"}
                     </span>
+                    <Chevron always />
                   </button>
                 </li>
               ))}
@@ -399,13 +402,13 @@ function PlacePanel({ query, onPick, onClose, search, inputRef }: { query: strin
       {short || places.length === 0 ? (
         <p className="text-[15px] text-muted">Postleitzahl oder Ort eingeben, z. B. 20095 oder Hamburg.</p>
       ) : (
-        <ul className="flex flex-col">
+        <ul className="flex flex-col gap-2">
           {places.map((p) => (
             <li key={`${p.postalCode}-${p.place}`}>
-              <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => onPick(`${p.postalCode} ${p.place}`)}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[15px] hover:bg-mint">
+              <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => onPick(`${p.postalCode} ${p.place}`)} className={bar}>
                 <span className="font-semibold tabular-nums">{p.postalCode}</span>
-                <span className="text-ink-soft">{p.place}</span>
+                <span className="min-w-0 flex-1 truncate text-ink-soft">{p.place}</span>
+                <Chevron always />
               </button>
             </li>
           ))}

@@ -45,9 +45,12 @@ body {
   font-family: var(--font-sans);
 }
 
-:focus-visible {
-  outline: 3px solid var(--color-brand);
-  outline-offset: 2px;
+/* in @layer base, damit focus-visible:outline-none an Eingabefeldern greift */
+@layer base {
+  :focus-visible {
+    outline: 3px solid var(--color-brand);
+    outline-offset: 2px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
