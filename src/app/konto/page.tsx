@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { SignOutButton } from "@/components/layout/sign-out-button";
+import { WithdrawButton } from "@/components/legal/withdraw-button";
 import { Container } from "@/components/ui/container";
 import { currentUser } from "@/lib/auth";
 import { withDb } from "@/lib/db";
@@ -39,14 +40,15 @@ async function Account() {
         ) : (
           <ul className="flex flex-col gap-2">
             {bookings.map((b) => (
-              <li key={b.id}>
-                <Link href={`/buchung/${b.id}`} className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-line p-4 hover:bg-soft">
+              <li key={b.id} className="flex flex-col gap-2 rounded-card border border-line p-2 sm:flex-row sm:items-center">
+                <Link href={`/buchung/${b.id}`} className="flex flex-1 flex-wrap items-center justify-between gap-3 rounded-card p-2 hover:bg-soft">
                   <span>
                     <span className="block font-bold">{b.service_name}</span>
                     <span className="block text-[14px] text-ink-soft">{when(new Date(b.starts_at))} Uhr, {b.company_name}</span>
                   </span>
                   <span className={`rounded-full px-2.5 py-1 text-[12px] font-bold ${b.status === "confirmed" ? "bg-mint text-brand-dark" : b.status === "requested" || b.status === "pending_payment" ? "bg-[#fff8e1] text-[#7a5b00]" : "bg-soft text-muted"}`}>{label[b.status]}</span>
                 </Link>
+                {b.status !== "pending_payment" && <WithdrawButton bookingNumber={b.number} className="min-h-11 px-4 text-[14px]" />}
               </li>
             ))}
           </ul>

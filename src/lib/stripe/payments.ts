@@ -51,6 +51,11 @@ export async function createBookingCheckout(input: {
  * oder Restbetrag nach Pauschale. Die Provision wird anteilig mit erstattet.
  */
 export async function refundBookingPayment(input: { providerAccountId: string; paymentIntentId: string; amountCents?: number; reason: string }) {
+  // Nur für Tests: STRIPE_MOCK=1 (wird mit Live-Schlüssel ignoriert) protokolliert den Aufruf statt ihn an Stripe zu senden
+  if (process.env.STRIPE_MOCK === "1" && !/^(sk|rk)_live_/.test(process.env.STRIPE_SECRET_KEY ?? "")) {
+    console.log("[STRIPE_MOCK] refunds.create", JSON.stringify({ ...input, refund_application_fee: true }));
+    return { id: `re_mock_${input.paymentIntentId}_${input.amountCents ?? "voll"}` } as { id: string };
+  }
   const stripe = getStripe();
   if (!stripe) throw new Error("Stripe ist nicht konfiguriert");
   return stripe.refunds.create(

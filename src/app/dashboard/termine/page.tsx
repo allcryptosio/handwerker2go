@@ -6,6 +6,7 @@ import { AutoRefresh } from "@/components/dashboard/auto-refresh";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { Container } from "@/components/ui/container";
 import { providerBookingAction } from "@/lib/actions/booking-actions";
+import { providerDecideWertersatz } from "@/lib/actions/withdrawal-admin-actions";
 import { currentUser } from "@/lib/auth";
 import { withDb } from "@/lib/db";
 
@@ -27,6 +28,14 @@ async function Appointments() {
         where p.user_id = $1 and b.status in ('requested', 'confirmed', 'pending_payment', 'completed', 'cancelled', 'declined')
           and b.starts_at > now() - interval '30 days'
         order by b.starts_at`,
+      [u.id],
+    )).rows,
+  );
+  const withdrawals = await withDb({ userId: u.id, role: "provider" }, async (db) =>
+    (await db.query(
+      `select w.id, w.received_at, w.status, w.case_kind, w.wertersatz_amount_cents, b.number, b.service_name, b.price_cents, b.early_start_consent_at
+         from withdrawals w join bookings b on b.id = w.booking_id join provider_profiles p on p.id = b.provider_id
+        where p.user_id = $1 and w.received_at > now() - interval '60 days' order by w.received_at desc`,
       [u.id],
     )).rows,
   );
@@ -69,6 +78,30 @@ async function Appointments() {
       <AutoRefresh seconds={30} />
       <h1 className="text-[clamp(28px,3.4vw,40px)] font-extrabold tracking-[-0.03em] text-brand-dark">Termine</h1>
       <DashboardNav active="/dashboard/termine" />
+      {withdrawals.length > 0 && (
+        <section className="flex flex-col gap-3 rounded-panel border-[1.5px] border-[#b42318] bg-[#fef3f2] p-5">
+          <h2 className="text-lg font-bold">Widerrufe von Kunden</h2>
+          <ul className="flex flex-col gap-3">
+            {withdrawals.map((w) => (
+              <li key={w.id} className="flex flex-col gap-2 rounded-card bg-white p-4 text-[15px]">
+                <div><b>{w.service_name}</b>, Buchung {w.number}, eingegangen {day(new Date(w.received_at))} {hm(new Date(w.received_at))} Uhr</div>
+                <div className="text-ink-soft">
+                  {w.status === "refunded" ? "Voll erstattet." : w.status === "partially_refunded" ? `Erstattet, Wertersatz ${eur(w.wertersatz_amount_cents)} einbehalten.` : w.case_kind === "wertersatz" ? "Der Termin hatte schon begonnen. Bitte Wertersatz für die bis zum Widerruf erbrachte Leistung mitteilen (innerhalb von 10 Tagen, sonst volle Erstattung am 14. Tag)." : "Wird von handwerker2go bearbeitet."}
+                </div>
+                {w.status === "received" && w.case_kind === "wertersatz" && w.early_start_consent_at && (
+                  <form action={providerDecideWertersatz} className="flex flex-wrap items-center gap-2">
+                    <input type="hidden" name="id" value={w.id} />
+                    <label className="text-[14px]">Wertersatz in € (höchstens {eur(w.price_cents)}){" "}
+                      <input name="wertersatz" inputMode="decimal" defaultValue="0" className="ml-1 min-h-10 w-28 rounded-xl border border-line-strong px-3" />
+                    </label>
+                    <button className="rounded-full bg-brand px-4 py-2 text-[14px] font-bold text-white">Mitteilen und Rest erstatten</button>
+                  </form>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       {open.length > 0 && (
         <section className="flex flex-col gap-3">
           <h2 className="text-lg font-bold">Offene Anfragen ({open.length})</h2>

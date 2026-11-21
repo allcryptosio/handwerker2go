@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WithdrawButton } from "@/components/legal/withdraw-button";
 import { Logo } from "@/components/ui/logo";
 
 /** Fußzeile des Partner-Bereichs */
@@ -29,6 +30,12 @@ export function PartnerFooter() {
         <p className="border-t border-line pt-5 text-[13px] text-muted">
           handwerker2go vermittelt Aufträge an selbstständige Handwerksbetriebe. Vertragspartner der Kunden ist der jeweilige Betrieb.
         </p>
+      </div>
+      <div className="border-t border-line bg-soft">
+        <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-4 px-5 py-6 sm:px-7">
+          <p className="text-[15px] text-ink-soft">Sie möchten einen über handwerker2go geschlossenen Vertrag widerrufen?</p>
+          <WithdrawButton />
+        </div>
       </div>
     </footer>
   );

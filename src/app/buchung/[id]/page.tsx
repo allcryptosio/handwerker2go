@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { CustomerCancelButton } from "@/components/booking/cancel-button";
 import { ReviewForm } from "@/components/booking/review-form";
+import { WithdrawButton } from "@/components/legal/withdraw-button";
 import { Container } from "@/components/ui/container";
 import { legal } from "@/config/legal";
 import { providerBookingAction, syncCheckoutReturn } from "@/lib/actions/booking-actions";
@@ -107,6 +108,13 @@ async function Detail({ params, searchParams }: PageProps<"/buchung/[id]">) {
           </div>
         )}
       </section>
+
+      {isCustomer && b.status !== "pending_payment" && (
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-panel border border-line p-5">
+          <p className="text-[15px] text-ink-soft">Sie möchten diesen Vertrag widerrufen? Ein Grund ist nicht nötig.</p>
+          <WithdrawButton bookingNumber={b.number} />
+        </section>
+      )}
 
       {isCustomer && b.early_start_consent_at && (
         <p className="text-[13px] text-muted">{earlyStartConfirmationParagraph(new Date(b.early_start_consent_at))}</p>

@@ -7,6 +7,7 @@
 // Nutzung: node --conditions=react-server --import tsx --env-file=.env.local scripts/reminders.mts [--dry-run]
 import pg from "pg";
 import { notifyBooking } from "@/lib/booking/notify";
+import { runWithdrawalDeadlines } from "@/lib/booking/withdrawal";
 
 const dry = process.argv.includes("--dry-run");
 const db = new pg.Client({ connectionString: process.env.DATABASE_URL_MIGRATIONS });
@@ -49,5 +50,11 @@ for (const [label, event, ids] of jobs) {
     }
   }
   if (!ids.length) console.log(`${label}: nichts fällig`);
+}
+
+// Widerrufe mit Wertersatz-Prüfung: Tag 10 Erinnerung, Tag 14 automatische volle Erstattung (§ 357 Abs. 1 BGB)
+if (!dry) {
+  const w = await runWithdrawalDeadlines();
+  console.log(`Widerrufe: ${w.reminded} Erinnerung(en), ${w.refunded} automatische Erstattung(en)`);
 }
 process.exit(0);

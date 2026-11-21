@@ -14,7 +14,12 @@ interface Mail {
   heading: string;
   paragraphs: string[];
   button?: { label: string; url: string };
+  /** Anhänge, z. B. Rechnungs-PDF (werden per SMTP bzw. Resend mitgeschickt, im Ausgang nur vermerkt) */
+  attachments?: { filename: string; content: Buffer; contentType: string }[];
 }
+
+/** Ergebnis: ID im Ausgang (email_outbox) und Message-ID des Versanddienstes, falls verschickt */
+export type SentMail = { outboxId: string; messageId: string | null; status: "queued" | "sent" | "failed" };
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
@@ -49,7 +54,7 @@ function smtp() {
   return transport;
 }
 
-export async function sendMail(m: Mail) {
+export async function sendMail(m: Mail): Promise<SentMail> {
   const { html, text } = render(m);
   const id: string = await asSystem(async (db) => {
     const r = await db.query(
@@ -60,22 +65,26 @@ export async function sendMail(m: Mail) {
   });
   if (process.env.MAIL_DRIVER === "smtp") {
     try {
-      const info = await smtp().sendMail({ from: process.env.EMAIL_FROM, to: m.to, subject: m.subject, html, text });
+      const info = await smtp().sendMail({ from: process.env.EMAIL_FROM, to: m.to, subject: m.subject, html, text, attachments: m.attachments });
       await asSystem((db) =>
         db.query("update email_outbox set status='sent', provider_message_id=$2, attempts=attempts+1, sent_at=now() where id=$1", [id, info.messageId ?? null]),
       );
+      return { outboxId: id, messageId: info.messageId ?? null, status: "sent" };
     } catch (e) {
       console.error("SMTP-Versand fehlgeschlagen", e);
       await asSystem((db) => db.query("update email_outbox set status='failed', error=$2, attempts=attempts+1 where id=$1", [id, String(e).slice(0, 500)]));
+      return { outboxId: id, messageId: null, status: "failed" };
     }
-    return;
   }
-  if (process.env.MAIL_DRIVER !== "resend") return;
+  if (process.env.MAIL_DRIVER !== "resend") return { outboxId: id, messageId: null, status: "queued" };
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: process.env.EMAIL_FROM, to: [m.to], subject: m.subject, html, text }),
+      body: JSON.stringify({
+        from: process.env.EMAIL_FROM, to: [m.to], subject: m.subject, html, text,
+        ...(m.attachments?.length ? { attachments: m.attachments.map((a) => ({ filename: a.filename, content: a.content.toString("base64") })) } : {}),
+      }),
     });
     const body = await res.json().catch(() => ({}));
     await asSystem((db) =>
@@ -83,8 +92,10 @@ export async function sendMail(m: Mail) {
         id, res.ok ? "sent" : "failed", body.id ?? null, res.ok ? null : JSON.stringify(body).slice(0, 500),
       ]),
     );
+    return { outboxId: id, messageId: body.id ?? null, status: res.ok ? "sent" : "failed" };
   } catch (e) {
     await asSystem((db) => db.query("update email_outbox set status='failed', error=$2, attempts=attempts+1 where id=$1", [id, String(e).slice(0, 500)]));
+    return { outboxId: id, messageId: null, status: "failed" };
   }
 }
 
