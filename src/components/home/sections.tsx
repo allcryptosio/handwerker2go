@@ -10,8 +10,8 @@ const h2 = "text-[clamp(24px,3.4vw,44px)] font-extrabold leading-tight tracking-
 /** Beliebte Projekte im selben Mint-Block wie Suche und Kategorien (Variante A): kleine weiße Karten, „Alle Leistungen“ unten rechts */
 export function PopularProjects({ citySlug, cityName }: { citySlug: string; cityName: string }) {
   return (
-    <div aria-labelledby="projekte-titel" className="mx-auto max-w-[1240px] px-4 pb-10 pt-6 sm:px-7 sm:pb-16 sm:pt-9">
-      <h2 id="projekte-titel" className="mb-4 text-[clamp(22px,2.6vw,32px)] font-extrabold leading-tight tracking-[-0.03em] text-brand-dark sm:mb-6">
+    <div aria-labelledby="projekte-titel" className="mx-auto max-w-[1240px] px-4 pb-10 pt-5 sm:px-7 sm:pb-16 sm:pt-7">
+      <h2 id="projekte-titel" className="sr-only">
         Beliebte Projekte in {cityName}
       </h2>
       <ul className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
