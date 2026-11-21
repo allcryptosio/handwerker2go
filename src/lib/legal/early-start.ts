@@ -6,9 +6,12 @@ import { legal } from "@/config/legal";
  * Zustimmung mit Zeitstempel in der Tabelle consents speichern und in der Bestätigungsmail wiederholen.
  */
 export const EARLY_START_CONSENT_TEXT =
-  "Ich verlange ausdrücklich, dass der Betrieb vor Ablauf der Widerrufsfrist mit der Leistung beginnt. Mir ist bekannt, dass ich " +
-  "mein Widerrufsrecht verliere, wenn die Leistung vollständig erbracht ist, und dass ich bei einem Widerruf für die bis dahin " +
-  "erbrachte Leistung anteiligen Wertersatz schulde.";
+  "Ich verlange ausdrücklich, dass der Betrieb vor Ablauf der Widerrufsfrist mit der Leistung beginnt. Mir ist bekannt, dass ich bei " +
+  "vollständiger Vertragserfüllung mein Widerrufsrecht verliere und bei einem Widerruf für die bis dahin erbrachte Leistung einen " +
+  "anteiligen Betrag (Wertersatz) zahlen muss.";
+
+/** Version des Wortlauts (Anhang C.1), wird mit der Zustimmung gespeichert */
+export const EARLY_START_TEXT_VERSION = "C.1-2026-11-21";
 
 /** True, wenn der Termin vor Ablauf der Widerrufsfrist liegt */
 export function needsEarlyStartConsent(contractAt: Date, appointmentStart: Date): boolean {

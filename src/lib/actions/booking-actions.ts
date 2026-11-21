@@ -9,7 +9,7 @@ import { customerCancel, markPaid, providerCancel, providerComplete, providerCon
 import { notifyBooking } from "@/lib/booking/notify";
 import { resolvePlace, searchAvailability, templateBySlug } from "@/lib/booking/search";
 import { isValidDate, isValidTime } from "@/lib/booking/time";
-import { EARLY_START_CONSENT_TEXT, needsEarlyStartConsent } from "@/lib/legal/early-start";
+import { EARLY_START_CONSENT_TEXT, EARLY_START_TEXT_VERSION, needsEarlyStartConsent } from "@/lib/legal/early-start";
 import { detectImageType, storage } from "@/lib/storage";
 import { getStripe } from "@/lib/stripe/client";
 import { applicationFeeCents, commissionBpsAt } from "@/lib/stripe/commission";
@@ -111,7 +111,7 @@ export async function createBooking(_: BookingFormState, form: FormData): Promis
       if (consentNeeded) {
         await db.query(
           `insert into consents (user_id, kind, terms_version, text_snapshot, booking_ref, accepted_at) values ($1, 'early_start_withdrawal', $2, $3, $4, $5)`,
-          [u.id, legal.termsVersion, EARLY_START_CONSENT_TEXT, b.number, now],
+          [u.id, `${legal.termsVersion}|${EARLY_START_TEXT_VERSION}`, EARLY_START_CONSENT_TEXT, b.number, now],
         );
       }
       await db.query(`insert into customer_profiles (user_id, phone, accepted_terms_at) values ($1, $2, now()) on conflict (user_id) do update set phone = excluded.phone`, [u.id, d.contact_phone]);
