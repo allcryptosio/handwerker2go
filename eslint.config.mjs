@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // E2E-Skripte laufen direkt mit Node (CommonJS), nicht Teil der App
+    "tests/e2e/**",
   ]),
 ]);
 
