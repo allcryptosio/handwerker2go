@@ -187,7 +187,7 @@ export default function PartnerLandingPage() {
             <li>Provision fällt nur auf erfolgreich abgeschlossene Buchungen an und wird bei der Zahlung über Stripe automatisch einbehalten.</li>
             <li>Die Gebühren von Stripe für die Zahlungsabwicklung verrechnet Stripe direkt mit deinem Stripe-Konto.</li>
             <li>Nach der Einführungsphase wird nichts automatisch kostenpflichtig. Wir erinnern dich vorher per E-Mail, du entscheidest aktiv.</li>
-            <li>{providerVatNote} Für die Mitgliedschaft brauchst du eine USt-IdNr.</li>
+            <li>{providerVatNote} Eine USt-IdNr. ist nicht nötig, auch Kleinunternehmer können mitmachen.</li>
           </ul>
         </Container>
       </section>

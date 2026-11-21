@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { legal } from "@/config/legal";
 import { pageMeta } from "@/lib/seo";
 import { Email } from "@/components/legal/email";
 import { LegalPage } from "@/components/legal/legal-page";
@@ -27,7 +28,7 @@ export default function Page() {
       <p>
         E-Mail: <Email />
         <br />
-        Telefon: <a href="tel:+35677818522" className="underline">+356 7781 8522</a>
+        Telefon: <a href={`tel:${legal.phone.replace(/\s/g, "")}`} className="underline">{legal.phone}</a>
       </p>
       <h2>Umsatzsteuer-Identifikationsnummer</h2>
       <p>MT33258727</p>

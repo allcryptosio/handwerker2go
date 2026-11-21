@@ -56,7 +56,8 @@ export async function createMembershipCheckout(providerId: string, plan: Plan, i
     ...(process.env.STRIPE_PAYMENT_METHOD_CONFIG ? { payment_method_configuration: process.env.STRIPE_PAYMENT_METHOD_CONFIG } : {}),
     line_items: [{ price: priceId(plan), quantity: 1 }],
     automatic_tax: { enabled: true },
-    tax_id_collection: { enabled: true, required: "if_supported" },
+    // USt-IdNr. freiwillig: Kleinunternehmer (§ 19 UStG) haben oft keine. Mit USt-IdNr. greift Reverse Charge.
+    tax_id_collection: { enabled: true },
     customer_update: { address: "auto", name: "auto" },
     payment_method_collection: "always",
     billing_address_collection: "required",

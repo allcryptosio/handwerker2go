@@ -90,8 +90,8 @@ export default function Page() {
         </li>
       </ul>
       <p>
-        (3) Für die Mitgliedschaft gibt der Betrieb eine gültige Umsatzsteuer-Identifikationsnummer an. Schließt der Betrieb keine
-        Mitgliedschaft ab, erscheint sein Profil nach der Einführungsphase nicht mehr in der Suche; bereits gebuchte Aufträge
+        (3) Eine Umsatzsteuer-Identifikationsnummer ist für die Mitgliedschaft nicht erforderlich. Gibt der Betrieb eine gültige
+        USt-IdNr. an, rechnen wir im Reverse-Charge-Verfahren ab. Schließt der Betrieb keine Mitgliedschaft ab, erscheint sein Profil nach der Einführungsphase nicht mehr in der Suche; bereits gebuchte Aufträge
         laufen normal weiter.
       </p>
       <p>

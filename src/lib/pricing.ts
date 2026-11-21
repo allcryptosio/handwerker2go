@@ -17,7 +17,7 @@ export const providerPricing = {
  * "Reverse charge", keine maltesische Mehrwertsteuer (gleiche Regelung wie bei deinminijob.com).
  */
 export const providerVatNote =
-  "Alle Preise sind Nettopreise. Die Umsatzsteuer schuldet der Betrieb als Leistungsempfänger (Reverse-Charge-Verfahren).";
+  "Alle Preise sind Nettopreise. Mit USt-IdNr. schuldet der Betrieb die Umsatzsteuer als Leistungsempfänger (Reverse-Charge-Verfahren).";
 
 const eur = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" });
 

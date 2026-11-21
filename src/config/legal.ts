@@ -15,7 +15,7 @@ export const legal = {
   vatId: "MT33258727",
   /** Kontakt für Widerruf, Kündigung und Fragen */
   email: "info@handwerker2go.com",
-  phone: "+356 7781 8522",
+  phone: "+49 177 8879538",
   /** Kostenlose Stornierung für Kunden bis so viele Stunden vor dem Termin */
   freeCancellationHours: 24,
   /** Pauschale bei späterer Stornierung oder Nichterscheinen, in Prozent des Festpreises */
@@ -23,7 +23,7 @@ export const legal = {
   /** Gesetzliche Widerrufsfrist in Tagen */
   withdrawalDays: 14,
   /** Stand der Rechtstexte, wird in Zustimmungen mitgespeichert */
-  termsVersion: "2026-11-20",
+  termsVersion: "2026-11-21",
 } as const;
 
 /** "Name, Straße, Ort" für Fließtext */

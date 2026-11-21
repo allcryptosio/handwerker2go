@@ -195,7 +195,7 @@ async function Dashboard() {
                 </form>
               </div>
               <p className="text-[13px] text-muted">
-                Alle Preise netto. Mit gültiger USt-IdNr. rechnen wir ohne Umsatzsteuer ab (Steuerschuldnerschaft des Leistungsempfängers).
+                Alle Preise netto. Die USt-IdNr. ist freiwillig: Gibst du sie auf der Bezahlseite an, rechnen wir ohne Umsatzsteuer ab (Steuerschuldnerschaft des Leistungsempfängers).
               </p>
             </>
           )}

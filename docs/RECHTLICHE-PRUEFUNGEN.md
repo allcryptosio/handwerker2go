@@ -39,7 +39,7 @@ Rechtsanwältin bzw. ein Datenschutzberater und die Steuerberatung prüfen. Dies
 - [ ] **Gerichtsstand Malta (§ 13)** bei deutschem Recht: Wirksamkeit gegenüber Kaufleuten prüfen. Alternative: Gerichtsstand am Sitz des Betriebs oder Hamburg.
 - [ ] **Umgehungsverbot (§ 7 Abs. 3):** Reichweite (nur über die Plattform vermittelte Aufträge) prüfen.
 - [ ] **DAC7-Mitwirkung (§ 7 Abs. 4):** Sperre nach zwei erfolglosen Erinnerungen; Pflichtenkreis prüfen.
-- [ ] **USt-IdNr. als Pflicht für die Mitgliedschaft:** Kleinunternehmer ohne USt-IdNr. können keine Mitgliedschaft abschließen; gewollt?
+- [ ] **USt-IdNr. freiwillig (seit 21.11.2026):** Kleinunternehmer ohne USt-IdNr. können die Mitgliedschaft abschließen. Steuerberatung klären: Wie rechnet ein maltesischer Plattformbetreiber Abo und Provision an deutsche Unternehmer ohne USt-IdNr. ab (Nachweis der Unternehmereigenschaft z. B. über Gewerbeanmeldung, § 13b UStG, oder maltesische bzw. deutsche USt)? Stripe Tax behandelt Kunden ohne Steuernummer derzeit nach den hinterlegten Registrierungen; Ergebnis auf einer Testrechnung prüfen.
 - [ ] **Erinnerung vor Verlängerung des Jahresabos:** umgesetzt über das Stripe-Ereignis `invoice.upcoming`. Den Vorlauf stellst du im Stripe-Dashboard ein (Einstellungen, Billing, Abonnements, „Upcoming renewal events“), empfohlen 30 Tage.
 
 ## Widerrufsbelehrung
