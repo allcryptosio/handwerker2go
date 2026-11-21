@@ -60,23 +60,23 @@ export function CategoryExplorer({ categories, citySlug }: { categories: Explore
           ))}
         </ul>
 
-        <div className="grid overflow-hidden rounded-panel bg-white shadow-[0_2px_10px_rgba(11,46,31,0.06)] md:grid-cols-2">
+        <div className="mx-auto grid max-w-[980px] overflow-hidden rounded-panel bg-white shadow-[0_2px_10px_rgba(11,46,31,0.06)] md:grid-cols-[0.85fr_1fr]">
           <PhotoSlot
             tone={current.tone}
             hint={current.photoHint}
             src={current.photoSrc}
             sizes="(min-width: 768px) 50vw, 100vw"
-            className="aspect-[16/9] w-full sm:aspect-[4/3] md:aspect-auto md:h-full md:min-h-[380px]"
+            className="aspect-[16/9] w-full sm:aspect-[4/3] md:aspect-auto md:h-full md:min-h-[260px]"
           />
-          <div className="flex min-w-0 flex-col justify-center gap-3 p-5 sm:gap-5 sm:p-10">
-            <h2 className="text-[24px] font-extrabold tracking-[-0.03em] text-brand-dark sm:text-[32px]">{current.label}</h2>
-            <p className="text-[15px] leading-relaxed text-ink-soft sm:text-[17px]">{current.summary}</p>
+          <div className="flex min-w-0 flex-col justify-center gap-3 p-5 sm:gap-3.5 sm:p-7">
+            <h2 className="text-[24px] font-extrabold tracking-[-0.03em] text-brand-dark sm:text-[26px]">{current.label}</h2>
+            <p className="text-[15px] leading-relaxed text-ink-soft">{current.summary}</p>
             <ul className="divide-y divide-line border-y border-line">
               {current.services.slice(0, 4).map((s) => (
                 <li key={s.slug}>
                   <Link
                     href={`/${citySlug}/${current.slug}#${s.slug}`}
-                    className="group flex items-center justify-between gap-3 py-2.5 text-[14px] font-semibold sm:py-3 sm:text-[15px]"
+                    className="group flex items-center justify-between gap-3 py-2.5 text-[14px] font-semibold"
                   >
                     <span className="group-hover:text-brand">{s.name}</span>
                     <span className="flex items-center gap-2">
@@ -95,7 +95,7 @@ export function CategoryExplorer({ categories, citySlug }: { categories: Explore
             </ul>
             <Link
               href={`/${citySlug}/${current.slug}`}
-              className="self-start rounded-full bg-brand px-5 py-3 text-[15px] font-bold text-white transition-colors hover:bg-brand-dark sm:px-6 sm:py-3.5 sm:text-base"
+              className="self-start rounded-full bg-brand px-5 py-2.5 text-[15px] font-bold text-white transition-colors hover:bg-brand-dark"
             >
               Alle Leistungen ansehen
             </Link>
