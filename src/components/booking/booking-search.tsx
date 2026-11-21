@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal, flushSync } from "react-dom";
 import { Icon } from "@/components/ui/icon";
 import { WINDOWS, formatDateLong, windowLabel } from "@/lib/booking/format";
 
@@ -65,7 +66,8 @@ export function BookingSearch({
   // Klick außerhalb und Escape schließen das offene Feld
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
-      if (root.current && !root.current.contains(e.target as Node)) setPanel(null);
+      const t = e.target as Element;
+      if (root.current && !root.current.contains(t) && !t.closest?.("[data-bs-sheet]")) setPanel(null);
     };
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setPanel(null);
     document.addEventListener("mousedown", onDown);
@@ -77,6 +79,14 @@ export function BookingSearch({
   }, []);
 
   const service = services.find((s) => s.slug === leistung);
+  const sheetInput = useRef<HTMLInputElement>(null);
+  /** Handy: Feld öffnet Vollbild-Auswahl, Tastatur direkt im Suchfeld oben (kein Zoom, nichts verrutscht) */
+  const openMobile = (p: "service" | "place") => {
+    flushSync(() => setPanel(p));
+    sheetInput.current?.focus();
+  };
+  const onServiceType = (v: string) => { setServiceQuery(v); setLeistung(""); setPanel("service"); };
+  const onPlaceType = (v: string) => { setOrt(v); setPanel("place"); };
   const timeText = zeit ? `${zeit} Uhr` : fenster ? windowLabel(fenster) : "";
 
   function submit(e: React.FormEvent) {
@@ -120,25 +130,30 @@ export function BookingSearch({
           <input
             id="bs-service"
             value={serviceQuery}
-            onChange={(e) => {
-              setServiceQuery(e.target.value);
-              setLeistung("");
-              setPanel("service");
-            }}
+            onChange={(e) => onServiceType(e.target.value)}
             onFocus={() => setPanel("service")}
             placeholder="Was soll erledigt werden?"
             autoComplete="off"
-            className="min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-[#6b6e6d] focus-visible:outline-none sm:w-full"
+            className="hidden w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-[#6b6e6d] focus-visible:outline-none sm:block"
           />
+          <button type="button" onClick={() => openMobile("service")} className={`${value} text-left sm:hidden ${serviceQuery ? "text-ink" : "text-[#6b6e6d]"}`}>
+            {serviceQuery || "Was soll erledigt werden?"}
+          </button>
+          <Chevron />
           </div>
           {panel === "service" && (
             <ServicePanel
               services={services}
               query={leistung ? "" : serviceQuery}
+              search={{ value: serviceQuery, onChange: onServiceType, placeholder: "Was soll erledigt werden?" }}
+              inputRef={sheetInput}
+              onClose={() => setPanel(null)}
               onPick={(s) => {
                 setLeistung(s.slug);
                 setServiceQuery(s.name);
-                setPanel(ort ? (datum ? "time" : "date") : "place");
+                const next = ort ? (datum ? "time" : "date") : "place";
+                if (next === "place") openMobile("place");
+                else setPanel(next);
               }}
             />
           )}
@@ -151,20 +166,24 @@ export function BookingSearch({
           <input
             id="bs-place"
             value={ort}
-            onChange={(e) => {
-              setOrt(e.target.value);
-              setPanel("place");
-            }}
+            onChange={(e) => onPlaceType(e.target.value)}
             onFocus={() => setPanel("place")}
             placeholder="PLZ oder Ort"
             autoComplete="postal-code"
             inputMode="text"
-            className="min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-[#6b6e6d] focus-visible:outline-none sm:w-full"
+            className="hidden w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-[#6b6e6d] focus-visible:outline-none sm:block"
           />
+          <button type="button" onClick={() => openMobile("place")} className={`${value} text-left sm:hidden ${ort ? "text-ink" : "text-[#6b6e6d]"}`}>
+            {ort || "PLZ oder Ort"}
+          </button>
+          <Chevron />
           </div>
           {panel === "place" && (
             <PlacePanel
               query={ort}
+              search={{ value: ort, onChange: onPlaceType, placeholder: "PLZ oder Ort, z. B. 20095" }}
+              inputRef={sheetInput}
+              onClose={() => setPanel(null)}
               onPick={(p) => {
                 setOrt(p);
                 setPanel(datum ? (zeit || fenster ? null : "time") : "date");
@@ -246,27 +265,83 @@ function Divider() {
   return <span aria-hidden className="mx-0 hidden w-px self-stretch bg-line sm:my-3 sm:block" />;
 }
 
-/** Klappfenster: am Handy als Blatt vom unteren Rand, sonst unter dem Feld */
-function Popover({ children, title, onClose, wide = false }: { children: React.ReactNode; title: string; onClose?: () => void; wide?: boolean }) {
-  return (
-    <>
-      <div className="fixed inset-0 z-40 bg-black/30 sm:hidden" onClick={onClose} aria-hidden />
-      <div
-        role="dialog"
-        aria-label={title}
-        className={`fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-auto rounded-t-3xl bg-white p-5 shadow-2xl animate-[h2g-up_.18s_ease-out] sm:absolute sm:inset-x-auto sm:bottom-auto sm:left-0 sm:top-[calc(100%+10px)] sm:max-h-[70vh] sm:rounded-3xl sm:border sm:border-line ${wide ? "sm:w-[400px]" : "sm:w-[360px]"}`}
-      >
-        <div className="mb-3 flex items-center justify-between sm:hidden">
-          <span className="font-bold">{title}</span>
-          <button type="button" onClick={onClose} className="rounded-full px-3 py-1 text-[14px] font-semibold text-brand">Fertig</button>
-        </div>
+type SheetSearch = { value: string; onChange: (v: string) => void; placeholder: string };
+type InputRef = React.RefObject<HTMLInputElement | null>;
+
+function useIsMobile() {
+  // Klappfenster entstehen erst nach Interaktion im Browser, daher direkt messen (kein Hydration-Thema)
+  const [m, setM] = useState(() => typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const on = () => setM(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return m;
+}
+
+/**
+ * Klappfenster: ab sm unter dem Feld. Am Handy per Portal direkt am body (nichts kann es verschieben):
+ * mit Suchfeld als Vollbild-Ansicht, sonst als Blatt vom unteren Rand.
+ */
+function Popover({ children, title, onClose, wide = false, search, inputRef }: { children: React.ReactNode; title: string; onClose?: () => void; wide?: boolean; search?: SheetSearch; inputRef?: InputRef }) {
+  const mobile = useIsMobile();
+  useEffect(() => {
+    if (!mobile) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [mobile]);
+
+  if (!mobile) {
+    return (
+      <div role="dialog" aria-label={title}
+        className={`absolute left-0 top-[calc(100%+10px)] z-50 max-h-[70vh] overflow-auto rounded-3xl border border-line bg-white p-5 shadow-2xl animate-[h2g-up_.18s_ease-out] ${wide ? "w-[400px]" : "w-[360px]"}`}>
         {children}
       </div>
-    </>
+    );
+  }
+
+  const header = (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-[17px] font-bold">{title}</span>
+      <button type="button" onClick={onClose} className="-mr-2 min-h-[44px] rounded-full px-3 text-[16px] font-bold text-brand">Fertig</button>
+    </div>
+  );
+
+  return createPortal(
+    search ? (
+      <div data-bs-sheet role="dialog" aria-label={title} className="fixed inset-0 z-[60] flex flex-col bg-white">
+        <div className="shrink-0 border-b border-line px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))]">
+          {header}
+          <div className="mt-2 flex items-center gap-2 rounded-xl border-[1.5px] border-line-strong bg-white px-3 focus-within:border-brand">
+            <Icon name="suche" size={17} strokeWidth={2.4} />
+            <input ref={inputRef} value={search.value} onChange={(e) => search.onChange(e.target.value)} placeholder={search.placeholder}
+              autoComplete="off" enterKeyHint="done" onKeyDown={(e) => e.key === "Enter" && onClose?.()}
+              className="min-h-[46px] w-full bg-transparent text-[16px] text-ink outline-none focus-visible:outline-none placeholder:text-[#6b6e6d]" />
+            {search.value && (
+              <button type="button" aria-label="Eingabe löschen" onClick={() => { search.onChange(""); inputRef?.current?.focus(); }}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-soft text-[15px] text-muted">×</button>
+            )}
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(24px,env(safe-area-inset-bottom))] pt-2">{children}</div>
+      </div>
+    ) : (
+      <div data-bs-sheet>
+        <div className="fixed inset-0 z-[60] bg-black/30" onClick={onClose} aria-hidden />
+        <div role="dialog" aria-label={title}
+          className="fixed inset-x-0 bottom-0 z-[61] max-h-[85dvh] overflow-y-auto overscroll-contain rounded-t-3xl bg-white px-5 pb-[max(20px,env(safe-area-inset-bottom))] pt-3 shadow-2xl animate-[h2g-up_.18s_ease-out]">
+          <div className="mb-3">{header}</div>
+          {children}
+        </div>
+      </div>
+    ),
+    document.body,
   );
 }
 
-function ServicePanel({ services, query, onPick }: { services: ServiceChoice[]; query: string; onPick: (s: ServiceChoice) => void }) {
+function ServicePanel({ services, query, onPick, onClose, search, inputRef }: { services: ServiceChoice[]; query: string; onPick: (s: ServiceChoice) => void; onClose: () => void; search: SheetSearch; inputRef: InputRef }) {
   const q = query.trim().toLowerCase();
   const list = q ? services.filter((s) => `${s.name} ${s.categoryLabel}`.toLowerCase().includes(q)) : services;
   const groups = useMemo(() => {
@@ -275,7 +350,7 @@ function ServicePanel({ services, query, onPick }: { services: ServiceChoice[]; 
     return [...m.entries()];
   }, [list]);
   return (
-    <Popover title="Leistung wählen" wide>
+    <Popover title="Leistung wählen" wide onClose={onClose} search={search} inputRef={inputRef}>
       {groups.length === 0 && <p className="text-[15px] text-muted">Keine passende Leistung gefunden.</p>}
       <div className="flex flex-col gap-4">
         {groups.map(([cat, items]) => (
@@ -301,7 +376,7 @@ function ServicePanel({ services, query, onPick }: { services: ServiceChoice[]; 
   );
 }
 
-function PlacePanel({ query, onPick }: { query: string; onPick: (label: string) => void }) {
+function PlacePanel({ query, onPick, onClose, search, inputRef }: { query: string; onPick: (label: string) => void; onClose: () => void; search: SheetSearch; inputRef: InputRef }) {
   const [places, setPlaces] = useState<{ postalCode: string; place: string }[]>([]);
   useEffect(() => {
     const q = query.trim();
@@ -318,10 +393,10 @@ function PlacePanel({ query, onPick }: { query: string; onPick: (label: string) 
       ctrl.abort();
     };
   }, [query]);
-  if (query.trim().length < 2) return null;
+  const short = query.trim().length < 2;
   return (
-    <Popover title="Ort wählen">
-      {places.length === 0 ? (
+    <Popover title="Ort wählen" onClose={onClose} search={search} inputRef={inputRef}>
+      {short || places.length === 0 ? (
         <p className="text-[15px] text-muted">Postleitzahl oder Ort eingeben, z. B. 20095 oder Hamburg.</p>
       ) : (
         <ul className="flex flex-col">
