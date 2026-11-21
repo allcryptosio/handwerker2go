@@ -7,6 +7,7 @@ import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { Container } from "@/components/ui/container";
 import { providerBookingAction } from "@/lib/actions/booking-actions";
 import { providerDecideWertersatz } from "@/lib/actions/withdrawal-admin-actions";
+import { OFFER_ONLINE_HINT } from "@/lib/legal/offer-hint";
 import { currentUser } from "@/lib/auth";
 import { withDb } from "@/lib/db";
 
@@ -78,6 +79,7 @@ async function Appointments() {
       <AutoRefresh seconds={30} />
       <h1 className="text-[clamp(28px,3.4vw,40px)] font-extrabold tracking-[-0.03em] text-brand-dark">Termine</h1>
       <DashboardNav active="/dashboard/termine" />
+      <p className="rounded-card border-[1.5px] border-[#e0a800] bg-[#fff8e1] p-4 text-[14px]"><b>Angebote:</b> {OFFER_ONLINE_HINT}</p>
       {withdrawals.length > 0 && (
         <section className="flex flex-col gap-3 rounded-panel border-[1.5px] border-[#b42318] bg-[#fef3f2] p-5">
           <h2 className="text-lg font-bold">Widerrufe von Kunden</h2>

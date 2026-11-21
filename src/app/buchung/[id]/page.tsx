@@ -5,6 +5,8 @@ import { Suspense } from "react";
 import { CustomerCancelButton } from "@/components/booking/cancel-button";
 import { ReviewForm } from "@/components/booking/review-form";
 import { WithdrawButton } from "@/components/legal/withdraw-button";
+import { CreateOfferForm } from "@/components/booking/offer-forms";
+import { OFFER_ONLINE_HINT } from "@/lib/legal/offer-hint";
 import { Container } from "@/components/ui/container";
 import { legal } from "@/config/legal";
 import { providerBookingAction, syncCheckoutReturn } from "@/lib/actions/booking-actions";
@@ -49,10 +51,12 @@ async function Detail({ params, searchParams }: PageProps<"/buchung/[id]">) {
     const review = (await db.query("select rating, body, created_at, visible from reviews where booking_id = $1", [id])).rows[0] as
       | { rating: number; body: string | null; created_at: Date; visible: boolean }
       | undefined;
-    return { b, photos, review };
+    const offers = (await db.query("select id, number, price_cents, status, valid_until, created_at from offers where inspection_booking_id = $1 order by created_at desc", [id])).rows as
+      { id: string; number: string; price_cents: number; status: string; valid_until: Date; created_at: Date }[];
+    return { b, photos, review, offers };
   });
   if (!data) notFound();
-  const { b, photos, review } = data;
+  const { b, photos, review, offers } = data;
   const isProvider = b.p_user === u.id;
   const isCustomer = b.customer_id === u.id;
   const start = new Date(b.starts_at);
@@ -152,6 +156,28 @@ async function Detail({ params, searchParams }: PageProps<"/buchung/[id]">) {
           </p>
           <CustomerCancelButton id={b.id} refundText={b.price_type === "fixed" ? "Die Erstattung ist veranlasst." : ""} />
           <p className="text-[13px] text-muted">Dir bleibt der Nachweis gestattet, dass dem Betrieb kein oder ein wesentlich geringerer Schaden entstanden ist. Fragen an <a className="underline" href={`mailto:${legal.email}?subject=Stornierung ${b.number}`}>{legal.email}</a>.</p>
+        </section>
+      )}
+
+      {b.price_type === "quote" && (isProvider || isCustomer) && (offers.length > 0 || isProvider) && (
+        <section className="flex flex-col gap-3 rounded-panel border border-line p-6">
+          <h2 className="text-lg font-bold">Angebote</h2>
+          {offers.length > 0 && (
+            <ul className="flex flex-col gap-2">
+              {offers.map((o) => (
+                <li key={o.id} className="flex flex-wrap items-center justify-between gap-3 rounded-card bg-soft p-3 text-[15px]">
+                  <span>{o.number}: {eur(o.price_cents)}, {o.status === "sent" ? (new Date(o.valid_until) > new Date() ? "offen" : "abgelaufen") : o.status === "accepted" ? "angenommen" : o.status}</span>
+                  <Link href={`/angebot/${o.id}`} className="font-semibold text-brand underline">{isCustomer && o.status === "sent" ? "Ansehen und annehmen" : "Ansehen"}</Link>
+                </li>
+              ))}
+            </ul>
+          )}
+          {isProvider && ["confirmed", "completed"].includes(b.status) && (
+            <>
+              <p className="rounded-card border-[1.5px] border-[#e0a800] bg-[#fff8e1] p-4 text-[14px]">{OFFER_ONLINE_HINT}</p>
+              <CreateOfferForm bookingId={b.id} />
+            </>
+          )}
         </section>
       )}
 

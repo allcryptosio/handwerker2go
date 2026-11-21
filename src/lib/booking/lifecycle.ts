@@ -27,7 +27,8 @@ async function load(id: string) {
 export async function markPaid(bookingId: string, payment: { sessionId: string; paymentIntentId: string | null }) {
   const b = await load(bookingId);
   if (!b || !["pending_payment", "expired"].includes(b.status)) return b?.status as string | undefined;
-  const next = b.booking_mode === "confirm" ? "requested" : "confirmed";
+  // Aus einem angenommenen Angebot: Der Betrieb hat Preis und Termin schon festgelegt, also sofort bestätigt
+  const next = b.offer_id ? "confirmed" : b.booking_mode === "confirm" ? "requested" : "confirmed";
   try {
     await asSystem(async (db) => {
       await db.query(
@@ -37,6 +38,9 @@ export async function markPaid(bookingId: string, payment: { sessionId: string; 
         [bookingId, next, payment.paymentIntentId],
       );
       await audit(db, { actorRole: "system", action: "booking.paid", entity: "bookings", entityId: bookingId, after: { status: next, session: payment.sessionId } });
+      if (b.offer_id) {
+        await db.query("update offers set status = 'accepted', accepted_booking_id = $2, accepted_at = now() where id = $1 and status = 'sent'", [b.offer_id, bookingId]);
+      }
     });
   } catch (e) {
     // Reservierung war abgelaufen und der Termin ist inzwischen vergeben: Zahlung voll erstatten
