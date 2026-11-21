@@ -5,29 +5,29 @@ import { Container } from "@/components/ui/container";
 import { Icon } from "@/components/ui/icon";
 import { PhotoSlot } from "@/components/ui/photo-slot";
 
-const h2 = "text-[clamp(30px,3.4vw,44px)] font-extrabold tracking-[-0.03em] text-brand-dark";
+const h2 = "text-[clamp(24px,3.4vw,44px)] font-extrabold leading-tight tracking-[-0.03em] text-brand-dark";
 
 export function PopularProjects({ citySlug, cityName }: { citySlug: string; cityName: string }) {
   return (
-    <section aria-labelledby="projekte-titel" className="py-[88px]">
+    <section aria-labelledby="projekte-titel" className="py-10 sm:py-[88px]">
       <Container>
-        <h2 id="projekte-titel" className={`${h2} mb-8`}>
+        <h2 id="projekte-titel" className={`${h2} mb-5 sm:mb-8`}>
           Beliebte Projekte in {cityName}
         </h2>
-        <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="grid grid-cols-2 gap-x-3 gap-y-4 sm:gap-6 lg:grid-cols-4">
           {popularProjects.map((x) => (
             <li key={x.title}>
-              <Link href={`/${citySlug}/${x.category}`} className="group flex flex-col gap-3">
-                <PhotoSlot tone={x.tone} hint={x.photoHint} src={photoSrc(x.photoFile)} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" className="aspect-[4/3] rounded-card" />
-                <span className="text-lg font-bold group-hover:text-brand">{x.title}</span>
-                <span className="-mt-1.5 text-[15px] text-muted">Preise auf der Leistungsseite</span>
+              <Link href={`/${citySlug}/${x.category}`} className="group flex flex-col gap-1.5 sm:gap-3">
+                <PhotoSlot tone={x.tone} hint={x.photoHint} src={photoSrc(x.photoFile)} sizes="(min-width: 1024px) 25vw, 50vw" className="aspect-[4/3] rounded-xl sm:rounded-card" />
+                <span className="text-[14px] font-bold leading-snug group-hover:text-brand sm:text-lg">{x.title}</span>
+                <span className="-mt-1.5 hidden text-[15px] text-muted sm:block">Preise auf der Leistungsseite</span>
               </Link>
             </li>
           ))}
         </ul>
         <Link
           href={`/${citySlug}`}
-          className="mt-8 inline-block rounded-full border-[1.5px] border-ink px-[22px] py-[13px] font-bold transition-colors hover:bg-ink hover:text-white"
+          className="mt-6 inline-block rounded-full border-[1.5px] border-ink px-5 py-3 text-[15px] font-bold transition-colors hover:bg-ink hover:text-white sm:mt-8 sm:px-[22px] sm:py-[13px] sm:text-base"
         >
           Alle Leistungen in {cityName}
         </Link>
@@ -39,30 +39,30 @@ export function PopularProjects({ citySlug, cityName }: { citySlug: string; city
 /** Bewertungen erscheinen erst, wenn es echte Bewertungen aus abgeschlossenen Buchungen gibt. */
 export function ReviewsIntro() {
   return (
-    <section aria-labelledby="bewertungen-titel" className="bg-soft py-[88px]">
-      <Container className="flex flex-wrap items-center gap-10">
+    <section aria-labelledby="bewertungen-titel" className="bg-soft py-10 sm:py-[88px]">
+      <Container className="flex flex-wrap items-center gap-6 sm:gap-10">
         <div className="min-w-0 flex-[1_1_420px]">
           <h2 id="bewertungen-titel" className={h2}>
             Bewertungen, auf die du dich verlassen kannst
           </h2>
-          <p className="mt-4 max-w-[560px] text-[17px] leading-relaxed text-ink-soft">
+          <p className="mt-3 max-w-[560px] text-[15px] leading-relaxed text-ink-soft sm:mt-4 sm:text-[17px]">
             Bewerten kann nur, wer über handwerker2go gebucht hat und dessen Auftrag abgeschlossen ist. Jede Bewertung ist
             mit einer echten Buchung verknüpft. Gekaufte oder importierte Sterne gibt es bei uns nicht.
           </p>
         </div>
-        <ol className="grid min-w-0 flex-[1_1_420px] gap-3">
+        <ol className="grid min-w-0 flex-[1_1_420px] gap-2 sm:gap-3">
           {[
             ["Auftrag erledigt", "Der Betrieb schließt die Buchung ab."],
             ["Einladung zur Bewertung", "Du bekommst eine E-Mail mit einem Link zu deiner Buchung."],
             ["1 bis 5 Sterne und ein paar Worte", "Deine Bewertung erscheint im Profil des Betriebs."],
           ].map(([t, d], i) => (
-            <li key={t} className="flex items-center gap-4 rounded-card bg-white p-5">
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand font-extrabold text-white">
+            <li key={t} className="flex items-center gap-3 rounded-card bg-white p-3.5 sm:gap-4 sm:p-5">
+              <span className="inline-flex h-8 w-8 shrink-0 text-[14px] sm:h-9 sm:w-9 sm:text-base items-center justify-center rounded-full bg-brand font-extrabold text-white">
                 {i + 1}
               </span>
               <span>
-                <span className="block font-bold">{t}</span>
-                <span className="block text-[15px] text-muted">{d}</span>
+                <span className="block text-[15px] font-bold sm:text-base">{t}</span>
+                <span className="block text-[13px] text-muted sm:text-[15px]">{d}</span>
               </span>
             </li>
           ))}
@@ -79,26 +79,26 @@ export function TrustBanner() {
     { icon: "stern" as const, t: "Echte Bewertungen", d: "Bewertungen gibt es nur nach einem abgeschlossenen Auftrag." },
   ];
   return (
-    <section className="py-[88px]">
+    <section className="py-10 sm:py-[88px]">
       <Container>
         <div className="flex flex-wrap overflow-hidden rounded-banner bg-mint">
-          <div className="flex min-w-0 flex-[1_1_460px] flex-col gap-7 p-7 sm:p-16">
-            <h2 className="text-[clamp(30px,3.6vw,46px)] font-extrabold leading-[1.1] tracking-[-0.03em] text-brand-dark">
+          <div className="flex min-w-0 flex-[1_1_460px] flex-col gap-5 p-5 sm:gap-7 sm:p-16">
+            <h2 className="text-[clamp(24px,3.6vw,46px)] font-extrabold leading-[1.1] tracking-[-0.03em] text-brand-dark">
               Sicher gebucht. Fair bezahlt.
             </h2>
-            <ul className="flex flex-col gap-[22px]">
+            <ul className="flex flex-col gap-4 sm:gap-[22px]">
               {items.map((x) => (
-                <li key={x.t} className="flex gap-4">
-                  <Icon name={x.icon} size={28} strokeWidth={2} className="shrink-0 text-brand" />
+                <li key={x.t} className="flex gap-3 sm:gap-4">
+                  <Icon name={x.icon} size={24} strokeWidth={2} className="shrink-0 text-brand" />
                   <span>
-                    <span className="block text-lg font-bold">{x.t}</span>
-                    <span className="mt-1 block text-[15px] leading-relaxed text-ink-soft">{x.d}</span>
+                    <span className="block text-[16px] font-bold sm:text-lg">{x.t}</span>
+                    <span className="mt-0.5 block text-[14px] leading-relaxed text-ink-soft sm:mt-1 sm:text-[15px]">{x.d}</span>
                   </span>
                 </li>
               ))}
             </ul>
           </div>
-          <PhotoSlot tone="garten" hint="Foto: Handwerker übergibt fertige Arbeit" src={photoSrc("vertrauen-uebergabe.webp")} className="min-h-[300px] flex-[1_1_380px] !bg-mint-strong" />
+          <PhotoSlot tone="garten" hint="Foto: Handwerker übergibt fertige Arbeit" src={photoSrc("vertrauen-uebergabe.webp")} className="hidden min-h-[300px] flex-[1_1_380px] !bg-mint-strong md:block" />
         </div>
       </Container>
     </section>
@@ -112,22 +112,22 @@ export function HowItWorks() {
     { t: "Online bezahlen, fertig", d: "Du zahlst sicher online und bekommst sofort eine Bestätigung per E-Mail.", hint: "Foto: Fertig erledigt", file: "ablauf-3-erledigt.webp" },
   ];
   return (
-    <section id="so-funktionierts" aria-labelledby="ablauf-titel" className="scroll-mt-6 pb-[88px]">
+    <section id="so-funktionierts" aria-labelledby="ablauf-titel" className="scroll-mt-6 pb-10 sm:pb-[88px]">
       <Container>
-        <h2 id="ablauf-titel" className={`${h2} mb-8`}>
+        <h2 id="ablauf-titel" className={`${h2} mb-5 sm:mb-8`}>
           So funktioniert’s
         </h2>
-        <ol className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <ol className="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-6">
           {steps.map((s, i) => (
-            <li key={s.t} className="flex flex-col gap-3.5">
-              <PhotoSlot tone="neutral" hint={s.hint} src={photoSrc(s.file)} sizes="(min-width: 768px) 33vw, 100vw" className="aspect-[16/10] rounded-card !bg-mint-soft" />
+            <li key={s.t} className="flex flex-col gap-1.5 rounded-card bg-soft p-4 md:gap-3.5 md:bg-transparent md:p-0">
+              <PhotoSlot tone="neutral" hint={s.hint} src={photoSrc(s.file)} sizes="33vw" className="hidden aspect-[16/10] rounded-card !bg-mint-soft md:block" />
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-full bg-brand font-extrabold text-white">
+                <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-[14px] font-extrabold text-white md:h-[34px] md:w-[34px] md:text-base">
                   {i + 1}
                 </span>
-                <h3 className="text-[19px] font-bold">{s.t}</h3>
+                <h3 className="text-[16px] font-bold md:text-[19px]">{s.t}</h3>
               </div>
-              <p className="text-[15px] leading-relaxed text-ink-soft">{s.d}</p>
+              <p className="pl-11 text-[14px] leading-relaxed text-ink-soft md:pl-0 md:text-[15px]">{s.d}</p>
             </li>
           ))}
         </ol>
@@ -140,7 +140,7 @@ export function HowItWorks() {
 export function ProviderCta() {
   return (
     <section aria-labelledby="betriebe-titel" className="border-t border-line bg-soft">
-      <Container className="flex flex-wrap items-center justify-between gap-6 py-12">
+      <Container className="flex flex-wrap items-center justify-between gap-4 py-8 sm:gap-6 sm:py-12">
         <div className="flex max-w-[640px] flex-col gap-2">
           <h2 id="betriebe-titel" className="text-[clamp(22px,2.4vw,28px)] font-extrabold tracking-[-0.02em] text-brand-dark">
             Du führst einen Handwerksbetrieb?

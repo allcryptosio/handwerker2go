@@ -96,7 +96,7 @@ export function BookingSearch({
     else router.push(`/termin?${new URLSearchParams(v as unknown as Record<string, string>)}`);
   }
 
-  const seg = "relative flex min-w-0 flex-1 flex-col justify-center rounded-2xl px-4 py-2.5 text-left transition-colors hover:bg-soft sm:rounded-full sm:px-6";
+  const seg = "relative flex min-w-0 flex-1 flex-col justify-center rounded-2xl px-3.5 py-2 text-left transition-colors hover:bg-soft sm:rounded-full sm:px-6 sm:py-2.5";
   const active = "bg-white shadow-[0_6px_24px_rgba(11,46,31,0.12)] hover:bg-white";
   const label = "text-[12px] font-bold uppercase tracking-[0.04em] text-brand-dark";
   const value = "truncate text-[15px] text-ink-soft";
@@ -109,9 +109,9 @@ export function BookingSearch({
       aria-label="Handwerker suchen und buchen"
       className={`relative w-full ${compact ? "max-w-[1040px]" : "max-w-[980px]"}`}
     >
-      <div className="flex flex-col gap-1 rounded-[28px] border-[1.5px] border-line-strong bg-white p-2 text-left shadow-[0_10px_30px_rgba(11,46,31,0.10)] sm:flex-row sm:items-stretch sm:gap-0 sm:rounded-full sm:p-1.5">
+      <div className="grid grid-cols-2 gap-1 rounded-[24px] border-[1.5px] border-line-strong bg-white p-1.5 text-left shadow-[0_10px_30px_rgba(11,46,31,0.10)] sm:flex sm:flex-row sm:items-stretch sm:gap-0 sm:rounded-full">
         {/* Leistung */}
-        <div className={`${seg} ${panel === "service" ? active : ""} sm:flex-[1.4]`}>
+        <div className={`${seg} ${panel === "service" ? active : ""} col-span-2 sm:flex-[1.4]`}>
           <label htmlFor="bs-service" className={label}>Leistung</label>
           <input
             id="bs-service"
@@ -140,7 +140,7 @@ export function BookingSearch({
         </div>
         <Divider />
         {/* Ort */}
-        <div className={`${seg} ${panel === "place" ? active : ""}`}>
+        <div className={`${seg} ${panel === "place" ? active : ""} col-span-2`}>
           <label htmlFor="bs-place" className={label}>Wo</label>
           <input
             id="bs-place"
@@ -211,7 +211,7 @@ export function BookingSearch({
         </div>
         <button
           type="submit"
-          className="mt-1 inline-flex min-h-[52px] shrink-0 items-center justify-center gap-2 rounded-2xl bg-brand px-6 font-bold text-white transition-colors hover:bg-brand-dark sm:mt-0 sm:rounded-full"
+          className="col-span-2 mt-0.5 inline-flex min-h-[48px] shrink-0 items-center justify-center gap-2 rounded-2xl bg-brand px-6 font-bold text-white transition-colors hover:bg-brand-dark sm:mt-0 sm:min-h-[52px] sm:rounded-full"
         >
           <Icon name="suche" size={18} strokeWidth={2.6} />
           <span>Finden</span>

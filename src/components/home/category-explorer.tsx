@@ -16,8 +16,8 @@ export function CategoryExplorer({ categories, citySlug }: { categories: Explore
   const current = categories[active];
 
   return (
-    <div id="leistungen" className="mx-auto max-w-[1240px] scroll-mt-6 px-5 pb-16 sm:px-7">
-      <div role="tablist" aria-label="Leistungen" className="flex gap-1.5 overflow-x-auto border-b border-line-strong sm:flex-wrap sm:justify-center">
+    <div id="leistungen" className="mx-auto max-w-[1240px] scroll-mt-6 px-4 pb-10 sm:px-7 sm:pb-16">
+      <div role="tablist" aria-label="Leistungen" className="grid grid-cols-4 gap-y-1 border-b border-line-strong sm:flex sm:flex-wrap sm:justify-center sm:gap-1.5">
         {categories.map((c, i) => {
           const selected = i === active;
           return (
@@ -29,16 +29,16 @@ export function CategoryExplorer({ categories, citySlug }: { categories: Explore
               aria-selected={selected}
               aria-controls="leistung-panel"
               onClick={() => setActive(i)}
-              className={`flex min-w-[104px] shrink-0 flex-col items-center gap-2 border-b-[3px] px-4 pb-3 pt-3.5 text-sm font-semibold transition-colors ${
+              className={`flex min-w-0 flex-col items-center gap-1.5 border-b-[3px] px-1 pb-2 pt-2 text-[11.5px] font-semibold leading-tight transition-colors sm:min-w-[104px] sm:shrink-0 sm:gap-2 sm:px-4 sm:pb-3 sm:pt-3.5 sm:text-sm ${
                 selected ? "border-brand text-ink" : "border-transparent text-muted hover:text-ink"
               }`}
             >
               <span
-                className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
+                className={`inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors sm:h-11 sm:w-11 ${
                   selected ? "bg-brand text-white" : "bg-white text-ink"
                 }`}
               >
-                <Icon name={c.icon} size={22} />
+                <Icon name={c.icon} size={19} />
               </span>
               {c.label}
             </button>
@@ -47,12 +47,12 @@ export function CategoryExplorer({ categories, citySlug }: { categories: Explore
       </div>
 
       <div id="leistung-panel" role="tabpanel" aria-labelledby={`tab-${current.slug}`}>
-        <ul className="flex flex-wrap justify-center gap-2.5 py-6">
+        <ul className="-mx-4 flex scroll-px-4 gap-2 overflow-x-auto px-4 py-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:justify-center sm:gap-2.5 sm:overflow-visible sm:px-0 sm:py-6">
           {current.services.map((s) => (
-            <li key={s.slug}>
+            <li key={s.slug} className="shrink-0">
               <Link
                 href={`/${citySlug}/${current.slug}#${s.slug}`}
-                className="inline-block rounded-full border-[1.5px] border-line-strong bg-white px-[18px] py-[11px] text-[15px] font-semibold transition-colors hover:border-brand hover:text-brand"
+                className="inline-block whitespace-nowrap rounded-full border-[1.5px] border-line-strong bg-white px-3.5 py-2 text-[13px] font-semibold transition-colors hover:border-brand hover:text-brand sm:px-[18px] sm:py-[11px] sm:text-[15px]"
               >
                 {s.name}
               </Link>
@@ -66,17 +66,17 @@ export function CategoryExplorer({ categories, citySlug }: { categories: Explore
             hint={current.photoHint}
             src={current.photoSrc}
             sizes="(min-width: 768px) 50vw, 100vw"
-            className="aspect-[4/3] w-full md:aspect-auto md:h-full md:min-h-[380px]"
+            className="aspect-[16/9] w-full sm:aspect-[4/3] md:aspect-auto md:h-full md:min-h-[380px]"
           />
-          <div className="flex min-w-0 flex-col justify-center gap-5 p-7 sm:p-10">
-            <h2 className="text-[32px] font-extrabold tracking-[-0.03em] text-brand-dark">{current.label}</h2>
-            <p className="text-[17px] leading-relaxed text-ink-soft">{current.summary}</p>
+          <div className="flex min-w-0 flex-col justify-center gap-3 p-5 sm:gap-5 sm:p-10">
+            <h2 className="text-[24px] font-extrabold tracking-[-0.03em] text-brand-dark sm:text-[32px]">{current.label}</h2>
+            <p className="text-[15px] leading-relaxed text-ink-soft sm:text-[17px]">{current.summary}</p>
             <ul className="divide-y divide-line border-y border-line">
               {current.services.slice(0, 4).map((s) => (
                 <li key={s.slug}>
                   <Link
                     href={`/${citySlug}/${current.slug}#${s.slug}`}
-                    className="group flex items-center justify-between gap-3 py-3 text-[15px] font-semibold"
+                    className="group flex items-center justify-between gap-3 py-2.5 text-[14px] font-semibold sm:py-3 sm:text-[15px]"
                   >
                     <span className="group-hover:text-brand">{s.name}</span>
                     <span className="flex items-center gap-2">
@@ -95,7 +95,7 @@ export function CategoryExplorer({ categories, citySlug }: { categories: Explore
             </ul>
             <Link
               href={`/${citySlug}/${current.slug}`}
-              className="self-start rounded-full bg-brand px-6 py-3.5 font-bold text-white transition-colors hover:bg-brand-dark"
+              className="self-start rounded-full bg-brand px-5 py-3 text-[15px] font-bold text-white transition-colors hover:bg-brand-dark sm:px-6 sm:py-3.5 sm:text-base"
             >
               Alle Leistungen ansehen
             </Link>

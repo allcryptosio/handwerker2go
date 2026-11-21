@@ -8,14 +8,14 @@ export function Footer() {
   const city = activeCities()[0];
   return (
     <footer className="border-t border-line bg-white">
-      <div className="mx-auto flex max-w-[1240px] flex-col gap-9 px-5 pb-8 pt-14 sm:px-7">
-        <div className="grid grid-cols-1 gap-7 text-sm sm:grid-cols-2 lg:grid-cols-4">
-          <div>
+      <div className="mx-auto flex max-w-[1240px] flex-col gap-6 px-5 pb-6 pt-8 sm:gap-9 sm:px-7 sm:pb-8 sm:pt-14">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-6 text-[13px] sm:gap-7 sm:text-sm lg:grid-cols-4">
+          <div className="col-span-2 sm:col-span-1">
             <Logo />
             <p className="mt-2.5 leading-relaxed text-muted">Geprüfte Handwerker in deiner Nähe. Gestartet in {city?.name}.</p>
           </div>
           {city && (
-            <nav aria-label={`Leistungen in ${city.name}`} className="flex flex-col gap-2.5">
+            <nav aria-label={`Leistungen in ${city.name}`} className="flex flex-col gap-2 sm:gap-2.5">
               <strong>{city.name}</strong>
               {categories.slice(0, 6).map((c) => (
                 <Link key={c.slug} href={`/${city.slug}/${c.slug}`} className="hover:text-brand">
@@ -24,14 +24,14 @@ export function Footer() {
               ))}
             </nav>
           )}
-          <nav aria-label="Mehr" className="flex flex-col gap-2.5">
+          <nav aria-label="Mehr" className="flex flex-col gap-2 sm:gap-2.5">
             <strong>Mehr</strong>
             <Link href="/ratgeber" className="hover:text-brand">Ratgeber</Link>
             <Link href="/ratgeber/ueber-handwerker2go" className="hover:text-brand">Über uns</Link>
             <Link href="/anmelden" className="hover:text-brand">Anmelden</Link>
             <Link href="/partner" className="hover:text-brand">Für Handwerksbetriebe</Link>
           </nav>
-          <nav aria-label="Rechtliches" className="flex flex-col gap-2.5">
+          <nav aria-label="Rechtliches" className="flex flex-col gap-2 sm:gap-2.5">
             <strong>Rechtliches</strong>
             <Link href="/impressum" className="hover:text-brand">Impressum</Link>
             <Link href="/datenschutz" className="hover:text-brand">Datenschutz</Link>
@@ -49,8 +49,8 @@ export function Footer() {
         </p>
       </div>
       <div className="border-t border-line bg-soft">
-        <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-4 px-5 py-6 sm:px-7">
-          <p className="text-[15px] text-ink-soft">Sie möchten einen über handwerker2go geschlossenen Vertrag widerrufen?</p>
+        <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-3 px-5 py-5 sm:gap-4 sm:px-7 sm:py-6">
+          <p className="text-[14px] text-ink-soft sm:text-[15px]">Sie möchten einen über handwerker2go geschlossenen Vertrag widerrufen?</p>
           <WithdrawButton />
         </div>
       </div>
