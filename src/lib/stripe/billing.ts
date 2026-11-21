@@ -8,7 +8,8 @@ import { platformCheckoutBranding } from "@/lib/stripe/branding";
 /**
  * Mitgliedschaft der Betriebe über Stripe Billing.
  * Kunde des Abos ist das v2-Konto des Betriebs (Konfiguration "customer"), kein separates Customer-Objekt.
- * Preise netto, Stripe Tax berechnet die Steuer; mit gültiger USt-IdNr. des Betriebs gilt Reverse Charge.
+ * Preise netto. Registrierung nach Malta VAT Act Art. 12: nur innergemeinschaftliche B2B-Leistungen im Reverse-Charge-Verfahren,
+ * keine maltesische USt. Deshalb berechnet Stripe keine Steuer (automatic_tax aus); maßgeblich ist unsere eigene Rechnung.
  * Ein Abo entsteht nur durch aktive Wahl des Betriebs; Abrechnung beginnt frühestens nach der Einführungsphase.
  */
 export type Plan = "monthly" | "yearly";
@@ -55,7 +56,8 @@ export async function createMembershipCheckout(providerId: string, plan: Plan, i
     // Eigene Zahlungsart-Konfiguration (Karte, Apple Pay, Google Pay), angelegt von scripts/stripe-setup.mjs
     ...(process.env.STRIPE_PAYMENT_METHOD_CONFIG ? { payment_method_configuration: process.env.STRIPE_PAYMENT_METHOD_CONFIG } : {}),
     line_items: [{ price: priceId(plan), quantity: 1 }],
-    automatic_tax: { enabled: true },
+    // Reverse Charge (Malta VAT Act Art. 12): keine Umsatzsteuer, auch nicht für Betriebe ohne USt-IdNr. (Weg B)
+    automatic_tax: { enabled: false },
     // USt-IdNr. freiwillig: Kleinunternehmer (§ 19 UStG) haben oft keine. Mit USt-IdNr. greift Reverse Charge.
     tax_id_collection: { enabled: true },
     customer_update: { address: "auto", name: "auto" },
