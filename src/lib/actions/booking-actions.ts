@@ -5,7 +5,7 @@ import { z } from "zod";
 import { legal } from "@/config/legal";
 import { currentUser } from "@/lib/auth";
 import { asSystem, audit, withDb } from "@/lib/db";
-import { customerCancel, markPaid, providerCancel, providerComplete, providerConfirm, providerDecline } from "@/lib/booking/lifecycle";
+import { customerCancel, markPaid, providerCancel, providerComplete, providerConfirm, providerDecline, providerNoShow } from "@/lib/booking/lifecycle";
 import { notifyBooking } from "@/lib/booking/notify";
 import { resolvePlace, searchAvailability, templateBySlug } from "@/lib/booking/search";
 import { isValidDate, isValidTime } from "@/lib/booking/time";
@@ -92,9 +92,9 @@ export async function createBooking(_: BookingFormState, form: FormData): Promis
       const r = await db.query(
         `insert into bookings (customer_id, provider_id, template_id, service_name, status, starts_at, ends_at, blocked, travel_minutes,
            street, postal_code, city, location, distance_km, contact_name, contact_phone, contact_email, notes,
-           price_type, price_cents, commission_bps, application_fee_cents, early_start_consent_at, terms_version, hold_expires_at, confirmed_at)
+           price_type, price_cents, commission_bps, application_fee_cents, early_start_consent_at, terms_version, hold_expires_at, confirmed_at, anfahrtskosten_cents)
          values ($1, $2, $3, $4, $5, $6, $7, tstzrange($8, $9), $10, $11, $12, $13, ST_SetSRID(ST_MakePoint($14, $15), 4326)::geography, $16,
-           $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28)
+           $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)
          returning id, number`,
         [
           u.id, d.providerId, tpl.templateId, tpl.name, status, start, end,
@@ -105,6 +105,7 @@ export async function createBooking(_: BookingFormState, form: FormData): Promis
           consentNeeded ? now : null, legal.termsVersion,
           fixed ? new Date(now.getTime() + 35 * 60_000) : null,
           status === "confirmed" ? now : null,
+          hit.anfahrtskostenCents,
         ],
       );
       const b = r.rows[0] as { id: string; number: string };
@@ -196,15 +197,16 @@ export async function providerBookingAction(form: FormData) {
   if (action === "confirm") await providerConfirm(id, u.id);
   else if (action === "decline") await providerDecline(id, u.id);
   else if (action === "complete") await providerComplete(id, u.id);
+  else if (action === "noshow") await providerNoShow(id, u.id);
   else if (action === "cancel") await providerCancel(id, u.id, String(form.get("reason") ?? "Vom Betrieb abgesagt"));
   redirect(String(form.get("back") ?? "/dashboard/termine").startsWith("/dashboard") ? String(form.get("back")) : "/dashboard/termine");
 }
 
-export async function customerCancelAction(_: { error?: string; ok?: boolean }, form: FormData): Promise<{ error?: string; ok?: boolean }> {
+export async function customerCancelAction(_: { error?: string; ok?: boolean; message?: string }, form: FormData): Promise<{ error?: string; ok?: boolean; message?: string }> {
   const u = await currentUser();
   if (!u) return { error: "Bitte melde dich an." };
   const id = idSchema.safeParse(form.get("id"));
   if (!id.success) return { error: "Buchung nicht gefunden." };
   const r = await customerCancel(id.data, u.id);
-  return r.ok ? { ok: true } : { error: r.reason };
+  return r.ok ? { ok: true, message: r.message } : { error: r.reason };
 }

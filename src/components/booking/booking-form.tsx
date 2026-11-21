@@ -12,12 +12,14 @@ export function BookingForm({
   needsConsent,
   fixed,
   priceText,
+  cancellationText,
 }: {
   hidden: { providerId: string; leistung: string; datum: string; zeit: string };
   defaults: { street?: string; postal_code: string; city: string; contact_name: string; contact_phone?: string };
   needsConsent: boolean;
   fixed: boolean;
   priceText: string;
+  cancellationText: string;
 }) {
   const [state, action] = useActionState<BookingFormState, FormData>(createBooking, {});
   const e = state.fieldErrors ?? {};
@@ -65,6 +67,7 @@ export function BookingForm({
       <div className="flex flex-col gap-4 rounded-panel border border-line bg-soft p-5">
         <TermsCheckbox error={e.terms} />
         {needsConsent && <EarlyStartConsentCheckbox error={e.early_start_consent} />}
+        <p className="text-[13px] text-muted">{cancellationText}</p>
         <p className="text-[13px] text-muted">
           Dein Vertragspartner für die Leistung ist der Betrieb. Es gilt die <Link href="/widerruf" className="underline">Widerrufsbelehrung</Link>.
           Wie wir mit deinen Daten umgehen, steht in der <Link href="/datenschutz" className="underline">Datenschutzerklärung</Link>.

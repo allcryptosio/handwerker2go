@@ -38,6 +38,8 @@ export function ProviderRegisterForm({ categories }: { categories: { slug: strin
 
       <fieldset className={section}>
         <legend className={`${h} mb-1`}>3. Leistungen und Einsatzgebiet</legend>
+        <Field name="anfahrtskosten" label="Anfahrtskosten in Euro" inputMode="text" error={e.anfahrtskosten}
+          hint="Die Anfahrt ist in deinen Festpreisen immer enthalten. Der Betrag ist die Obergrenze der Pauschale bei später Stornierung oder wenn niemand angetroffen wird (höchstens 25 % des Festpreises)." />
         <div className="flex flex-col gap-2">
           <span className="text-sm font-semibold">Welche Leistungen bietest du an?</span>
           <div className="flex flex-wrap gap-2.5">

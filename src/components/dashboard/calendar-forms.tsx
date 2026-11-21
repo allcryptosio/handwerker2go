@@ -64,7 +64,7 @@ export function TimeOffForm() {
   );
 }
 
-export function SettingsForm({ buffer, notice, mode }: { buffer: number; notice: number; mode: "instant" | "confirm" }) {
+export function SettingsForm({ buffer, notice, mode, anfahrtskostenCents }: { buffer: number; notice: number; mode: "instant" | "confirm"; anfahrtskostenCents: number | null }) {
   const [s, action, pending] = useActionState(saveSettings, {});
   return (
     <form action={action} className="flex flex-col gap-4">
@@ -78,6 +78,10 @@ export function SettingsForm({ buffer, notice, mode }: { buffer: number; notice:
             {[2, 4, 12, 24, 48, 72].map((h) => <option key={h} value={h}>{h} Stunden</option>)}
           </select></label>
       </div>
+      <label className="flex flex-col gap-1 text-sm font-semibold">Anfahrtskosten in Euro (Pflicht)
+        <input name="anfahrtskosten" required inputMode="decimal" defaultValue={anfahrtskostenCents === null ? "" : (anfahrtskostenCents / 100).toFixed(2).replace(".", ",")} className={sel} />
+        <span className="font-normal text-muted">Die Anfahrt ist in deinen Festpreisen enthalten. Der Betrag ist die Obergrenze der Pauschale bei später Stornierung oder wenn niemand angetroffen wird (höchstens 25 % des Festpreises). Ohne Angabe bist du nicht buchbar.</span>
+      </label>
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-1 text-sm font-semibold">Buchungen</legend>
         <label className="flex items-start gap-3 text-[15px]"><input type="radio" name="booking_mode" value="instant" defaultChecked={mode === "instant"} className="mt-1 h-4 w-4 accent-[#12704f]" />

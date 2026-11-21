@@ -117,6 +117,7 @@ async function Dashboard() {
           },
           { t: "Leistungen mit Preisen eingetragen", done: setup.services > 0, href: "/dashboard/kalender", hint: "Welche Leistungen, zu welchem Preis, wie lange." },
           { t: "Arbeitszeiten festgelegt", done: setup.hours > 0, href: "/dashboard/kalender", hint: "Nur in diesen Zeiten können Kunden buchen." },
+          { t: "Anfahrtskosten eingetragen", done: p.anfahrtskosten_cents !== null, href: "/dashboard/kalender", hint: "Bitte Anfahrtskosten eintragen. Ohne Angabe bist du nicht buchbar." },
         ]}
       />
       <section className={`rounded-panel border-[1.5px] p-6 ${s.tone}`}>

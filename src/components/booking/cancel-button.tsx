@@ -5,7 +5,7 @@ import { customerCancelAction } from "@/lib/actions/booking-actions";
 
 export function CustomerCancelButton({ id, refundText }: { id: string; refundText: string }) {
   const [state, action, pending] = useActionState(customerCancelAction, {});
-  if (state.ok) return <p className="font-semibold text-brand-dark">Storniert. {refundText}</p>;
+  if (state.ok) return <p className="font-semibold text-brand-dark">Storniert. {state.message ?? refundText}</p>;
   return (
     <form action={action} onSubmit={(e) => { if (!confirm("Buchung wirklich stornieren?")) e.preventDefault(); }} className="flex flex-col gap-2">
       <input type="hidden" name="id" value={id} />

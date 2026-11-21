@@ -9,7 +9,8 @@ import { Container } from "@/components/ui/container";
 import { legal } from "@/config/legal";
 import { providerBookingAction, syncCheckoutReturn } from "@/lib/actions/booking-actions";
 import { currentUser } from "@/lib/auth";
-import { freeCancellationUntil } from "@/lib/booking/lifecycle";
+import { cancellationNotice, decideCancellation } from "@/lib/booking/cancellation";
+import { contractConcludedAt } from "@/lib/booking/withdrawal";
 import { withDb } from "@/lib/db";
 import { earlyStartConfirmationParagraph } from "@/lib/legal/early-start";
 
@@ -55,9 +56,11 @@ async function Detail({ params, searchParams }: PageProps<"/buchung/[id]">) {
   const isCustomer = b.customer_id === u.id;
   const start = new Date(b.starts_at);
   const s = statusInfo[b.status];
-  const freeUntil = freeCancellationUntil(start);
   const canReview = isCustomer && !review && (b.status === "completed" || (b.status === "confirmed" && new Date(b.ends_at) < new Date()));
-  const canCancelFree = isCustomer && ["confirmed", "requested"].includes(b.status) && new Date() < freeUntil;
+  const cancelPreview = decideCancellation({
+    priceType: b.price_type, priceCents: b.price_cents, anfahrtskostenCents: b.anfahrtskosten_cents,
+    contractAt: contractConcludedAt(b), startsAt: start, now: new Date(),
+  });
 
   return (
     <div className="flex flex-col gap-6">
@@ -142,17 +145,12 @@ async function Detail({ params, searchParams }: PageProps<"/buchung/[id]">) {
       {isCustomer && ["confirmed", "requested"].includes(b.status) && (
         <section className="flex flex-col gap-3 rounded-panel border border-line p-6">
           <h2 className="text-lg font-bold">Stornieren</h2>
-          {canCancelFree ? (
-            <>
-              <p className="text-[15px] text-ink-soft">Bis {when(freeUntil)} Uhr kostenlos{b.price_type === "fixed" ? ", du bekommst den vollen Betrag zurück" : ""}.</p>
-              <CustomerCancelButton id={b.id} refundText={b.price_type === "fixed" ? "Die Erstattung ist veranlasst." : ""} />
-            </>
-          ) : (
-            <p className="text-[15px] text-ink-soft">
-              Die kostenlose Stornierung war bis {legal.freeCancellationHours} Stunden vor dem Termin möglich. Bitte schreib uns an{" "}
-              <a className="underline" href={`mailto:${legal.email}?subject=Stornierung ${b.number}`}>{legal.email}</a>.
-            </p>
-          )}
+          <p className="text-[14px] text-muted">{cancellationNotice(b.price_type, b.price_cents, b.anfahrtskosten_cents)}</p>
+          <p className="text-[15px] text-ink-soft">
+            Wenn du jetzt stornierst: {cancelPreview.kind === "late_fee" ? `Der Betrieb behält ${eur(cancelPreview.feeCents)} als Pauschale, du bekommst ${eur(cancelPreview.refundCents)} zurück.` : cancelPreview.message}
+          </p>
+          <CustomerCancelButton id={b.id} refundText={b.price_type === "fixed" ? "Die Erstattung ist veranlasst." : ""} />
+          <p className="text-[13px] text-muted">Dir bleibt der Nachweis gestattet, dass dem Betrieb kein oder ein wesentlich geringerer Schaden entstanden ist. Fragen an <a className="underline" href={`mailto:${legal.email}?subject=Stornierung ${b.number}`}>{legal.email}</a>.</p>
         </section>
       )}
 
@@ -166,6 +164,7 @@ async function Detail({ params, searchParams }: PageProps<"/buchung/[id]">) {
           )}
           {b.status === "confirmed" && start > new Date() && <ProviderButton id={b.id} action="cancel" label="Termin absagen" />}
           {b.status === "confirmed" && start <= new Date() && <ProviderButton id={b.id} action="complete" label="Als erledigt markieren" primary />}
+          {b.status === "confirmed" && start <= new Date() && !b.no_show_at && <ProviderButton id={b.id} action="noshow" label="Kunde nicht angetroffen" />}
         </section>
       )}
     </div>

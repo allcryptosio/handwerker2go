@@ -96,6 +96,11 @@ async function Admin({ searchParams }: { searchParams: Promise<Record<string, st
           {outbox} E-Mail(s) warten im Ausgang. Der Versand startet, sobald ein E-Mail-Anbieter eingerichtet ist (MAIL_DRIVER).
         </p>
       )}
+      {sp.fehler === "anfahrtskosten" && (
+        <p role="alert" className="rounded-card border-[1.5px] border-[#b42318] bg-[#fef3f2] p-4 text-[15px]">
+          Freischaltung nicht möglich: Der Betrieb hat noch keine Anfahrtskosten eingetragen (Pflichtangabe, Obergrenze der Stornopauschale).
+        </p>
+      )}
       {sp.fehler === "begruendung" && (
         <p role="alert" className="rounded-card border-[1.5px] border-[#b42318] bg-[#fef3f2] p-4 text-[15px]">
           Bitte gib bei Ablehnung oder Sperre eine Begründung an (mindestens 5 Zeichen). Sie geht per E-Mail an den Betrieb (AGB für Betriebe § 10).

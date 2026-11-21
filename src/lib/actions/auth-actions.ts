@@ -98,6 +98,7 @@ const providerSchema = z.object({
   description: z.string().trim().min(40, "Bitte beschreibe deinen Betrieb in mindestens 40 Zeichen").max(2000),
   area_label: z.string().trim().min(2, "Bitte gib den Mittelpunkt deines Einsatzgebiets an").max(120),
   radius_km: z.coerce.number().min(1, "Mindestens 1 km").max(200, "Höchstens 200 km"),
+  anfahrtskosten: z.string().trim().regex(/^\d{1,3}([.,]\d{1,2})?$/, "Bitte deine Anfahrtskosten in Euro angeben, z. B. 25 oder 25,50"),
   terms,
 });
 
@@ -175,9 +176,10 @@ export async function registerProvider(_: FormState, form: FormData): Promise<Fo
     await asSystem((db) => db.query(`update "user" set role = 'provider' where id = $1`, [userId]));
     await withDb({ userId, role: "provider" }, async (db) => {
       const p = await db.query(
-        `insert into provider_profiles (user_id, company_name, legal_form, contact_name, phone, street, postal_code, city, vat_id, description, accepted_terms_at)
-         values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10, now()) returning id`,
-        [userId, d.company_name, d.legal_form || null, d.contact_name, d.phone, d.street, d.postal_code, d.city, d.vat_id ? normalizeVatId(d.vat_id) : null, d.description],
+        `insert into provider_profiles (user_id, company_name, legal_form, contact_name, phone, street, postal_code, city, vat_id, description, accepted_terms_at, anfahrtskosten_cents)
+         values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10, now(), $11) returning id`,
+        [userId, d.company_name, d.legal_form || null, d.contact_name, d.phone, d.street, d.postal_code, d.city, d.vat_id ? normalizeVatId(d.vat_id) : null, d.description,
+          Math.round(Number(d.anfahrtskosten.replace(",", ".")) * 100)],
       );
       const pid: string = p.rows[0].id;
       await db.query(
@@ -313,6 +315,7 @@ export async function decideProvider(form: FormData) {
   const result = await withDb({ userId: admin.id, role: "admin" }, async (db) => {
     const before = (await db.query("select p.*, u.email from provider_profiles p join \"user\" u on u.id = p.user_id where p.id = $1 for update", [d.providerId])).rows[0];
     if (!before) throw new Error("Betrieb nicht gefunden");
+    if (status === "approved" && before.anfahrtskosten_cents === null) return { blocked: "anfahrtskosten" as const };
     let slug = before.slug;
     if (status === "approved" && !slug) {
       const base = slugify(before.company_name);
@@ -332,6 +335,7 @@ export async function decideProvider(form: FormData) {
       before: { status: before.status }, after: { status, reason: d.reason || null } });
     return { email: before.email as string, company: before.company_name as string, contact: before.contact_name as string };
   });
+  if ("blocked" in result) redirect("/admin?fehler=anfahrtskosten");
   const texts = {
     approved: { subject: "Dein Betrieb ist freigeschaltet", p: ["Gute Nachrichten: Wir haben deine Angaben geprüft und deinen Betrieb freigeschaltet. Ab heute läuft deine Einführungsphase ohne Grundgebühr.", "Im Dashboard kannst du jetzt dein Profil vervollständigen."] },
     rejected: { subject: "Deine Registrierung bei handwerker2go", p: ["Leider können wir deinen Betrieb derzeit nicht freischalten.", d.reason ? `Grund: ${d.reason}` : "Bei Fragen antworte einfach auf diese E-Mail."] },

@@ -102,6 +102,8 @@ export interface ProviderInfo {
   offeredServices: number;
   avgResponseHours: number | null;
   approvedAt: string;
+  /** Anfahrtskosten des Betriebs (Obergrenze der Stornopauschale, im Festpreis enthalten) */
+  anfahrtskostenCents: number;
 }
 
 interface Loaded {
@@ -117,7 +119,7 @@ async function loadCandidates(opts: { templateId: string; lat: number; lon: numb
     // Bevor gerechnet wird: abgelaufene Zahlungs-Reservierungen freigeben
     await db.query(`update bookings set status = 'expired' where status = 'pending_payment' and hold_expires_at < now()`);
     const rows = (await db.query(
-      `select p.id, p.slug, p.company_name, p.logo_key, p.buffer_minutes, p.stripe_account_id, p.approved_at, p.min_notice_hours, p.booking_mode,
+      `select p.id, p.slug, p.company_name, p.logo_key, p.buffer_minutes, p.stripe_account_id, p.approved_at, p.min_notice_hours, p.booking_mode, p.anfahrtskosten_cents,
               (p.stripe_charges_enabled and p.stripe_payouts_enabled) payable,
               sa.radius_km, case when sa.center is null then null else ST_Distance(sa.center, ST_SetSRID(ST_MakePoint($3, $2), 4326)::geography) / 1000 end distance_km,
               ps.price_type, ps.price_cents, coalesce(ps.duration_min, t.duration_min, 60) duration_min, ps.template_id is not null offers,
@@ -135,7 +137,7 @@ async function loadCandidates(opts: { templateId: string; lat: number; lon: numb
          join provider_profiles p on p.id = pc.provider_id
          join lateral (select * from service_areas s where s.provider_id = p.id order by s.created_at limit 1) sa on true
          left join provider_services ps on ps.provider_id = p.id and ps.template_id = t.id and ps.active
-        where t.id = $1 and p.status = 'approved' and app.provider_listed(p.id) ${opts.providerId ? "and p.id = $4" : ""}`,
+        where t.id = $1 and p.status = 'approved' and app.provider_listed(p.id) and p.anfahrtskosten_cents is not null ${opts.providerId ? "and p.id = $4" : ""}`,
       opts.providerId ? [opts.templateId, opts.lat, opts.lon, opts.providerId] : [opts.templateId, opts.lat, opts.lon],
     )).rows;
     if (rows.length === 0) return [];
@@ -192,6 +194,7 @@ async function loadCandidates(opts: { templateId: string; lat: number; lon: numb
         offeredServices: Number(r.offered_services),
         avgResponseHours: r.avg_response_hours === null ? null : Number(r.avg_response_hours),
         approvedAt: new Date(r.approved_at).toISOString(),
+        anfahrtskostenCents: Number(r.anfahrtskosten_cents),
       };
       return { info, candidate };
     });

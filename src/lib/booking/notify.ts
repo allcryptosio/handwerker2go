@@ -2,6 +2,7 @@ import "server-only";
 import { asSystem } from "@/lib/db";
 import { earlyStartConfirmationParagraph } from "@/lib/legal/early-start";
 import { withdrawalNoticeForMail } from "@/lib/legal/withdrawal-notice";
+import { cancellationNotice } from "@/lib/booking/cancellation";
 import { sendMail } from "@/lib/mail";
 import { reviewOptOutUrl } from "@/lib/review-optout";
 
@@ -32,6 +33,7 @@ export async function notifyBooking(bookingId: string, event: BookingEvent) {
     `Preis: ${price}`,
     `Buchungsnummer: ${b.number}`,
   ];
+  const storno = cancellationNotice(b.price_type, b.price_cents, b.anfahrtskosten_cents);
   const provider = `Dein Vertragspartner ist ${b.company_name}, ${b.p_street}, ${b.p_postal} ${b.p_city}, Telefon ${b.p_phone}.`;
   const consent = b.early_start_consent_at ? [earlyStartConfirmationParagraph(new Date(b.early_start_consent_at))] : [];
   // Widerrufsbelehrung auf dauerhaftem Datenträger (Textform, § 312f BGB): amtliches Muster vollständig im Mailtext (Anhang A)
@@ -53,11 +55,11 @@ export async function notifyBooking(bookingId: string, event: BookingEvent) {
 
   switch (event) {
     case "confirmed":
-      toCustomer(`Gebucht: ${b.service_name} am ${start.toLocaleDateString("de-DE", { timeZone: "Europe/Berlin" })}`, "Dein Termin steht", [`${b.company_name} kommt zu dir. Hier sind alle Angaben.`], [provider, ...consent, ...withdrawal]);
+      toCustomer(`Gebucht: ${b.service_name} am ${start.toLocaleDateString("de-DE", { timeZone: "Europe/Berlin" })}`, "Dein Termin steht", [`${b.company_name} kommt zu dir. Hier sind alle Angaben.`], [provider, storno, ...consent, ...withdrawal]);
       toProvider(`Neuer Auftrag: ${b.service_name}`, "Neuer Auftrag gebucht", ["Ein Kunde hat dich über handwerker2go gebucht. Der Termin steht in deinem Kalender."]);
       break;
     case "requested":
-      toCustomer(`Angefragt: ${b.service_name}`, "Deine Anfrage ist beim Betrieb", [`${b.company_name} bestätigt deinen Termin in der Regel innerhalb weniger Stunden. Wir schicken dir dann eine E-Mail.`], [provider, ...consent, ...withdrawal]);
+      toCustomer(`Angefragt: ${b.service_name}`, "Deine Anfrage ist beim Betrieb", [`${b.company_name} bestätigt deinen Termin in der Regel innerhalb weniger Stunden. Wir schicken dir dann eine E-Mail.`], [provider, storno, ...consent, ...withdrawal]);
       toProvider(`Bitte bestätigen: ${b.service_name}`, "Neue Buchungsanfrage", ["Bitte bestätige oder lehne die Anfrage im Dashboard ab. Bis dahin ist der Termin in deinem Kalender reserviert."]);
       break;
     case "provider_confirmed":

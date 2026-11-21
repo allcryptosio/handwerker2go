@@ -3,6 +3,8 @@ import { legal } from "@/config/legal";
 import { asSystem, audit } from "@/lib/db";
 import { notifyBooking } from "@/lib/booking/notify";
 import { refundBookingPayment } from "@/lib/stripe/payments";
+import { decideCancellation } from "@/lib/booking/cancellation";
+import { contractConcludedAt, submitWithdrawal } from "@/lib/booking/withdrawal";
 
 /**
  * Statusübergänge einer Buchung:
@@ -88,23 +90,86 @@ export function freeCancellationUntil(startsAt: Date) {
   return new Date(startsAt.getTime() - legal.freeCancellationHours * 3_600_000);
 }
 
-export async function customerCancel(bookingId: string, actorId: string): Promise<{ ok: boolean; reason?: string }> {
+/**
+ * Kunde storniert (AGB für Kunden § 6):
+ * - innerhalb der Widerrufsfrist als Widerruf (volle Erstattung vor Leistungsbeginn, egal wie kurzfristig; gespeichert in withdrawals),
+ * - danach bis 24 Std. vorher kostenlos, später Pauschale min(25 %, Anfahrtskosten), Rest erstattet, Provision anteilig.
+ */
+export async function customerCancel(bookingId: string, actorId: string): Promise<{ ok: boolean; reason?: string; message?: string }> {
   const b = await load(bookingId);
   if (!b || b.customer_id !== actorId) return { ok: false, reason: "Buchung nicht gefunden." };
   if (!["confirmed", "requested", "pending_payment"].includes(b.status)) return { ok: false, reason: "Diese Buchung kann nicht mehr storniert werden." };
-  if (b.status !== "pending_payment" && new Date() > freeCancellationUntil(new Date(b.starts_at))) {
-    return { ok: false, reason: `Die kostenlose Stornierung ist nur bis ${legal.freeCancellationHours} Stunden vor dem Termin möglich. Bitte schreib uns an ${legal.email}.` };
+  if (b.status === "pending_payment") {
+    await asSystem(async (db) => {
+      await db.query(`update bookings set status = 'cancelled', refunded_cents = 0, cancelled_at = now(), cancel_reason = 'Storniert durch Kunden' where id = $1 and status = 'pending_payment'`, [bookingId]);
+      await audit(db, { actorId, actorRole: "customer", action: "booking.cancel", entity: "bookings", entityId: bookingId, after: { refunded: 0 } });
+    });
+    return { ok: true };
   }
-  const refunded = b.status === "pending_payment" ? 0 : await refundIfPaid(b, "customer_cancel");
+  const d = decideCancellation({
+    priceType: b.price_type, priceCents: b.price_cents, anfahrtskostenCents: b.anfahrtskosten_cents,
+    contractAt: contractConcludedAt(b), startsAt: new Date(b.starts_at), now: new Date(),
+  });
+  if (d.kind === "withdrawal") {
+    await submitWithdrawal({ name: b.contact_name, bookingNumber: b.number, email: b.contact_email, userId: actorId, source: "cancel_flow" });
+    return { ok: true, message: d.message };
+  }
+  let refunded = 0;
+  if (b.price_type === "fixed" && b.stripe_payment_intent_id && b.stripe_account_id && d.refundCents > 0) {
+    await refundBookingPayment({
+      providerAccountId: b.stripe_account_id, paymentIntentId: b.stripe_payment_intent_id,
+      amountCents: d.refundCents === b.price_cents ? undefined : d.refundCents, reason: d.kind === "free" ? "customer_cancel" : "customer_cancel_late",
+    });
+    refunded = d.refundCents;
+  }
   await asSystem(async (db) => {
     await db.query(
-      `update bookings set status = 'cancelled', refunded_cents = $2, cancelled_at = now(), cancel_reason = 'Storniert durch Kunden' where id = $1 and status in ('confirmed', 'requested', 'pending_payment')`,
-      [bookingId, refunded],
+      `update bookings set status = 'cancelled', refunded_cents = $2, cancellation_fee_cents = $3, cancelled_at = now(), cancel_reason = 'Storniert durch Kunden'
+        where id = $1 and status in ('confirmed', 'requested')`,
+      [bookingId, refunded, d.feeCents || null],
     );
-    await audit(db, { actorId, actorRole: "customer", action: "booking.cancel", entity: "bookings", entityId: bookingId, after: { refunded } });
+    await audit(db, { actorId, actorRole: "customer", action: "booking.cancel", entity: "bookings", entityId: bookingId, after: { refunded, fee: d.feeCents, kind: d.kind } });
   });
-  if (b.status !== "pending_payment") await notifyBooking(bookingId, "cancelled_by_customer");
-  return { ok: true };
+  await notifyBooking(bookingId, "cancelled_by_customer");
+  return { ok: true, message: d.message };
+}
+
+/**
+ * Betrieb meldet: Kunde nicht angetroffen. Nach Ablauf der Widerrufsfrist Pauschale, Rest erstattet;
+ * innerhalb der Frist keine automatische Pauschale, sondern Prüfung durch den Admin.
+ */
+export async function providerNoShow(bookingId: string, actorId: string): Promise<{ ok: boolean; message: string }> {
+  const b = await load(bookingId);
+  if (!b || b.status !== "confirmed" || new Date(b.starts_at) > new Date()) return { ok: false, message: "Nur bei bestätigten Terminen nach Beginn möglich." };
+  const d = decideCancellation({
+    priceType: b.price_type, priceCents: b.price_cents, anfahrtskostenCents: b.anfahrtskosten_cents,
+    contractAt: contractConcludedAt(b), startsAt: new Date(b.starts_at), now: new Date(), noShow: true,
+  });
+  if (d.kind === "admin_case") {
+    await asSystem(async (db) => {
+      await db.query("update bookings set no_show_at = coalesce(no_show_at, now()) where id = $1", [bookingId]);
+      await audit(db, { actorId, actorRole: "provider", action: "booking.no_show_reported", entity: "bookings", entityId: bookingId, after: { admin_case: true } });
+    });
+    if (process.env.ADMIN_EMAIL) {
+      const { sendMail } = await import("@/lib/mail");
+      await sendMail({ to: process.env.ADMIN_EMAIL, template: "no_show_admin", subject: `Nichterscheinen in der Widerrufsfrist: ${b.number}`, heading: "Bitte prüfen", paragraphs: [`Der Betrieb meldet, dass bei Buchung ${b.number} niemand angetroffen wurde. Die Widerrufsfrist läuft noch: keine automatische Pauschale.`] }).catch(console.error);
+    }
+    return { ok: true, message: d.message };
+  }
+  let refunded = 0;
+  if (b.price_type === "fixed" && b.stripe_payment_intent_id && b.stripe_account_id && d.refundCents > 0) {
+    await refundBookingPayment({ providerAccountId: b.stripe_account_id, paymentIntentId: b.stripe_payment_intent_id, amountCents: d.refundCents, reason: "no_show" });
+    refunded = d.refundCents;
+  }
+  await asSystem(async (db) => {
+    await db.query(
+      `update bookings set status = 'cancelled', refunded_cents = $2, cancellation_fee_cents = $3, no_show_at = now(), cancelled_at = now(), cancel_reason = 'Kunde nicht angetroffen' where id = $1 and status = 'confirmed'`,
+      [bookingId, refunded, d.feeCents || null],
+    );
+    await audit(db, { actorId, actorRole: "provider", action: "booking.no_show", entity: "bookings", entityId: bookingId, after: { refunded, fee: d.feeCents } });
+  });
+  await notifyBooking(bookingId, "cancelled_by_customer");
+  return { ok: true, message: d.message };
 }
 
 export async function providerCancel(bookingId: string, actorId: string, reason: string) {

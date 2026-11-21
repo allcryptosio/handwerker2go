@@ -18,7 +18,7 @@ async function Calendar() {
   if (!u) redirect("/anmelden");
   if (u.role !== "provider") redirect("/konto");
   const data = await withDb({ userId: u.id, role: "provider" }, async (db) => {
-    const p = (await db.query("select id, buffer_minutes, min_notice_hours, booking_mode, logo_key from provider_profiles where user_id = $1", [u.id])).rows[0];
+    const p = (await db.query("select id, buffer_minutes, min_notice_hours, booking_mode, logo_key, anfahrtskosten_cents from provider_profiles where user_id = $1", [u.id])).rows[0];
     if (!p) return null;
     const hours = (await db.query("select weekday, to_char(starts, 'HH24:MI') f, to_char(ends, 'HH24:MI') t from provider_working_hours where provider_id = $1 order by starts", [p.id])).rows;
     const off = (await db.query("select id, lower(during) s, upper(during) e, reason from provider_time_off where provider_id = $1 and upper(during) > now() order by lower(during)", [p.id])).rows;
@@ -88,7 +88,7 @@ async function Calendar() {
       </section>
       <section className={card}>
         <h2 className="text-lg font-bold">Planung</h2>
-        <SettingsForm buffer={p.buffer_minutes} notice={p.min_notice_hours} mode={p.booking_mode} />
+        <SettingsForm buffer={p.buffer_minutes} notice={p.min_notice_hours} mode={p.booking_mode} anfahrtskostenCents={p.anfahrtskosten_cents} />
       </section>
       <section className={card}>
         <h2 className="text-lg font-bold">Logo oder Profilbild</h2>

@@ -92,14 +92,16 @@ const settingsSchema = z.object({
   buffer_minutes: z.coerce.number().int().min(0).max(240),
   min_notice_hours: z.coerce.number().int().min(0).max(168),
   booking_mode: z.enum(["instant", "confirm"]),
+  anfahrtskosten: z.string().trim().regex(/^\d{1,3}([.,]\d{1,2})?$/),
 });
 
 export async function saveSettings(_: CalState, form: FormData): Promise<CalState> {
   const { u, pid } = await me();
   const p = settingsSchema.safeParse(Object.fromEntries(form));
-  if (!p.success) return { error: "Bitte prüfe die Angaben." };
+  if (!p.success) return { error: "Bitte prüfe die Angaben. Anfahrtskosten in Euro, z. B. 25 oder 25,50." };
   await asProvider(u.id, (db) =>
-    db.query("update provider_profiles set buffer_minutes = $2, min_notice_hours = $3, booking_mode = $4 where id = $1", [pid, p.data.buffer_minutes, p.data.min_notice_hours, p.data.booking_mode]),
+    db.query("update provider_profiles set buffer_minutes = $2, min_notice_hours = $3, booking_mode = $4, anfahrtskosten_cents = $5 where id = $1",
+      [pid, p.data.buffer_minutes, p.data.min_notice_hours, p.data.booking_mode, Math.round(Number(p.data.anfahrtskosten.replace(",", ".")) * 100)]),
   );
   revalidatePath("/dashboard/kalender");
   return { ok: "Einstellungen gespeichert." };

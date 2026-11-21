@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { BookingForm } from "@/components/booking/booking-form";
 import { ProviderReviews } from "@/components/booking/provider-reviews";
+import { cancellationNotice } from "@/lib/booking/cancellation";
 import { formatDateLong } from "@/lib/booking/format";
 import { Container } from "@/components/ui/container";
 import { currentUser } from "@/lib/auth";
@@ -68,6 +69,7 @@ async function Booking({ params, searchParams }: PageProps<"/buchen/[providerId]
             needsConsent={needsEarlyStartConsent(new Date(), new Date(hit.start))}
             fixed={fixed}
             priceText={priceText}
+            cancellationText={cancellationNotice(hit.priceType, hit.priceCents, hit.anfahrtskostenCents)}
           />
         )}
         <ProviderReviews providerId={providerId} />
@@ -92,7 +94,7 @@ async function Booking({ params, searchParams }: PageProps<"/buchen/[providerId]
             <span className="text-2xl font-extrabold">{priceText}</span>
           </div>
           {!fixed && <p className="text-[13px] text-muted">Der Betrieb schaut sich den Auftrag vor Ort an und macht dir danach ein Angebot. Du entscheidest dann, ob du es annimmst.</p>}
-          {fixed && <p className="text-[13px] text-muted">Kostenlos stornierbar bis 24 Stunden vor dem Termin.</p>}
+          <p className="text-[13px] text-muted">{cancellationNotice(hit.priceType, hit.priceCents, hit.anfahrtskostenCents)}</p>
           <Link href={back} className="text-[14px] font-semibold text-brand underline">Andere Zeit oder anderen Betrieb wählen</Link>
         </div>
       </aside>
