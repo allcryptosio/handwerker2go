@@ -10,6 +10,7 @@ import { notifyBooking } from "@/lib/booking/notify";
 import { resolvePlace, searchAvailability, templateBySlug } from "@/lib/booking/search";
 import { isValidDate, isValidTime } from "@/lib/booking/time";
 import { EARLY_START_CONSENT_TEXT, EARLY_START_TEXT_VERSION, needsEarlyStartConsent } from "@/lib/legal/early-start";
+import { REVIEW_OPTIN_TEXT, REVIEW_OPTIN_VERSION } from "@/lib/legal/review-optin";
 import { detectImageType, storage } from "@/lib/storage";
 import { getStripe } from "@/lib/stripe/client";
 import { applicationFeeCents, commissionBpsAt } from "@/lib/stripe/commission";
@@ -79,6 +80,7 @@ export async function createBooking(_: BookingFormState, form: FormData): Promis
     return { fieldErrors: { early_start_consent: "Bitte bestätige den Beginn vor Ablauf der Widerrufsfrist." }, error: "Bitte prüfe die markierten Felder." };
   }
 
+  const reviewOptin = form.get("review_optin") === "on";
   const fixed = hit.priceType === "fixed";
   if (fixed && (!hit.priceCents || !hit.stripeAccountId)) return { error: "Dieser Betrieb kann gerade keine Zahlungen annehmen." };
   const bps = fixed ? commissionBpsAt(new Date(hit.approvedAt), now) : null;
@@ -92,9 +94,9 @@ export async function createBooking(_: BookingFormState, form: FormData): Promis
       const r = await db.query(
         `insert into bookings (customer_id, provider_id, template_id, service_name, status, starts_at, ends_at, blocked, travel_minutes,
            street, postal_code, city, location, distance_km, contact_name, contact_phone, contact_email, notes,
-           price_type, price_cents, commission_bps, application_fee_cents, early_start_consent_at, terms_version, hold_expires_at, confirmed_at, anfahrtskosten_cents, provider_tax_status)
+           price_type, price_cents, commission_bps, application_fee_cents, early_start_consent_at, terms_version, hold_expires_at, confirmed_at, anfahrtskosten_cents, provider_tax_status, review_optin, review_optin_at, review_optin_text_version)
          values ($1, $2, $3, $4, $5, $6, $7, tstzrange($8, $9), $10, $11, $12, $13, ST_SetSRID(ST_MakePoint($14, $15), 4326)::geography, $16,
-           $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30)
+           $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33)
          returning id, number`,
         [
           u.id, d.providerId, tpl.templateId, tpl.name, status, start, end,
@@ -107,6 +109,7 @@ export async function createBooking(_: BookingFormState, form: FormData): Promis
           status === "confirmed" ? now : null,
           hit.anfahrtskostenCents,
           hit.taxStatus,
+          reviewOptin, reviewOptin ? now : null, reviewOptin ? REVIEW_OPTIN_VERSION : null,
         ],
       );
       const b = r.rows[0] as { id: string; number: string };
@@ -114,6 +117,12 @@ export async function createBooking(_: BookingFormState, form: FormData): Promis
         await db.query(
           `insert into consents (user_id, kind, terms_version, text_snapshot, booking_ref, accepted_at) values ($1, 'early_start_withdrawal', $2, $3, $4, $5)`,
           [u.id, `${legal.termsVersion}|${EARLY_START_TEXT_VERSION}`, EARLY_START_CONSENT_TEXT, b.number, now],
+        );
+      }
+      if (reviewOptin) {
+        await db.query(
+          `insert into legal_declarations (user_id, booking_id, kind, text_version, text_snapshot, legal_version) values ($1, $2, 'review_optin', $3, $4, $5)`,
+          [u.id, b.id, REVIEW_OPTIN_VERSION, REVIEW_OPTIN_TEXT, legal.termsVersion],
         );
       }
       await db.query(`insert into customer_profiles (user_id, phone, accepted_terms_at) values ($1, $2, now()) on conflict (user_id) do update set phone = excluded.phone`, [u.id, d.contact_phone]);

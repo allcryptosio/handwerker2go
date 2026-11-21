@@ -1,6 +1,6 @@
 // Terminerinnerung und Bitte um Bewertung (systemd: handwerker2go-reminders.timer, alle 15 Minuten).
 // 1. Kunde und Betrieb bekommen 24 Stunden vor einem bestätigten Termin eine E-Mail.
-// 2. Der Kunde bekommt 3 Stunden nach dem Ende des Termins (zwischen 9 und 20 Uhr) eine Bitte um Bewertung, höchstens 7 Tage danach.
+// 2. Der Kunde bekommt mit Einwilligung frühestens 24 Stunden nach dem Ende des Termins (zwischen 9 und 20 Uhr) einmal eine Bitte um Bewertung.
 // Erinnert wird erst, wenn die Buchung mindestens 12 Stunden alt ist: Wer gerade gebucht hat, hat die Bestätigung noch frisch.
 // Jede Buchung wird vor dem Versand markiert (reminder_sent_at), dadurch nie doppelt, auch wenn zwei Läufe überlappen.
 //
@@ -17,11 +17,12 @@ const due = `status = 'confirmed' and reminder_sent_at is null
   and starts_at > now() + interval '1 hour' and starts_at <= now() + interval '24 hours'
   and created_at <= now() - interval '12 hours'`;
 
-// Bitte um Bewertung: Termin vorbei, nicht abgesagt, noch keine Bewertung, nur tagsüber (Berliner Zeit)
-const reviewDue = `review_request_sent_at is null and status in ('confirmed', 'completed')
-  and ends_at <= now() - interval '3 hours' and ends_at > now() - interval '7 days'
+// Bitte um Bewertung (Aufgabe 13): nur mit Einwilligung bei der Buchung, einmal, frühestens 24 Std. nach Ende des Termins,
+// höchstens 7 Tage danach, nicht bei Adressen auf der Sperrliste, nur tagsüber (Berliner Zeit)
+const reviewDue = `review_request_sent_at is null and review_optin and status in ('confirmed', 'completed')
+  and ends_at <= now() - interval '24 hours' and ends_at > now() - interval '7 days'
   and not exists (select 1 from reviews r where r.booking_id = bookings.id)
-  and not exists (select 1 from customer_profiles cp where cp.user_id = bookings.customer_id and cp.review_mails_opt_out_at is not null)
+  and not exists (select 1 from review_mail_blocklist bl where bl.email = lower(trim(bookings.contact_email)))
   and extract(hour from now() at time zone 'Europe/Berlin') between 9 and 19`;
 
 async function claim(where: string, column: string): Promise<string[]> {

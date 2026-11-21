@@ -6,6 +6,7 @@ import { cancellationNotice } from "@/lib/booking/cancellation";
 import { priceLine } from "@/lib/booking/price-label";
 import { sendMail } from "@/lib/mail";
 import { reviewOptOutUrl } from "@/lib/review-optout";
+import { reviewMailFooter } from "@/lib/legal/review-optin";
 
 const base = () => process.env.BETTER_AUTH_URL ?? "https://handwerker2go.com";
 const eur = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
@@ -97,7 +98,7 @@ export async function notifyBooking(bookingId: string, event: BookingEvent) {
         paragraphs: [
           `${b.company_name} war für „${b.service_name}“ bei dir. Wie lief es? Deine Bewertung dauert eine Minute und hilft anderen Kunden bei der Wahl.`,
           "Bewerten können nur Kunden, die über handwerker2go gebucht haben. Öffentlich sichtbar sind nur Sterne, Text und Datum, nicht dein Name.",
-          `Du möchtest keine Bitten um Bewertung mehr bekommen? Hier abbestellen: ${reviewOptOutUrl(b.customer_id)}`,
+          reviewMailFooter(reviewOptOutUrl(b.contact_email)),
         ],
         button: { label: "Jetzt bewerten", url: `${link}#bewerten` },
       }));

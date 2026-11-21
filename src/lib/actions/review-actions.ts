@@ -7,7 +7,6 @@ import { currentUser } from "@/lib/auth";
 import { asSystem, audit } from "@/lib/db";
 import { sendMail } from "@/lib/mail";
 import { findContactData } from "@/lib/partner/guard";
-import { verifyReviewOptOut } from "@/lib/review-optout";
 
 export type ReviewFormState = { ok?: boolean; error?: string; fieldErrors?: Record<string, string> };
 
@@ -92,16 +91,4 @@ export async function moderateReview(form: FormData) {
     await audit(db, { actorId: u.id, actorRole: "admin", action: show ? "review.show" : "review.hide", entity: "reviews", entityId: id, before, after: { visible: show, reason } });
   });
   revalidatePath("/admin/bewertungen");
-}
-
-/** Widerspruch gegen Bewertungsanfragen per E-Mail (Link in jeder Anfrage, ohne Login) */
-export async function optOutReviewMails(_: ReviewFormState, form: FormData): Promise<ReviewFormState> {
-  const userId = String(form.get("u") ?? "");
-  const token = String(form.get("t") ?? "");
-  if (!userId || !verifyReviewOptOut(userId, token)) return { error: "Der Link ist ungültig. Schreib uns einfach eine E-Mail, dann tragen wir dich aus." };
-  await asSystem(async (db) => {
-    await db.query("update customer_profiles set review_mails_opt_out_at = coalesce(review_mails_opt_out_at, now()) where user_id = $1", [userId]);
-    await audit(db, { actorId: userId, actorRole: "customer", action: "review_mails.opt_out", entity: "customer_profiles", entityId: userId });
-  });
-  return { ok: true };
 }

@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { EarlyStartConsentCheckbox } from "@/components/forms/early-start-consent";
 import { Field, FormAlert, SubmitButton, TermsCheckbox } from "@/components/forms/fields";
 import { type BookingFormState, createBooking } from "@/lib/actions/booking-actions";
+import { REVIEW_OPTIN_TEXT } from "@/lib/legal/review-optin";
 
 export function BookingForm({
   hidden,
@@ -69,6 +70,10 @@ export function BookingForm({
       <div className="flex flex-col gap-4 rounded-panel border border-line bg-soft p-5">
         <TermsCheckbox error={e.terms} />
         {needsConsent && <EarlyStartConsentCheckbox error={e.early_start_consent} />}
+        <label className="flex items-start gap-3 text-[15px] leading-snug">
+          <input type="checkbox" name="review_optin" className="mt-0.5 h-5 w-5 shrink-0 accent-[#12704f]" />
+          <span>{REVIEW_OPTIN_TEXT}</span>
+        </label>
         <p className="text-[13px] text-muted">{cancellationText}</p>
         <p className="text-[13px] text-muted">
           Dein Vertragspartner für die Leistung ist der Betrieb. Es gilt die <Link href="/widerruf" className="underline">Widerrufsbelehrung</Link>.
