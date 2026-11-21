@@ -177,3 +177,25 @@ Stand 21.11.2026. Technische Umsetzung der Vorabprüfung vom 21.11.2026. **Keine
   - Dann `RETENTION_DELETE_ENABLED=1` setzen.
 - [ ] **Stripe-Dashboard:** Am Plattform-Webhook das Ereignis `invoice.paid` aktivieren (siehe Abschnitt 4, Punkt 8).
 - [ ] **Stripe-Befund „nicht Direct Charges“:** entfällt, der Charge-Typ ist korrekt.
+
+---
+
+## Deploy am 21.11.2026
+
+- **Live:** Branch nach `phase3-buchung` und `main` übernommen, Abhängigkeiten installiert (`pdf-lib`, `exceljs`), 8 Migrationen auf der Live-Datenbank, Build, Neustart.
+- **Systemdienste:** `handwerker2go-commission`, `-reminders` und `-maintenance` sind neu installiert (daemon-reload).
+- **Reverse Charge nach Malta VAT Act Art. 12:**
+  - Beim Abo-Abschluss rechnet Stripe keine Steuer mehr (`automatic_tax` aus).
+  - Alle Rechnungen an Betriebe laufen ohne Umsatzsteuer, mit Reverse-Charge-Vermerk.
+- **Stripe:** Ereignis `invoice.paid` am Plattform-Webhook `we_1UdIClE5NDOqrw3b7iBTSuNO` aktiviert.
+- **Löschjob:**
+  - Live-Probelauf: nichts zu löschen.
+  - Danach `RETENTION_DELETE_ENABLED=1` in `/opt/handwerker2go/.env.local` gesetzt.
+- **Testumgebung:** eigener Ablageordner `/var/lib/handwerker2go-test/uploads`. Drei Testdateien sind aus dem Live-Ordner dorthin verschoben.
+- **Prüfungen nach dem Deploy:**
+  - Alle Rechtsseiten antworten mit 200, der Widerrufs-Button ist auf jeder Seite.
+  - Erinnerungsjob läuft.
+  - VIES ist vom Server aus erreichbar.
+  - Provisions-Probelauf ohne Fehler.
+- **AGB-Mitteilung E.2:** entfällt, weil es live keine Bestandsbetriebe gibt.
+- **Offen für Aleks:** Google CDPA, AV-Verträge als PDF ablegen, Steuerberater (Art. 12, Weg B, DAC7), Anwalt (Anhänge gegenlesen).
