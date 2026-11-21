@@ -1,11 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import { UNTERNEHMER_DECLARATION_TEXT, WEG_B_HINT } from "@/lib/legal/unternehmer";
 import { registerProvider, type FormState } from "@/lib/actions/auth-actions";
 import { Field, FormAlert, SubmitButton, TermsCheckbox } from "./fields";
 
 export function ProviderRegisterForm({ categories }: { categories: { slug: string; label: string }[] }) {
   const [state, action] = useActionState<FormState, FormData>(registerProvider, {});
+  const [way, setWay] = useState<"ust_idnr" | "gewerbe_nachweis">("ust_idnr");
   if (state.ok) return <FormAlert message={state.message} />;
   const e = state.fieldErrors ?? {};
   const section = "flex flex-col gap-5 rounded-panel border border-line bg-white p-6 sm:p-8";
@@ -23,7 +25,39 @@ export function ProviderRegisterForm({ categories }: { categories: { slug: strin
           <Field name="postal_code" label="PLZ" inputMode="numeric" autoComplete="postal-code" error={e.postal_code} />
           <Field name="city" label="Ort" autoComplete="address-level2" error={e.city} />
         </div>
-        <Field name="vat_id" label="USt-IdNr." required={false} error={e.vat_id} hint="Freiwillig, auch Kleinunternehmer ohne USt-IdNr. können mitmachen. Format DE123456789; damit rechnen wir netto im Reverse-Charge-Verfahren ab." />
+      </fieldset>
+
+      <fieldset className={section}>
+        <legend className={`${h} mb-1`}>Steuerangaben</legend>
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-semibold">Steuerstatus deines Betriebs</span>
+          <label className="flex items-start gap-3 text-[15px]"><input type="radio" name="tax_status" value="regelbesteuert" className="mt-1 h-4 w-4 accent-[#12704f]" />
+            <span><b>Regelbesteuert.</b> Ich berechne Kunden Umsatzsteuer. Preise werden als „inkl. 19 % MwSt.“ angezeigt.</span></label>
+          <label className="flex items-start gap-3 text-[15px]"><input type="radio" name="tax_status" value="kleinunternehmer_19" className="mt-1 h-4 w-4 accent-[#12704f]" />
+            <span><b>Kleinunternehmer nach § 19 UStG.</b> Ich berechne keine Umsatzsteuer. Preise werden als „Endpreis, keine USt nach § 19 UStG“ angezeigt.</span></label>
+          {e.tax_status && <p className="text-[13px] font-semibold text-[#b42318]">{e.tax_status}</p>}
+        </div>
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-semibold">Nachweis, dass du Unternehmer bist (nötig für unsere Rechnungen ohne Umsatzsteuer)</span>
+          <label className="flex items-start gap-3 text-[15px]"><input type="radio" name="proof_way" value="ust_idnr" checked={way === "ust_idnr"} onChange={() => setWay("ust_idnr")} className="mt-1 h-4 w-4 accent-[#12704f]" />
+            <span><b>Mit USt-IdNr.</b> Wir prüfen sie sofort bei der EU (VIES).</span></label>
+          <label className="flex items-start gap-3 text-[15px]"><input type="radio" name="proof_way" value="gewerbe_nachweis" checked={way === "gewerbe_nachweis"} onChange={() => setWay("gewerbe_nachweis")} className="mt-1 h-4 w-4 accent-[#12704f]" />
+            <span><b>Ohne USt-IdNr.</b> Mit Gewerbeanmeldung, Steuernummer und Unternehmer-Erklärung (z. B. Kleinunternehmer).</span></label>
+          {e.proof_way && <p className="text-[13px] font-semibold text-[#b42318]">{e.proof_way}</p>}
+        </div>
+        {way === "ust_idnr" ? (
+          <Field name="vat_id" label="USt-IdNr." error={e.vat_id} hint="Format DE123456789" />
+        ) : (
+          <>
+            <Field name="steuernummer" label="Steuernummer" error={e.steuernummer} hint="Wie auf deinen Bescheiden vom Finanzamt, z. B. 12/345/67890" />
+            <p className="rounded-card bg-mint p-4 text-[14px] text-brand-dark">{WEG_B_HINT}</p>
+            <label className="flex items-start gap-3 text-[15px] leading-snug">
+              <input type="checkbox" name="unternehmer_declaration" className="mt-0.5 h-5 w-5 shrink-0 accent-[#12704f]" aria-invalid={!!e.unternehmer_declaration} />
+              <span>{UNTERNEHMER_DECLARATION_TEXT}</span>
+            </label>
+            {e.unternehmer_declaration && <p className="text-[13px] font-semibold text-[#b42318]">{e.unternehmer_declaration}</p>}
+          </>
+        )}
       </fieldset>
 
       <fieldset className={section}>

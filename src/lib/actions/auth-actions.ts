@@ -9,6 +9,9 @@ import { asSystem, audit, withDb } from "@/lib/db";
 import { mailReady, sendMail } from "@/lib/mail";
 import { detectDocumentType, storage } from "@/lib/storage";
 import { MASTER_REQUIRED_CATEGORIES, findContactData, normalizePhone, normalizeVatId } from "@/lib/partner/guard";
+import { legal } from "@/config/legal";
+import { UNTERNEHMER_DECLARATION_TEXT, UNTERNEHMER_DECLARATION_VERSION, isSteuernummer } from "@/lib/legal/unternehmer";
+import { checkVatId, type ViesResult } from "@/lib/tax/vies";
 
 export type FormState = { ok?: boolean; error?: string; fieldErrors?: Record<string, string>; message?: string };
 
@@ -98,6 +101,9 @@ const providerSchema = z.object({
   description: z.string().trim().min(40, "Bitte beschreibe deinen Betrieb in mindestens 40 Zeichen").max(2000),
   area_label: z.string().trim().min(2, "Bitte gib den Mittelpunkt deines Einsatzgebiets an").max(120),
   radius_km: z.coerce.number().min(1, "Mindestens 1 km").max(200, "Höchstens 200 km"),
+  tax_status: z.enum(["regelbesteuert", "kleinunternehmer_19"], { message: "Bitte gib deinen Steuerstatus an" }),
+  proof_way: z.enum(["ust_idnr", "gewerbe_nachweis"], { message: "Bitte wähle, wie du dich als Unternehmer ausweist" }),
+  steuernummer: z.string().trim().max(30).optional(),
   anfahrtskosten: z.string().trim().regex(/^\d{1,3}([.,]\d{1,2})?$/, "Bitte deine Anfahrtskosten in Euro angeben, z. B. 25 oder 25,50"),
   terms,
 });
@@ -141,6 +147,13 @@ export async function registerProvider(_: FormState, form: FormData): Promise<Fo
     docs.push({ kind: dd.kind, buf, type, name: file.name.slice(0, 200) });
   }
 
+  // Unternehmer-Nachweis (AGB für Betriebe § 6 Abs. 2): Weg A USt-IdNr. (VIES) oder Weg B Gewerbenachweis + Steuernummer + Erklärung
+  if (parsed.success && parsed.data.proof_way === "ust_idnr" && !parsed.data.vat_id) errors.vat_id = "Bitte gib deine USt-IdNr. an oder wähle den Weg ohne USt-IdNr.";
+  if (parsed.success && parsed.data.proof_way === "gewerbe_nachweis") {
+    if (!parsed.data.steuernummer || !isSteuernummer(parsed.data.steuernummer)) errors.steuernummer = "Bitte gib deine Steuernummer an (10 bis 13 Ziffern)";
+    if (form.get("unternehmer_declaration") !== "on") errors.unternehmer_declaration = "Bitte bestätige die Unternehmer-Erklärung";
+  }
+
   // Doppelte Registrierung verhindern (gleiche USt-IdNr. oder Telefonnummer)
   if (parsed.success) {
     const vat = parsed.data.vat_id ? normalizeVatId(parsed.data.vat_id) : "";
@@ -157,6 +170,18 @@ export async function registerProvider(_: FormState, form: FormData): Promise<Fo
   }
   if (!parsed.success || Object.keys(errors).length) return { fieldErrors: errors };
   const d = parsed.data;
+
+  // Weg A: sofortige VIES-Prüfung. Ungültig oder Ausfall: kein Abschluss über Weg A, Weg B anbieten.
+  let vies: ViesResult | null = null;
+  if (d.proof_way === "ust_idnr" && d.vat_id) {
+    vies = await checkVatId(d.vat_id);
+    await asSystem((db) => db.query(
+      "insert into vies_checks (vat_id, valid, request_identifier, name, address, error, checked_at, purpose) values ($1,$2,$3,$4,$5,$6,$7,'onboarding')",
+      [normalizeVatId(d.vat_id!), vies!.ok ? vies!.valid : null, vies!.ok ? vies!.requestIdentifier : null, vies!.ok ? vies!.name : null, vies!.ok ? vies!.address : null, vies!.ok ? null : vies!.error, vies!.checkedAt],
+    )).catch(console.error);
+    if (!vies.ok) return { fieldErrors: { vat_id: "Die Prüfung der USt-IdNr. bei der EU (VIES) ist gerade nicht erreichbar. Bitte versuche es später erneut oder wähle den Weg ohne USt-IdNr. (Gewerbenachweis)." } };
+    if (!vies.valid) return { fieldErrors: { vat_id: "Diese USt-IdNr. ist laut EU-Prüfung (VIES) nicht gültig. Bitte prüfe sie oder wähle den Weg ohne USt-IdNr. (Gewerbenachweis)." } };
+  }
 
   let userId: string;
   try {
@@ -176,10 +201,14 @@ export async function registerProvider(_: FormState, form: FormData): Promise<Fo
     await asSystem((db) => db.query(`update "user" set role = 'provider' where id = $1`, [userId]));
     await withDb({ userId, role: "provider" }, async (db) => {
       const p = await db.query(
-        `insert into provider_profiles (user_id, company_name, legal_form, contact_name, phone, street, postal_code, city, vat_id, description, accepted_terms_at, anfahrtskosten_cents)
-         values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10, now(), $11) returning id`,
+        `insert into provider_profiles (user_id, company_name, legal_form, contact_name, phone, street, postal_code, city, vat_id, description, accepted_terms_at, anfahrtskosten_cents,
+           tax_status, business_proof_type, steuernummer, vat_id_valid, vat_id_checked_at, vies_request_id, vies_name, vies_address, unternehmer_declaration_at, unternehmer_declaration_text_version)
+         values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10, now(), $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21) returning id`,
         [userId, d.company_name, d.legal_form || null, d.contact_name, d.phone, d.street, d.postal_code, d.city, d.vat_id ? normalizeVatId(d.vat_id) : null, d.description,
-          Math.round(Number(d.anfahrtskosten.replace(",", ".")) * 100)],
+          Math.round(Number(d.anfahrtskosten.replace(",", ".")) * 100),
+          d.tax_status, d.proof_way, d.proof_way === "gewerbe_nachweis" ? d.steuernummer : (d.steuernummer || null),
+          vies?.ok ? vies.valid : null, vies?.checkedAt ?? null, vies?.ok ? vies.requestIdentifier : null, vies?.ok ? vies.name : null, vies?.ok ? vies.address : null,
+          d.proof_way === "gewerbe_nachweis" ? new Date() : null, d.proof_way === "gewerbe_nachweis" ? UNTERNEHMER_DECLARATION_VERSION : null],
       );
       const pid: string = p.rows[0].id;
       await db.query(
@@ -198,12 +227,22 @@ export async function registerProvider(_: FormState, form: FormData): Promise<Fo
         "insert into provider_working_hours (provider_id, weekday, starts, ends) select $1, wd, '08:00', '17:00' from generate_series(1, 5) wd",
         [pid],
       );
+      const proofIds: string[] = [];
       for (const x of keys) {
-        await db.query(
-          "insert into provider_documents (provider_id, kind, storage_key, original_name, mime_type, size_bytes) values ($1,$2,$3,$4,$5,$6)",
+        const r = await db.query(
+          "insert into provider_documents (provider_id, kind, storage_key, original_name, mime_type, size_bytes) values ($1,$2,$3,$4,$5,$6) returning id",
           [pid, x.kind, x.key, x.name, x.type.mime, x.buf.length],
         );
+        if (x.kind === "gewerbeanmeldung" || x.kind === "handwerksrolle") proofIds.push(r.rows[0].id);
       }
+      await db.query("update provider_profiles set business_proof_file_ids = $2 where id = $1", [pid, proofIds]);
+      if (d.proof_way === "gewerbe_nachweis") {
+        await db.query(
+          "insert into legal_declarations (user_id, provider_id, kind, text_version, text_snapshot, legal_version) values ($1, $2, 'unternehmer_declaration', $3, $4, $5)",
+          [userId, pid, UNTERNEHMER_DECLARATION_VERSION, UNTERNEHMER_DECLARATION_TEXT, legal.termsVersion],
+        );
+      }
+      if (vies) await db.query("update vies_checks set provider_id = $1 where provider_id is null and vat_id = $2", [pid, normalizeVatId(d.vat_id!)]);
       await audit(db, { actorId: userId, actorRole: "provider", action: "register", entity: "provider_profiles", entityId: pid, after: { company: d.company_name, categories } });
     });
   } catch (e) {

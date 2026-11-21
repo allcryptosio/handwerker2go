@@ -118,6 +118,11 @@ async function Admin({ searchParams }: { searchParams: Promise<Record<string, st
             <dl className="mt-4 grid gap-3 text-[14px] sm:grid-cols-2">
               <div><dt className="text-muted">Kontakt</dt><dd>{p.contact_name}, {p.email} {p.email_verified ? "(bestätigt)" : "(E-Mail noch nicht bestätigt)"}, {p.phone}</dd></div>
               <div><dt className="text-muted">Anschrift</dt><dd>{p.street}, {p.postal_code} {p.city}{p.legal_form ? `, ${p.legal_form}` : ""}{p.vat_id ? `, USt-IdNr. ${p.vat_id}` : ""}</dd></div>
+              <div><dt className="text-muted">Steuer und Nachweis</dt><dd>
+                {p.tax_status === "kleinunternehmer_19" ? "Kleinunternehmer § 19 UStG" : p.tax_status === "regelbesteuert" ? "Regelbesteuert" : "Steuerstatus fehlt"}
+                {p.business_proof_type === "ust_idnr" ? `, USt-IdNr. ${p.vat_id_valid ? "VIES gültig" : "nicht geprüft"}${p.vies_request_id ? ` (Prüfnr. ${p.vies_request_id})` : ""}` : p.business_proof_type === "gewerbe_nachweis" ? `, Weg B: Steuernummer ${p.steuernummer ?? "fehlt"}, Erklärung ${p.unternehmer_declaration_at ? "abgegeben" : "fehlt"}` : ", kein Nachweis"}
+                {p.anfahrtskosten_cents === null ? ", Anfahrtskosten fehlen" : `, Anfahrt ${(p.anfahrtskosten_cents / 100).toFixed(2).replace(".", ",")} €`}
+              </dd></div>
               <div><dt className="text-muted">Leistungen</dt><dd>{p.categories}</dd></div>
               <div><dt className="text-muted">Einsatzgebiet</dt><dd>{p.area}</dd></div>
               <div className="sm:col-span-2"><dt className="text-muted">Beschreibung</dt><dd className="whitespace-pre-line">{p.description}</dd></div>

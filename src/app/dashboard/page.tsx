@@ -11,6 +11,7 @@ import { formatCents, formatPercent, providerPricing, yearlyPerMonthCents, yearl
 import { openBillingPortal, startMembership, startStripeOnboarding } from "@/lib/actions/auth-actions";
 import { stripeConfigured, stripeIsTestMode } from "@/lib/stripe/client";
 import { isBookable, syncConnectAccount } from "@/lib/stripe/connect";
+import { TaxForm } from "@/components/dashboard/tax-form";
 
 export const metadata: Metadata = { title: "Dashboard", robots: { index: false } };
 
@@ -118,8 +119,14 @@ async function Dashboard() {
           { t: "Leistungen mit Preisen eingetragen", done: setup.services > 0, href: "/dashboard/kalender", hint: "Welche Leistungen, zu welchem Preis, wie lange." },
           { t: "Arbeitszeiten festgelegt", done: setup.hours > 0, href: "/dashboard/kalender", hint: "Nur in diesen Zeiten können Kunden buchen." },
           { t: "Anfahrtskosten eingetragen", done: p.anfahrtskosten_cents !== null, href: "/dashboard/kalender", hint: "Bitte Anfahrtskosten eintragen. Ohne Angabe bist du nicht buchbar." },
+          { t: "Steuerstatus angegeben", done: p.tax_status !== null, href: "/dashboard#steuer", hint: "Regelbesteuert oder Kleinunternehmer. Ohne Angabe bist du nicht buchbar." },
         ]}
       />
+      <section id="steuer" className="flex scroll-mt-6 flex-col gap-3 rounded-panel border border-line p-6">
+        <h2 className="text-lg font-bold">Steuerangaben</h2>
+        <p className="text-[14px] text-ink-soft">Unsere Rechnungen über Provision und Mitgliedschaft enthalten keine Umsatzsteuer (Reverse Charge). Die deutsche Umsatzsteuer darauf schuldest du selbst nach § 13b UStG, auch als Kleinunternehmer (AGB für Betriebe § 6).</p>
+        <TaxForm taxStatus={p.tax_status} vatId={p.vat_id} vatValid={p.vat_id_valid} proofType={p.business_proof_type} />
+      </section>
       <section className={`rounded-panel border-[1.5px] p-6 ${s.tone}`}>
         <h2 className="text-lg font-bold">Status: {s.label}</h2>
         <p className="mt-2 text-[15px]">{s.text}{p.status_reason ? ` Grund: ${p.status_reason}` : ""}</p>
