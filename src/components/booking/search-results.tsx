@@ -141,6 +141,10 @@ export function SearchResults({ services }: { services: ServiceChoice[] }) {
               </p>
             </div>
           ) : (
+            <>
+            <p className="text-[13px] text-muted">
+              <Link href="/ranking" className="font-semibold text-brand underline">So sortieren wir die Suchergebnisse</Link>
+            </p>
             <ul className="grid gap-4 md:grid-cols-2">
               {hits.map((h, i) => (
                 <li key={h.providerId} style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }} className="min-w-0 animate-[h2g-up_.25s_ease-out_both]">
@@ -148,6 +152,7 @@ export function SearchResults({ services }: { services: ServiceChoice[] }) {
                 </li>
               ))}
             </ul>
+            </>
           )}
 
           {data.funnel && data.funnel.total > 0 && (
