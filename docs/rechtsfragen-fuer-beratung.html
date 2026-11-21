@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>handwerker2go: offene Rechts- und Steuerfragen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --brand:#12704f; --dark:#0b2e1f; --mint:#eaf5ee; --ink:#1a1e1d; --soft:#3f4442; --muted:#565958; --line:#e3e6e4; --bg:#f5f7f6; --red:#b42318; --amber:#9a6700; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Inter, system-ui, sans-serif; color: var(--ink); line-height: 1.6; background: #fff; }
+  header { background: var(--dark); color: #fff; padding: 44px 24px 36px; }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { margin: 0 0 10px; font-size: clamp(28px, 4.5vw, 40px); line-height: 1.1; letter-spacing: -0.03em; }
+  header p { margin: 0; color: #cfe3d7; max-width: 680px; }
+  main { padding: 10px 24px 70px; }
+  section { padding-top: 34px; }
+  h2 { margin: 0 0 4px; font-size: 24px; letter-spacing: -0.02em; color: var(--dark); }
+  .sub { margin: 0 0 16px; color: var(--soft); }
+  .facts { display: grid; grid-template-columns: 210px 1fr; gap: 6px 16px; font-size: 15px; background: var(--bg); border-radius: 14px; padding: 18px 20px; margin-top: 18px; }
+  .facts dt { color: var(--muted); }
+  .facts dd { margin: 0; font-weight: 600; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: 14px; color: var(--soft); margin-top: 14px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .t1 { background: #fef3f2; color: var(--red); }
+  .t2 { background: #fff8e1; color: var(--amber); }
+  .t3 { background: var(--bg); color: var(--muted); }
+  ol.q { list-style: none; counter-reset: q; padding: 0; margin: 0; display: grid; gap: 12px; }
+  ol.q > li { counter-increment: q; border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px 14px 56px; position: relative; }
+  ol.q > li::before { content: counter(q); position: absolute; left: 16px; top: 15px; width: 28px; height: 28px; border-radius: 50%; background: var(--dark); color: #fff; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  .head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+  .head strong { font-size: 16px; color: var(--dark); }
+  .q p { margin: 6px 0 0; font-size: 15px; color: var(--soft); }
+  .q .stand { font-size: 14px; color: var(--muted); }
+  .q .stand b { color: var(--soft); font-weight: 600; }
+  .note { margin-top: 30px; border-left: 4px solid var(--brand); background: var(--mint); border-radius: 12px; padding: 14px 18px; font-size: 15px; color: var(--dark); }
+  footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; padding: 24px; }
+  @media (max-width: 620px) { .facts { grid-template-columns: 1fr; } .facts dd { margin-bottom: 6px; } .head { flex-direction: column; } }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Offene Rechts- und Steuerfragen</h1>
+  <p>Fragenkatalog für Anwalt, Datenschutzberatung und Steuerberatung zur Plattform handwerker2go.com. Jede Frage nennt kurz, wie es heute umgesetzt ist, damit die Prüfung direkt am Ist-Stand ansetzen kann.</p>
+</div></header>
+
+<main><div class="wrap">
+
+<section>
+  <h2>Das Geschäftsmodell in Kürze</h2>
+  <dl class="facts">
+    <dt>Betreiber</dt><dd>Einzelunternehmer (natürliche Person) mit Sitz in Malta, Handelsname handwerker2go, USt-IdNr. MT33258727</dd>
+    <dt>Angebot</dt><dd>Online-Marktplatz: Verbraucher in Hamburg buchen Handwerksbetriebe direkt in freie Termine (Festpreis oder kostenlose Besichtigung mit späterem Angebot)</dd>
+    <dt>Vertragspartner</dt><dd>Der Werkvertrag kommt zwischen Kunde und Betrieb zustande; handwerker2go vermittelt und bestätigt im Namen des Betriebs</dd>
+    <dt>Zahlung</dt><dd>Stripe Connect, Direct Charges: Der Kunde zahlt direkt auf das Stripe-Konto des Betriebs, handwerker2go behält die Provision als application fee ein</dd>
+    <dt>Einnahmen</dt><dd>Provision 10 % (Monat 1 bis 3), danach 15 % plus Mitgliedschaft 29,99 € pro Monat oder 299,88 € pro Jahr, jeweils netto</dd>
+    <dt>Rechtstexte</dt><dd>handwerker2go.com/agb, /agb-betriebe, /widerruf, /datenschutz, /impressum (deutsches Recht, Du-Form)</dd>
+  </dl>
+  <div class="legend">
+    <span><span class="tag t1">vor dem Start</span> sollte geklärt sein, bevor echte Kunden buchen</span>
+    <span><span class="tag t2">zeitnah</span> in den ersten Wochen</span>
+    <span><span class="tag t3">später</span> Absicherung, kein Startblocker</span>
+  </div>
+</section>
+
+<section>
+  <h2>1. Anwalt: Verbraucher- und Wettbewerbsrecht</h2>
+  <p class="sub">Am besten eine Kanzlei mit Schwerpunkt E-Commerce, Plattformen und UWG.</p>
+  <ol class="q">
+    <li><div class="head"><strong>Ist eine elektronische Widerrufsfunktion („Widerrufsbutton“) Pflicht?</strong><span class="tag t1">vor dem Start</span></div>
+      <p>Die Richtlinie (EU) 2023/2673 verlangt seit 19.06.2026 für online geschlossene Verbraucherverträge eine Widerrufsfunktion auf der Online-Benutzeroberfläche. Gilt das hier für die Werkverträge zwischen Kunde und Betrieb, und muss die Plattform sie bereitstellen? Wie genau muss sie aussehen?</p>
+      <p class="stand"><b>Stand:</b> Widerruf ist per E-Mail oder Formular möglich, eine eigene Widerrufsfunktion auf der Seite gibt es noch nicht. Die kostenlose Stornierung (bis 24 Stunden vorher) ist als Button vorhanden.</p></li>
+    <li><div class="head"><strong>Trägt der Vertragsschluss im Namen des Betriebs?</strong><span class="tag t1">vor dem Start</span></div>
+      <p>Die Plattform bestätigt die Buchung im Namen des Betriebs aufgrund einer Vollmacht in den AGB für Betriebe (§ 2 Abs. 1). Bei Besichtigungsterminen soll nur ein kostenloser Termin vereinbart werden; der Werkvertrag entsteht erst mit Annahme des Angebots. Ist diese Konstruktion wirksam und klar genug für Verbraucher?</p></li>
+    <li><div class="head"><strong>Ist die Widerrufsbelehrung richtig aufgestellt?</strong><span class="tag t1">vor dem Start</span></div>
+      <p>Die Belehrung erfolgt für den Betrieb; handwerker2go wird als zusätzlicher Empfänger des Widerrufs genannt. Sie steht in Du-Form statt in der Sie-Form des gesetzlichen Musters. Gefährdet das die Musterwirkung (Art. 246a § 1 Abs. 2 S. 2 EGBGB)? Passt der Hinweis auf § 312g Abs. 2 Nr. 11 BGB (dringende Reparaturen) zu den angebotenen Leistungen?</p>
+      <p class="stand"><b>Stand:</b> Vollständige Belehrung mit den Daten des Betriebs in der Buchungsbestätigung per E-Mail; Zustimmung zum vorzeitigen Beginn wird bei Terminen innerhalb der Widerrufsfrist abgefragt.</p></li>
+    <li><div class="head"><strong>Ist die Stornopauschale wirksam?</strong><span class="tag t1">vor dem Start</span></div>
+      <p>Kostenlos bis 24 Stunden vor dem Termin, danach 25 % des Festpreises, höchstens die Anfahrtskosten, mit ausdrücklich erlaubtem Gegenbeweis. Hält das §§ 307 ff., 309 Nr. 5 BGB stand?</p></li>
+    <li><div class="head"><strong>Ist die Bitte um Bewertung per E-Mail zulässig?</strong><span class="tag t2">zeitnah</span></div>
+      <p>Nach BGH VI ZR 225/17 ist eine Feedback-Anfrage Werbung. Umgesetzt ist § 7 Abs. 3 UWG: Hinweis bei der Registrierung, Abmeldelink in jeder Anfrage, eine Anfrage pro Buchung. Trägt § 7 Abs. 3 UWG, obwohl der Vertrag mit dem Betrieb und nicht mit der Plattform zustande kommt? Sonst: Einwilligung bei der Buchung einholen?</p></li>
+    <li><div class="head"><strong>Reichen die Angaben zu Bewertungen und Ranking?</strong><span class="tag t2">zeitnah</span></div>
+      <p>§ 5b Abs. 3 UWG (Echtheit von Bewertungen) steht in AGB für Kunden § 7 und auf /ranking; die Hauptparameter des Rankings (Entfernung, Verfügbarkeit, Bewertungen, Zuverlässigkeit, Profil) sind offengelegt. Vollständig?</p></li>
+    <li><div class="head"><strong>Änderung der AGB für Kunden</strong><span class="tag t3">später</span></div>
+      <p>Ohne Zustimmungsfiktion umgesetzt: Neue Fassungen gelten mit Zustimmung bei der nächsten Buchung. Ausreichend?</p></li>
+    <li><div class="head"><strong>Preisangaben (PAngV)</strong><span class="tag t2">zeitnah</span></div>
+      <p>Festpreise werden als Endpreise angezeigt. Betriebe als Kleinunternehmer weisen keine USt aus, andere schon. Muss die Plattform unterschiedlich kennzeichnen (z. B. „inkl. USt“ bzw. „kein Ausweis nach § 19 UStG“)?</p></li>
+  </ol>
+</section>
+
+<section>
+  <h2>2. Anwalt: Plattformrecht und Vertrag mit den Betrieben</h2>
+  <ol class="q">
+    <li><div class="head"><strong>Gerichtsstand Malta bei deutschem Recht</strong><span class="tag t1">vor dem Start</span></div>
+      <p>AGB für Betriebe § 13 sieht deutsches Recht und Gerichtsstand Malta gegenüber Kaufleuten vor. Wirksam und sinnvoll? Viele Betriebe sind keine Kaufleute. Alternative: Gerichtsstand am Sitz des Betriebs oder Hamburg.</p></li>
+    <li><div class="head"><strong>Ist eine Erlaubnis nach dem ZAG nötig?</strong><span class="tag t1">vor dem Start</span></div>
+      <p>Direct Charges über Stripe Connect: Das Geld des Kunden geht direkt auf das Stripe-Konto des Betriebs, die Plattform nimmt nie Kundengelder an und behält nur die Provision ein. Erlaubnisfrei, auch aus Sicht des maltesischen Rechts?</p></li>
+    <li><div class="head"><strong>P2B-Verordnung (EU) 2019/1150</strong><span class="tag t2">zeitnah</span></div>
+      <p>Umgesetzt: Gründe für Einschränkung und Sperre, Begründung per E-Mail, 30 Tage Frist bei Beendigung, Ranking-Parameter, Datenzugang, einfacher Beschwerdeweg per E-Mail. Internes Beschwerdesystem und Mediation (Art. 11, 12) entfallen für Kleinunternehmen; trifft das zu? Sonst noch etwas offen?</p></li>
+    <li><div class="head"><strong>Digital Services Act</strong><span class="tag t2">zeitnah</span></div>
+      <p>Welche Pflichten gelten als kleine Online-Plattform? Umgesetzt: Meldung unzulässiger Inhalte per E-Mail (Art. 16), Kontaktstellen. Entfällt die Nachverfolgbarkeit von Unternehmern (Art. 30) für Kleinst- und Kleinunternehmen?</p></li>
+    <li><div class="head"><strong>Klauseln in den AGB für Betriebe</strong><span class="tag t2">zeitnah</span></div>
+      <p>Wirksamkeit von: Zustimmungsfiktion bei Änderungen mit Hinweis und Kündigungsrecht (§ 12); Umgehungsverbot nur für über die Plattform vermittelte Aufträge (§ 7 Abs. 3); Sperre bei fehlender DAC7-Mitwirkung nach zwei erfolglosen Erinnerungen (§ 7 Abs. 4); Jahresabo mit automatischer Verlängerung um 12 Monate und Erinnerung vorher.</p></li>
+    <li><div class="head"><strong>Vertrieb an Betriebe</strong><span class="tag t2">zeitnah</span></div>
+      <p>Geplant: telefonische Erstansprache von Handwerksbetrieben (mutmaßliche Einwilligung), E-Mails erst nach Zustimmung im Gespräch, Besuche vor Ort. So zulässig?</p></li>
+  </ol>
+</section>
+
+<section>
+  <h2>3. Datenschutz</h2>
+  <ol class="q">
+    <li><div class="head"><strong>Auftragsverarbeitung und Drittland</strong><span class="tag t1">vor dem Start</span></div>
+      <p>Die Datenschutzerklärung nennt Hostinger (Server in Frankfurt), Cloudflare und Google Workspace als Auftragsverarbeiter. Sind die Verträge zur Auftragsverarbeitung in den jeweiligen Konten wirksam abgeschlossen? Sind DPF-Zertifizierung bzw. Standardvertragsklauseln bei Cloudflare, Google und Stripe ausreichend dokumentiert?</p>
+      <p class="stand"><b>Selbst erledigen:</b> Google Admin-Konsole (Data Processing Amendment), Cloudflare (DPA im Self-Serve Agreement), Hostinger (DPA, Vertragspartner und Anschrift im Konto prüfen).</p></li>
+    <li><div class="head"><strong>Rolle von Stripe</strong><span class="tag t2">zeitnah</span></div>
+      <p>Beschrieben als eigenständig Verantwortlicher (Betrugsprävention, Identitätsprüfung, gesetzliche Pflichten). Ist Stripe für den Zahlungsvorgang teilweise Auftragsverarbeiter und so zu nennen?</p></li>
+    <li><div class="head"><strong>Speicherfristen</strong><span class="tag t2">zeitnah</span></div>
+      <p>Umgesetzt und automatisch gelöscht: Fotos und Freitext nach 12 Monaten; Anonymisierung von Buchungen 3 Jahre nach Jahresende (§§ 195, 199 BGB); Abrechnungsdaten und Protokolle 9 Jahre (maltesisches Steuerrecht, ITMA Cap. 372 Art. 19(5), VAT Act Cap. 406 Art. 48(4), Commercial Code Cap. 13 Art. 26); E-Mail-Ausgang 3 Jahre; Gewerbenachweise 6 Monate nach Ablehnung. Bestätigen?</p></li>
+    <li><div class="head"><strong>Cookies</strong><span class="tag t3">später</span></div>
+      <p>Nur technisch notwendige Cookies (Login-Cookie, 30 Tage), kein Tracking, kein Cookie-Banner. Einordnung unter § 25 Abs. 2 Nr. 2 TDDDG bestätigen. Cloudflare kann bei Bot-Schutz `__cf_bm` setzen.</p></li>
+    <li><div class="head"><strong>Aufsicht und Datenschutzbeauftragter</strong><span class="tag t3">später</span></div>
+      <p>Ist die maltesische IDPC die federführende Aufsichtsbehörde? Ist ein Datenschutzbeauftragter entbehrlich (Einzelunternehmer, keine umfangreiche Verarbeitung besonderer Kategorien)?</p></li>
+  </ol>
+</section>
+
+<section>
+  <h2>4. Steuerberatung (Malta und Deutschland)</h2>
+  <ol class="q">
+    <li><div class="head"><strong>Umsatzsteuer auf Provision und Mitgliedschaft</strong><span class="tag t1">vor dem Start</span></div>
+      <p>Abrechnung netto mit Reverse Charge an deutsche Unternehmer. Ist die maltesische Registrierung dafür richtig (Artikel 10 oder 11)? Was ist auf den Rechnungen anzugeben?</p></li>
+    <li><div class="head"><strong>Betriebe ohne USt-IdNr. (Kleinunternehmer)</strong><span class="tag t1">vor dem Start</span></div>
+      <p>Seit 21.11.2026 können Betriebe ohne USt-IdNr. die Mitgliedschaft abschließen. Wie wird an sie korrekt abgerechnet? Reicht als Nachweis der Unternehmereigenschaft z. B. die Gewerbeanmeldung, sodass Reverse Charge gilt (§ 13b UStG, Steuerschuld beim Betrieb ohne Vorsteuerabzug)? Oder ist maltesische bzw. deutsche USt auszuweisen? Muss die Plattform die Betriebe darauf hinweisen?</p>
+      <p class="stand"><b>Stand:</b> Die Provision wird bei jeder Zahlung automatisch einbehalten. Monatliche Provisionsrechnungen an Betriebe ohne USt-IdNr. bleiben bis zur Klärung als Entwurf in Stripe liegen.</p></li>
+    <li><div class="head"><strong>DAC7-Meldepflicht</strong><span class="tag t2">zeitnah</span></div>
+      <p>Ist ein Einzelunternehmer in Malta meldender Plattformbetreiber nach S.L. 123.127? Ab wann, und greift die Ausnahme für kleine Plattformen? Aufbewahrung 5 Jahre (Reg. 13(12)(i)) bestätigen. Spielt das deutsche PStTG eine Rolle?</p></li>
+    <li><div class="head"><strong>Ertragsteuer und Betriebsstätte</strong><span class="tag t3">später</span></div>
+      <p>Entsteht durch Vertrieb vor Ort in Hamburg (eigene Besuche, Vertriebspartner) eine Betriebsstätte oder ein ständiger Vertreter in Deutschland?</p></li>
+  </ol>
+</section>
+
+<div class="note">Mit „vor dem Start“ markiert sind die Punkte, bei denen ein Fehler Abmahnungen, Rückforderungen oder falsche Rechnungen auslösen kann. Den Widerrufsbutton kann die Plattform technisch kurzfristig nachrüsten, sobald die Anforderungen bestätigt sind.</div>
+
+</div></main>
+<footer><div class="wrap">Stand 21. November 2026. Zusammenstellung zur Vorbereitung der Beratung, keine Rechtsberatung.</div></footer>
+</body>
+</html>

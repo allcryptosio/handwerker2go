@@ -1,6 +1,6 @@
 # Offene rechtliche und steuerliche Prüfpunkte
 
-Stand 20.11.2026. **Intern, nicht auf der Website.** Die öffentlichen Rechtstexte (/datenschutz, /agb, /agb-betriebe,
+Stand 21.11.2026. Weiterleitbare Fassung mit Prioritäten: docs/rechtsfragen-fuer-beratung.html. **Intern, nicht auf der Website.** Die öffentlichen Rechtstexte (/datenschutz, /agb, /agb-betriebe,
 /widerruf, /impressum) sind so formuliert, dass sie keine unbestätigten Fakten behaupten. Die folgenden Punkte sollte eine
 Rechtsanwältin bzw. ein Datenschutzberater und die Steuerberatung prüfen. Dies ist keine Rechtsberatung.
 
@@ -48,11 +48,13 @@ Rechtsanwältin bzw. ein Datenschutzberater und die Steuerberatung prüfen. Dies
 - [ ] **Wer belehrt:** Die Belehrung erfolgt für den Betrieb; handwerker2go als zusätzlicher Empfänger. Prüfen, ob die Plattform als Empfangsbote so genannt werden kann.
 - [ ] **Dauerhafter Datenträger:** Die vollständige Belehrung mit den Daten des Betriebs steht jetzt in der Buchungsbestätigung per E-Mail.
 - [ ] **§ 312g Abs. 2 Nr. 11 BGB (dringende Reparaturen):** Hinweis bleibt drin; prüfen, ob er für die angebotenen Leistungen passt.
-- [ ] **Widerrufsbutton:** Prüfen, ob eine elektronische Widerrufsfunktion für die Verträge erforderlich ist.
+- [ ] **Widerrufsbutton (PRIORITÄT):** RL (EU) 2023/2673 verlangt seit 19.06.2026 eine elektronische Widerrufsfunktion für online geschlossene Verbraucherverträge. Prüfen, ob und wie die Plattform sie bereitstellen muss; danach technisch nachrüsten.
 
 ## Zahlungen und Steuern
 
 - [ ] **ZAG:** Erlaubnisfreiheit bei Direct Charges über Stripe Connect (Zahlung direkt an den Betrieb, Plattform behält nur Provision ein).
 - [ ] **Umsatzsteuer der Plattform:** Registrierung MT33258727 (Artikel 10 oder 11, Malta); Reverse Charge für Provision und Mitgliedschaft an deutsche Unternehmer.
 - [ ] **Kleinunternehmer-Betriebe (§ 19 UStG):** schulden die Umsatzsteuer nach § 13b UStG, ohne Vorsteuerabzug; Hinweis an Betriebe prüfen.
-- [ ] **PAngV:** Festpreise als Endpreise inkl. USt, soweit der Betrieb USt berechnet.
+- [ ] **PAngV:** Festpreise als Endpreise inkl. USt, soweit der Betrieb USt berechnet; Kennzeichnung bei Kleinunternehmer-Betrieben (§ 19 UStG) prüfen.
+- [ ] **Betriebsstätte:** Entsteht durch Vertrieb vor Ort in Hamburg eine Betriebsstätte oder ein ständiger Vertreter in Deutschland?
+- [ ] **Vertrieb an Betriebe:** Telefonische Erstansprache (mutmaßliche Einwilligung), E-Mail erst nach Zustimmung; Zulässigkeit bestätigen.
