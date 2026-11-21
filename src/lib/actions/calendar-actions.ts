@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { currentUser } from "@/lib/auth";
-import { audit, withDb } from "@/lib/db";
+import { asSystem, audit, withDb } from "@/lib/db";
+import { legal } from "@/config/legal";
+import { INSTANT_CONFIRM_TEXT, INSTANT_CONFIRM_VERSION } from "@/lib/legal/instant-confirm";
 import { addDays, berlinToDate, isValidDate } from "@/lib/booking/time";
 import { detectImageType, storage } from "@/lib/storage";
 
@@ -99,10 +101,17 @@ export async function saveSettings(_: CalState, form: FormData): Promise<CalStat
   const { u, pid } = await me();
   const p = settingsSchema.safeParse(Object.fromEntries(form));
   if (!p.success) return { error: "Bitte prüfe die Angaben. Anfahrtskosten in Euro, z. B. 25 oder 25,50." };
+  // Sofortige Bestätigung nur mit Aktivierungserklärung (AGB für Betriebe § 2a Abs. 1)
+  const prev = await asProvider(u.id, async (db) => (await db.query("select instant_confirm_consent_at from provider_profiles where id = $1", [pid])).rows[0]);
+  const consentNow = form.get("instant_consent") === "on";
+  if (p.data.booking_mode === "instant" && !prev?.instant_confirm_consent_at && !consentNow) {
+    return { error: "Für die sofortige Bestätigung bitte die Vollmacht unten bestätigen." };
+  }
   await asProvider(u.id, (db) =>
     db.query("update provider_profiles set buffer_minutes = $2, min_notice_hours = $3, booking_mode = $4, anfahrtskosten_cents = $5 where id = $1",
       [pid, p.data.buffer_minutes, p.data.min_notice_hours, p.data.booking_mode, Math.round(Number(p.data.anfahrtskosten.replace(",", ".")) * 100)]),
   );
+  if (p.data.booking_mode === "instant" && consentNow) await recordInstantConsent(u.id, pid);
   revalidatePath("/dashboard/kalender");
   return { ok: "Einstellungen gespeichert." };
 }
@@ -159,4 +168,27 @@ export async function uploadLogo(_: CalState, form: FormData): Promise<CalState>
   await asProvider(u.id, (db) => db.query("update provider_profiles set logo_key = $2 where id = $1", [pid, key]));
   revalidatePath("/dashboard/kalender");
   return { ok: "Logo gespeichert.", v: Date.now() };
+}
+
+/** Aktivierungserklärung protokollieren: Zeitpunkt, Nutzer und AGB-Version (Aufgabe 10) */
+async function recordInstantConsent(userId: string, pid: string) {
+  await asSystem(async (db) => {
+    await db.query(
+      "update provider_profiles set instant_confirm_consent_at = now(), instant_confirm_terms_version = $2, instant_confirm_user_id = $3 where id = $1",
+      [pid, legal.termsVersion, userId],
+    );
+    await db.query(
+      "insert into legal_declarations (user_id, provider_id, kind, text_version, text_snapshot, legal_version) values ($1, $2, 'instant_confirm', $3, $4, $5)",
+      [userId, pid, INSTANT_CONFIRM_VERSION, INSTANT_CONFIRM_TEXT, legal.termsVersion],
+    );
+    await audit(db, { actorId: userId, actorRole: "provider", action: "provider.instant_confirm_consent", entity: "provider_profiles", entityId: pid, after: { version: INSTANT_CONFIRM_VERSION } });
+  });
+}
+
+/** Einmalige Bestätigung für Bestandsbetriebe mit sofortiger Bestätigung (Banner im Dashboard) */
+export async function confirmInstantMode(form: FormData) {
+  const { u, pid } = await me();
+  if (form.get("instant_consent") === "on") await recordInstantConsent(u.id, pid);
+  else await asProvider(u.id, (db) => db.query("update provider_profiles set booking_mode = 'confirm' where id = $1", [pid]));
+  revalidatePath("/dashboard");
 }

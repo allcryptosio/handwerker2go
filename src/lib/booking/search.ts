@@ -2,6 +2,7 @@ import "server-only";
 import { asSystem } from "@/lib/db";
 import { type Candidate, type Exclusion, earliestSlot, rankScore, timesBetween } from "@/lib/booking/engine";
 import { addDays, berlinToDate, berlinTime, isoWeekday, minutesOf } from "@/lib/booking/time";
+import { EFFECTIVE_BOOKING_MODE_SQL } from "@/lib/legal/instant-confirm";
 
 export interface Place {
   postalCode: string;
@@ -121,7 +122,7 @@ async function loadCandidates(opts: { templateId: string; lat: number; lon: numb
     // Bevor gerechnet wird: abgelaufene Zahlungs-Reservierungen freigeben
     await db.query(`update bookings set status = 'expired' where status = 'pending_payment' and hold_expires_at < now()`);
     const rows = (await db.query(
-      `select p.id, p.slug, p.company_name, p.logo_key, p.buffer_minutes, p.stripe_account_id, p.approved_at, p.min_notice_hours, p.booking_mode, p.anfahrtskosten_cents, p.tax_status,
+      `select p.id, p.slug, p.company_name, p.logo_key, p.buffer_minutes, p.stripe_account_id, p.approved_at, p.min_notice_hours, ${EFFECTIVE_BOOKING_MODE_SQL} booking_mode, p.anfahrtskosten_cents, p.tax_status,
               (p.stripe_charges_enabled and p.stripe_payouts_enabled) payable,
               sa.radius_km, case when sa.center is null then null else ST_Distance(sa.center, ST_SetSRID(ST_MakePoint($3, $2), 4326)::geography) / 1000 end distance_km,
               ps.price_type, ps.price_cents, coalesce(ps.duration_min, t.duration_min, 60) duration_min, ps.template_id is not null offers,

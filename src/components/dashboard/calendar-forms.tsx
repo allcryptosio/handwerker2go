@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { type CalState, addTimeOff, saveServices, saveSettings, saveWorkingHours, uploadLogo } from "@/lib/actions/calendar-actions";
+import { INSTANT_CONFIRM_TEXT } from "@/lib/legal/instant-confirm";
 
 const DAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
 const TIMES = Array.from({ length: 37 }, (_, i) => `${String(5 + Math.floor(i / 2)).padStart(2, "0")}:${i % 2 ? "30" : "00"}`); // 05:00–23:00
@@ -64,7 +65,7 @@ export function TimeOffForm() {
   );
 }
 
-export function SettingsForm({ buffer, notice, mode, anfahrtskostenCents }: { buffer: number; notice: number; mode: "instant" | "confirm"; anfahrtskostenCents: number | null }) {
+export function SettingsForm({ buffer, notice, mode, anfahrtskostenCents, instantConsent }: { buffer: number; notice: number; mode: "instant" | "confirm"; anfahrtskostenCents: number | null; instantConsent: boolean }) {
   const [s, action, pending] = useActionState(saveSettings, {});
   return (
     <form action={action} className="flex flex-col gap-4">
@@ -88,6 +89,12 @@ export function SettingsForm({ buffer, notice, mode, anfahrtskostenCents }: { bu
           <span><b>Sofort bestätigen.</b> Freie Termine sind direkt gebucht. Kunden mögen das am meisten.</span></label>
         <label className="flex items-start gap-3 text-[15px]"><input type="radio" name="booking_mode" value="confirm" defaultChecked={mode === "confirm"} className="mt-1 h-4 w-4 accent-[#12704f]" />
           <span><b>Ich bestätige selbst.</b> Jede Buchung ist erst eine Anfrage. Lehnst du ab, bekommt der Kunde sein Geld zurück.</span></label>
+        {!instantConsent && (
+          <label className="mt-2 flex items-start gap-3 rounded-card bg-soft p-3 text-[14px] leading-snug">
+            <input type="checkbox" name="instant_consent" className="mt-0.5 h-5 w-5 shrink-0 accent-[#12704f]" />
+            <span>Für „Sofort bestätigen“ nötig (AGB für Betriebe § 2a Abs. 1): {INSTANT_CONFIRM_TEXT}</span>
+          </label>
+        )}
       </fieldset>
       <p className="text-[13px] text-muted">Die Anfahrtszeit rechnen wir automatisch aus der Entfernung (Stadtverkehr, rund 25 km/h) und planen sie vor jedem Termin ein.</p>
       <div className="flex flex-wrap items-center gap-4">

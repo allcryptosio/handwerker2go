@@ -3,7 +3,7 @@ import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { Email } from "@/components/legal/email";
 import { LegalPage } from "@/components/legal/legal-page";
-import { legal, operatorLine, termsDate } from "@/config/legal";
+import { LEGAL, legal, operatorLine, termsDate } from "@/config/legal";
 import { formatCents, formatPercent, providerPricing as p, yearlyPerMonthCents } from "@/lib/pricing";
 
 export const metadata: Metadata = pageMeta({
@@ -37,7 +37,7 @@ export default function Page() {
       <p>
         (1) Wir vermitteln Aufträge zwischen Kunden und Betrieben. Der Vertrag über die Handwerkerleistung kommt ausschließlich
         zwischen dem Kunden und dem Betrieb zustande. Der Betrieb erbringt die Leistung im eigenen Namen, auf eigene Rechnung und
-        auf eigene Verantwortung. Bei Betrieben mit sofortiger Bestätigung bestätigen wir Buchungen im Namen des Betriebs.
+        auf eigene Verantwortung.
       </p>
       <p>
         (2) Die Reihenfolge der Betriebe in den Suchergebnissen richtet sich nach diesen Hauptparametern, absteigend gewichtet:
@@ -47,11 +47,42 @@ export default function Page() {
         der Provision haben keinen Einfluss auf das Ranking; bezahlte Platzierungen gibt es nicht.
       </p>
 
+      <h2>§ 2a Vollmacht, Empfangsvollmacht und Widerrufsfunktion</h2>
+      <p>
+        (1) <strong>Sofortige Bestätigung.</strong> Aktiviert der Betrieb im Dashboard die sofortige Bestätigung, bevollmächtigt er uns,
+        Buchungen von Kunden in seinem Namen anzunehmen, soweit sie den im Profil hinterlegten Leistungen, Festpreisen, Arbeitszeiten,
+        Einsatzgebieten und freien Terminen entsprechen. Die Vollmacht umfasst die Abgabe der Annahmeerklärung sowie die Übermittlung
+        der Vertragsbestätigung und der Widerrufsbelehrung in seinem Namen. Der Betrieb kann die sofortige Bestätigung jederzeit mit
+        Wirkung für künftige Buchungen deaktivieren.
+      </p>
+      <p>
+        (2) <strong>Empfangsvollmacht.</strong> Der Betrieb bevollmächtigt uns, für alle über die Plattform geschlossenen Verträge
+        Erklärungen der Kunden in seinem Namen entgegenzunehmen, insbesondere Widerrufs- und Stornierungserklärungen. Eine Erklärung,
+        die bei uns eingeht, gilt als beim Betrieb eingegangen. Wir leiten sie unverzüglich an den Betrieb weiter.
+      </p>
+      <p>
+        (3) <strong>Widerrufsbelehrung und Widerrufsfunktion.</strong> Der Betrieb beauftragt uns, den Kunden in seinem Namen die
+        Widerrufsbelehrung nach dem gesetzlichen Muster zu erteilen und auf der Plattform die elektronische Widerrufsfunktion nach
+        § 356a BGB bereitzustellen, einschließlich der Eingangsbestätigung an den Kunden.
+      </p>
+      <p>
+        (4) <strong>Rückzahlungen.</strong> Der Betrieb ermächtigt uns, nach einem wirksamen Widerruf, nach einer kostenlosen
+        Stornierung oder nach einer Stornierung, die nach den AGB für Kunden als Widerruf gilt, die Rückzahlung über sein Stripe-Konto
+        auszulösen. Hat der Betrieb auf ausdrückliches Verlangen des Kunden bereits mit der Leistung begonnen, teilt er uns den
+        Wertersatz innerhalb von 10 Tagen nach Eingang des Widerrufs mit; andernfalls erstatten wir am 14. Tag den vollen Betrag.
+      </p>
+      <p>
+        (5) <strong>Angebote.</strong> Angebote nach einem Besichtigungstermin erstellt der Betrieb über die Plattform; der Vertrag
+        kommt durch Online-Annahme des Kunden zustande. Der Betrieb lässt Angebote zu über die Plattform vermittelten Aufträgen nicht
+        vor Ort annehmen.
+      </p>
+
       <h2>§ 3 Registrierung, Prüfung und Freischaltung</h2>
       <p>
         (1) Der Betrieb registriert sich mit seinen Unternehmensdaten und lädt die Gewerbeanmeldung, den Nachweis seiner
         Betriebshaftpflichtversicherung und, für zulassungspflichtige Gewerke wie Elektro, Sanitär und Maler, die Eintragung in die
-        Handwerksrolle hoch. Wir prüfen die
+        Handwerksrolle hoch. Außerdem gibt der Betrieb seinen Steuerstatus an (regelbesteuert oder Kleinunternehmer nach § 19 UStG),
+        die Höhe seiner Anfahrtskosten in Euro und einen Unternehmer-Nachweis nach § 6 Abs. 2. Wir prüfen die
         Angaben und entscheiden über die Freischaltung. Ein Anspruch auf Freischaltung besteht nicht; eine Ablehnung begründen wir
         per E-Mail.
       </p>
@@ -90,9 +121,8 @@ export default function Page() {
         </li>
       </ul>
       <p>
-        (3) Eine Umsatzsteuer-Identifikationsnummer ist für die Mitgliedschaft nicht erforderlich. Gibt der Betrieb eine gültige
-        USt-IdNr. an, rechnen wir im Reverse-Charge-Verfahren ab. Schließt der Betrieb keine Mitgliedschaft ab, erscheint sein Profil nach der Einführungsphase nicht mehr in der Suche; bereits gebuchte Aufträge
-        laufen normal weiter.
+        (3) Schließt der Betrieb keine Mitgliedschaft ab, erscheint sein Profil nach der Einführungsphase nicht mehr in der Suche;
+        bereits gebuchte Aufträge laufen normal weiter. Zur Umsatzsteuer siehe § 6.
       </p>
       <p>
         (4) Die Mitgliedschaft wird im Voraus über Stripe abgerechnet. Schlägt eine Zahlung fehl, versucht Stripe den Einzug
@@ -119,11 +149,14 @@ export default function Page() {
         Auszahlungsplan legt der Betrieb in seinem Stripe-Konto fest.
       </p>
       <p>
-        (4) Storniert ein Kunde innerhalb der kostenlosen Frist von {legal.freeCancellationHours} Stunden vor dem Termin, widerruft
-        er wirksam oder lehnt der Betrieb eine Buchung ab, wird dem Kunden der volle Betrag über Stripe aus dem Stripe-Konto des
-        Betriebs erstattet; die Provision wird dann ebenfalls erstattet. Bei späterer Stornierung oder Nichterscheinen des Kunden
-        behält der Betrieb die Pauschale nach den AGB für Kunden ({legal.lateCancellationPercent} % des Festpreises, höchstens die
-        Anfahrtskosten); die Provision wird anteilig berechnet.
+        (4) Storniert ein Kunde kostenlos, widerruft er wirksam, gilt seine Stornierung nach den AGB für Kunden als Widerruf, oder
+        lehnt der Betrieb eine Buchung ab, wird dem Kunden der Betrag über Stripe aus dem Stripe-Konto des Betriebs erstattet
+        (abzüglich eines etwaigen Wertersatzes); die Provision wird im gleichen Verhältnis erstattet. Storniert der Kunde nach Ablauf
+        der Widerrufsfrist später als {legal.freeCancellationHours} Stunden vor dem Termin oder erscheint er nicht, behält der Betrieb
+        die Pauschale nach den AGB für Kunden ({legal.lateCancellationPercent} % des Festpreises, höchstens die im Profil angegebenen
+        Anfahrtskosten); die Provision wird auf die Pauschale berechnet. Für kostenlose Besichtigungstermine fällt keine Pauschale an.
+        Mit der kostenlosen Stornierung bis {legal.freeCancellationHours} Stunden vor dem Termin und der Pauschalregelung verzichtet der
+        Betrieb gegenüber dem Kunden auf weitergehende Ansprüche wegen der Kündigung (§ 648 BGB).
       </p>
       <p>
         (5) Die Gebühren von Stripe für die Zahlungsabwicklung trägt der Betrieb; Stripe verrechnet sie direkt mit seinem
@@ -136,11 +169,30 @@ export default function Page() {
         Monats eine Rechnung per E-Mail; sie ist bereits beglichen, weil die Provision bei den Kundenzahlungen einbehalten wurde.
       </p>
 
-      <h2>§ 6 Umsatzsteuer</h2>
+      <h2>§ 6 Umsatzsteuer und Unternehmer-Nachweis</h2>
       <p>
-        Alle Preise für Betriebe sind Nettopreise. Wir stellen Provision und Mitgliedschaft ohne Umsatzsteuer in Rechnung, mit dem
-        Hinweis „Steuerschuldnerschaft des Leistungsempfängers“ (Reverse-Charge-Verfahren). Die steuerliche Behandlung beim
-        Betrieb liegt in seiner Verantwortung.
+        (1) Alle Preise für Betriebe sind Nettopreise. Unsere Leistungen (Provision und Mitgliedschaft) erbringen wir als in Malta
+        ansässiger Unternehmer (USt-IdNr. {LEGAL.vatId}) an den Betrieb als Unternehmer. Ort der Leistung ist Deutschland. Wir stellen
+        unsere Leistungen ohne Umsatzsteuer in Rechnung, mit dem Hinweis „Reverse Charge – Steuerschuldnerschaft des
+        Leistungsempfängers (Art. 196 MwStSystRL, § 13b UStG)“.
+      </p>
+      <p>
+        (2) Voraussetzung für die Teilnahme ist der Nachweis, dass der Betrieb Unternehmer ist, durch (a) eine gültige deutsche
+        USt-IdNr., die wir über das Bestätigungsverfahren der EU (VIES) prüfen, oder (b) bei Betrieben ohne USt-IdNr. die
+        Gewerbeanmeldung, bei zulassungspflichtigen Gewerken die Eintragung in die Handwerksrolle, die Steuernummer und eine
+        Erklärung des Betriebs, dass er die Leistungen für sein Unternehmen bezieht. Wir empfehlen auch Kleinunternehmern, beim
+        Bundeszentralamt für Steuern eine USt-IdNr. zu beantragen und nachzureichen.
+      </p>
+      <p>
+        (3) <strong>Wichtig:</strong> Der Betrieb schuldet auf unsere Provision und Mitgliedschaft die deutsche Umsatzsteuer nach
+        § 13b UStG und meldet sie bei seinem Finanzamt an. <strong>Das gilt auch für Kleinunternehmer nach § 19 UStG</strong>: Sie
+        müssen die Steuer für die betreffenden Zeiträume anmelden und abführen und können sie nicht als Vorsteuer abziehen.
+        Regelbesteuerte Betriebe können die Steuer in der Regel zugleich als Vorsteuer abziehen. Die steuerliche Behandlung beim
+        Betrieb liegt in seiner Verantwortung; im Zweifel sollte er seinen Steuerberater fragen.
+      </p>
+      <p>
+        (4) Der Betrieb teilt uns Änderungen seines Steuerstatus oder seiner USt-IdNr. unverzüglich mit. Wird eine USt-IdNr. ungültig,
+        dürfen wir die Abrechnung bis zur Klärung anhalten.
       </p>
 
       <h2>§ 7 Pflichten des Betriebs</h2>
@@ -152,7 +204,9 @@ export default function Page() {
       <p>
         (2) Der Betrieb gibt Preise korrekt und als Endpreise einschließlich Umsatzsteuer an, soweit er Umsatzsteuer berechnet,
         hält Kalender, Arbeitszeiten und freie Tage aktuell, nimmt vereinbarte Termine wahr, beantwortet Anfragen zügig und erfüllt
-        seine steuerlichen Pflichten selbst. Änderungen an seinen Angaben teilt er uns unverzüglich mit.
+        seine steuerlichen Pflichten selbst. Änderungen an seinen Angaben teilt er uns unverzüglich mit. Der Betrieb kennzeichnet
+        seinen Steuerstatus wahrheitsgemäß; danach zeigen wir seine Preise als „inkl. 19 % MwSt.“ oder „Endpreis, keine USt nach
+        § 19 UStG“ an. Die Anfahrt ist im Festpreis enthalten.
       </p>
       <p>
         (3) Der Betrieb wickelt über die Plattform vermittelte Aufträge nicht an der Plattform vorbei ab. In öffentlichen
@@ -235,9 +289,8 @@ export default function Page() {
       <h2>§ 13 Anwendbares Recht und Gerichtsstand</h2>
       <p>(1) Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts (CISG).</p>
       <p>
-        (2) Ist der Betrieb Kaufmann, juristische Person des öffentlichen Rechts oder öffentlich-rechtliches Sondervermögen, ist
-        ausschließlicher Gerichtsstand der Sitz des Plattformbetreibers in Malta. Im Übrigen gelten die
-        gesetzlichen Regeln.
+        (2) Gerichtsstand für alle Streitigkeiten aus diesem Vertragsverhältnis ist {LEGAL.jurisdictionCourt} (Deutschland). Dieser
+        Gerichtsstand ist nicht ausschließlich; jede Partei kann auch an den gesetzlich zuständigen Gerichten klagen.
       </p>
       <p>(3) Sollten einzelne Bestimmungen unwirksam sein, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.</p>
     </LegalPage>

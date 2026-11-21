@@ -4,6 +4,7 @@ import { asSystem, audit } from "@/lib/db";
 import { notifyBooking } from "@/lib/booking/notify";
 import { refundBookingPayment } from "@/lib/stripe/payments";
 import { decideCancellation } from "@/lib/booking/cancellation";
+import { EFFECTIVE_BOOKING_MODE_SQL } from "@/lib/legal/instant-confirm";
 import { contractConcludedAt, submitWithdrawal } from "@/lib/booking/withdrawal";
 
 /**
@@ -17,7 +18,7 @@ import { contractConcludedAt, submitWithdrawal } from "@/lib/booking/withdrawal"
 async function load(id: string) {
   return asSystem(async (db) =>
     (await db.query(
-      `select b.*, p.booking_mode, p.stripe_account_id from bookings b join provider_profiles p on p.id = b.provider_id where b.id = $1`,
+      `select b.*, ${EFFECTIVE_BOOKING_MODE_SQL} booking_mode, p.stripe_account_id from bookings b join provider_profiles p on p.id = b.provider_id where b.id = $1`,
       [id],
     )).rows[0],
   );

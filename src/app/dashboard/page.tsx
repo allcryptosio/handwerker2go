@@ -12,6 +12,8 @@ import { openBillingPortal, startMembership, startStripeOnboarding } from "@/lib
 import { stripeConfigured, stripeIsTestMode } from "@/lib/stripe/client";
 import { isBookable, syncConnectAccount } from "@/lib/stripe/connect";
 import { TaxForm } from "@/components/dashboard/tax-form";
+import { confirmInstantMode } from "@/lib/actions/calendar-actions";
+import { INSTANT_CONFIRM_TEXT } from "@/lib/legal/instant-confirm";
 
 export const metadata: Metadata = { title: "Dashboard", robots: { index: false } };
 
@@ -122,6 +124,20 @@ async function Dashboard() {
           { t: "Steuerstatus angegeben", done: p.tax_status !== null, href: "/dashboard#steuer", hint: "Regelbesteuert oder Kleinunternehmer. Ohne Angabe bist du nicht buchbar." },
         ]}
       />
+      {p.booking_mode === "instant" && !p.instant_confirm_consent_at && (
+        <section className="flex flex-col gap-3 rounded-panel border-[1.5px] border-[#e0a800] bg-[#fff8e1] p-6">
+          <h2 className="text-lg font-bold">Bitte einmal bestätigen: sofortige Bestätigung</h2>
+          <p className="text-[14px]">Unsere AGB für Betriebe regeln die sofortige Bestätigung neu (§ 2a Abs. 1). Bis du bestätigst, laufen deine Buchungen als Anfragen, die du selbst bestätigst.</p>
+          <form action={confirmInstantMode} className="flex flex-col gap-3">
+            <label className="flex items-start gap-3 text-[14px] leading-snug">
+              <input type="checkbox" name="instant_consent" className="mt-0.5 h-5 w-5 shrink-0 accent-[#12704f]" />
+              <span>{INSTANT_CONFIRM_TEXT}</span>
+            </label>
+            <button className="self-start rounded-full bg-brand px-5 py-2.5 font-bold text-white">Speichern</button>
+            <p className="text-[13px] text-muted">Ohne Häkchen speichern stellt deinen Modus auf „Ich bestätige selbst“.</p>
+          </form>
+        </section>
+      )}
       <section id="steuer" className="flex scroll-mt-6 flex-col gap-3 rounded-panel border border-line p-6">
         <h2 className="text-lg font-bold">Steuerangaben</h2>
         <p className="text-[14px] text-ink-soft">Unsere Rechnungen über Provision und Mitgliedschaft enthalten keine Umsatzsteuer (Reverse Charge). Die deutsche Umsatzsteuer darauf schuldest du selbst nach § 13b UStG, auch als Kleinunternehmer (AGB für Betriebe § 6).</p>
