@@ -187,8 +187,19 @@ export default function PartnerLandingPage() {
             <li>Provision fällt nur auf erfolgreich abgeschlossene Buchungen an und wird bei der Zahlung über Stripe automatisch einbehalten.</li>
             <li>Die Gebühren von Stripe für die Zahlungsabwicklung verrechnet Stripe direkt mit deinem Stripe-Konto.</li>
             <li>Nach der Einführungsphase wird nichts automatisch kostenpflichtig. Wir erinnern dich vorher per E-Mail, du entscheidest aktiv.</li>
-            <li>{providerVatNote} Eine USt-IdNr. ist nicht nötig, auch Kleinunternehmer können mitmachen.</li>
+            <li>{providerVatNote} Auch Kleinunternehmer können mitmachen, mit USt-IdNr. oder mit Gewerbenachweis. Wichtig zur Umsatzsteuer: siehe unten.</li>
           </ul>
+          <div id="umsatzsteuer" className="mt-8 max-w-[820px] rounded-panel border-[1.5px] border-brand bg-white p-6 text-[15px] leading-relaxed text-ink-soft">
+            <h3 className="mb-2 text-lg font-bold text-brand-dark">Umsatzsteuer, kurz erklärt</h3>
+            <p>
+              handwerker2go sitzt in Malta. Unsere Rechnungen über Provision und Mitgliedschaft enthalten deshalb keine Umsatzsteuer
+              („Reverse Charge“). Die deutsche Umsatzsteuer darauf (19 %) <strong>schuldest du selbst</strong> und meldest sie bei deinem
+              Finanzamt an (§ 13b UStG). Regelbesteuerte Betriebe ziehen sie in der Regel gleich wieder als Vorsteuer ab.{" "}
+              <strong>Kleinunternehmer</strong> müssen sie ebenfalls anmelden und zahlen, können sie aber nicht abziehen; für sie kosten
+              Provision und Mitgliedschaft also effektiv 19 % mehr. Zum Mitmachen brauchst du eine USt-IdNr. oder, als Kleinunternehmer,
+              deine Gewerbeanmeldung und Steuernummer. Im Zweifel frag deinen Steuerberater.
+            </p>
+          </div>
         </Container>
       </section>
 

@@ -3,7 +3,7 @@ import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { Email } from "@/components/legal/email";
 import { LegalPage } from "@/components/legal/legal-page";
-import { legal, operatorLine, termsDate } from "@/config/legal";
+import { LEGAL, legal, operatorLine, termsDate } from "@/config/legal";
 
 export const metadata: Metadata = pageMeta({
   title: "Datenschutzerklärung",
@@ -30,6 +30,7 @@ export default function Page() {
         E-Mail: <Email />, Telefon: {legal.phone}
       </p>
       <p>Einen Datenschutzbeauftragten haben wir nicht benannt. Für alle Fragen zum Datenschutz erreichst du uns unter <Email />.</p>
+      <p>Kontaktstelle nach Art. 11 und 12 DSA: {LEGAL.dsaContactEmail} (Deutsch, Englisch), siehe auch <Link href="/kontakt-dsa" className="underline">Kontaktstelle (DSA)</Link>.</p>
 
       <h2>2. Überblick</h2>
       <p>
@@ -51,7 +52,9 @@ export default function Page() {
       <h2>4. Hosting</h2>
       <p>
         Website und Datenbank laufen auf einem Server der Hostinger International Ltd. in einem Rechenzentrum in Frankfurt am
-        Main, Deutschland. Hostinger verarbeitet die Daten in unserem Auftrag (Art. 28 DSGVO).
+        Main, Deutschland. Hostinger verarbeitet die Daten in unserem Auftrag (Art. 28 DSGVO). Hostinger setzt
+        Unterauftragsverarbeiter ein, darunter Anbieter mit Sitz in den USA (z. B. Cloudflare, Inc.); zur Übermittlung siehe
+        Abschnitt 18.
       </p>
 
       <h2>5. Cloudflare</h2>
@@ -115,6 +118,12 @@ export default function Page() {
         Abrechnung; Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Öffentlich sichtbar sind nur Profilangaben, Leistungen,
         Preise und Bewertungen des Betriebs.
       </p>
+      <p>
+        Zur steuerlichen Abrechnung verarbeiten wir außerdem den Steuerstatus, die USt-IdNr. einschließlich des Ergebnisses der
+        Prüfung über das EU-System VIES (Name, Anschrift, Prüfnummer, Zeitpunkt) oder, ohne USt-IdNr., Steuernummer,
+        Gewerbeanmeldung, Eintragung in die Handwerksrolle und die Unternehmer-Erklärung sowie die Anfahrtskosten. Rechtsgrundlage
+        ist Art. 6 Abs. 1 lit. b und c DSGVO. Abrechnungsrelevante Nachweise bewahren wir 9 Jahre auf (Abschnitt 16).
+      </p>
 
       <h2>9. Terminsuche, Buchungen und Angebotsanfragen</h2>
       <p>
@@ -134,6 +143,12 @@ export default function Page() {
         Verantwortlicher für die Durchführung deines Vertrags mit ihm. Fragen zur Verarbeitung beim Betrieb richtest du an den
         Betrieb; seine Kontaktdaten stehen in der Buchungsbestätigung.
       </p>
+      <p>
+        <b>Widerruf:</b> Nutzt du die Online-Widerrufsfunktion oder stornierst du innerhalb der Widerrufsfrist, speichern wir Name,
+        Vertragsangaben, E-Mail-Adresse, Zeitpunkt des Eingangs, IP-Adresse und die versandte Eingangsbestätigung als Nachweis. Wir
+        geben diese Angaben an den Betrieb weiter. Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO (§ 356a BGB) und lit. f
+        (Nachweis). Speicherdauer wie Buchungsdaten.
+      </p>
 
       <h2>10. Zahlung über Stripe</h2>
       <p>
@@ -150,8 +165,10 @@ export default function Page() {
       </p>
       <p>
         Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, für steuerliche Pflichten Art. 6 Abs. 1 lit. c DSGVO. Stripe verarbeitet
-        Daten zur Betrugsprävention, zur Prüfung von Identitäten und zur Erfüllung gesetzlicher Pflichten in eigener
-        Verantwortung; Einzelheiten stehen in der Datenschutzerklärung von Stripe unter stripe.com/de/privacy.
+        Daten teils als unser Auftragsverarbeiter (Bereitstellung der Zahlungsdienste, Art. 28 DSGVO) und teils in eigener
+        Verantwortung, insbesondere zur Betrugsprävention, zur Identitätsprüfung, zur Erfüllung gesetzlicher Pflichten (z. B.
+        Geldwäscheprävention) und zur Verbesserung seiner Dienste; Grundlage ist die Datenverarbeitungsvereinbarung von Stripe. Bei
+        Zahlungen für Handwerkerleistungen ist der gebuchte Betrieb Händler gegenüber Stripe. Einzelheiten: stripe.com/de/privacy.
       </p>
 
       <h2>11. Bewertungen</h2>
@@ -163,10 +180,17 @@ export default function Page() {
         besteht oder bis du sie löschen lässt.
       </p>
       <p>
-        Nach einem Termin bitten wir dich einmal per E-Mail um eine Bewertung. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO
-        mit unserem berechtigten Interesse an echten Bewertungen; wir nutzen dafür die E-Mail-Adresse aus deiner Buchung
-        (§ 7 Abs. 3 UWG). Du kannst dem jederzeit widersprechen, über den Link in jeder dieser E-Mails oder per E-Mail an uns,
-        ohne dass dafür andere Kosten als die Übermittlungskosten nach den Basistarifen entstehen.
+        Um eine Bewertung bitten wir dich per E-Mail nur, wenn du bei der Buchung eingewilligt hast (Art. 6 Abs. 1 lit. a DSGVO,
+        § 7 Abs. 2 Nr. 2 UWG). Du kannst die Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen, über den Link in jeder
+        dieser E-Mails oder per E-Mail an uns. Abmeldungen speichern wir in einer Sperrliste, damit du keine weiteren Anfragen
+        erhältst.
+      </p>
+
+      <h2>11a. Meldungen von Inhalten</h2>
+      <p>
+        Meldest du uns einen Inhalt, verarbeiten wir die Angaben aus der Meldung und, falls angegeben, Name und E-Mail-Adresse, um
+        die Meldung zu prüfen und dir das Ergebnis mitzuteilen (Art. 6 Abs. 1 lit. c DSGVO in Verbindung mit Art. 16 DSA).
+        Speicherdauer: 3 Jahre ab Ende des Jahres der Entscheidung.
       </p>
 
       <h2>12. E-Mails</h2>
@@ -275,6 +299,27 @@ export default function Page() {
               <td className={td}>14 Tage</td>
               <td className={td}>berechtigtes Interesse</td>
             </tr>
+            <tr className="border-b border-line">
+              <td className={td}>Widerrufserklärungen und Eingangsbestätigungen</td>
+              <td className={td}>Nachweis nach § 356a BGB</td>
+              <td className={td}>Art. 6 Abs. 1 lit. c, f DSGVO</td>
+              <td className={td}>3 Jahre ab Ende des Kalenderjahres</td>
+              <td className={td}>§§ 195, 199 BGB</td>
+            </tr>
+            <tr className="border-b border-line">
+              <td className={td}>Unternehmer-Nachweise und VIES-Ergebnisse</td>
+              <td className={td}>steuerlicher Nachweis</td>
+              <td className={td}>Art. 6 Abs. 1 lit. c DSGVO</td>
+              <td className={td}>9 Jahre nach Abschluss des Vorgangs</td>
+              <td className={td}>ITMA Cap. 372 Art. 19(5)</td>
+            </tr>
+            <tr className="border-b border-line">
+              <td className={td}>Meldungen von Inhalten</td>
+              <td className={td}>DSA</td>
+              <td className={td}>Art. 6 Abs. 1 lit. c DSGVO</td>
+              <td className={td}>3 Jahre ab Ende des Kalenderjahres</td>
+              <td className={td}>Art. 16, 17 DSA</td>
+            </tr>
             <tr>
               <td className={td}>Kontodaten von Kunden und Betrieben</td>
               <td className={td}>Bereitstellung des Kontos</td>
@@ -295,7 +340,8 @@ export default function Page() {
 
       <h2>17. Empfänger</h2>
       <p>
-        Personenbezogene Daten erhalten nur: der von dir gebuchte Betrieb (Abschnitt 9), Stripe (Abschnitt 10), unsere
+        Personenbezogene Daten erhalten nur: der von dir gebuchte Betrieb (Abschnitt 9), Stripe (Abschnitt 10, teils als
+        Auftragsverarbeiter, teils als eigener Verantwortlicher), unsere
         Dienstleister Hostinger, Cloudflare und Google, die in unserem Auftrag handeln (Abschnitte 4, 5 und 12), sowie Behörden,
         wenn wir gesetzlich dazu verpflichtet sind (Abschnitt 15). Wir verkaufen keine Daten.
       </p>
@@ -304,7 +350,8 @@ export default function Page() {
       <p>
         Eine Übermittlung in die USA ist bei Cloudflare, Stripe und Google möglich. Diese Anbieter sind nach dem EU-US Data
         Privacy Framework zertifiziert, für das ein Angemessenheitsbeschluss der EU-Kommission besteht (Art. 45 DSGVO). Ergänzend
-        sehen ihre Verträge die Standardvertragsklauseln der EU-Kommission vor (Art. 46 Abs. 2 lit. c DSGVO).
+        sehen ihre Verträge die Standardvertragsklauseln der EU-Kommission vor (Art. 46 Abs. 2 lit. c DSGVO). Das gilt auch für
+        Unterauftragsverarbeiter von Hostinger in den USA.
       </p>
 
       <h2>19. Deine Rechte</h2>

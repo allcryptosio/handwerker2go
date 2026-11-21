@@ -3,7 +3,7 @@ import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { Email } from "@/components/legal/email";
 import { LegalPage } from "@/components/legal/legal-page";
-import { legal, operatorLine, termsDate } from "@/config/legal";
+import { LEGAL, legal, operatorLine, termsDate } from "@/config/legal";
 
 export const metadata: Metadata = pageMeta({
   title: "AGB für Kunden",
@@ -66,9 +66,11 @@ export default function Page() {
         zurück.
       </p>
       <p>
-        (2) Besichtigungstermin für ein Angebot: Bei Leistungen ohne Festpreis buchst du einen kostenlosen Termin, bei dem sich der
-        Betrieb den Auftrag ansieht. Der Vertrag über diesen Termin kommt wie in Absatz 1 zustande, ohne dass eine Zahlung
-        anfällt. Ein Vertrag über die eigentliche Handwerkerleistung entsteht erst, wenn du ein Angebot des Betriebs annimmst.
+        (2) Besichtigungstermin für ein Angebot: Bei Leistungen ohne Festpreis buchst du einen kostenlosen und unverbindlichen
+        Termin, bei dem sich der Betrieb den Auftrag ansieht. Für diesen Termin fallen keine Kosten und keine Stornopauschale an.
+        Danach schickt dir der Betrieb sein Angebot über handwerker2go. Ein Vertrag über die Handwerkerleistung entsteht nur, wenn du
+        das Angebot online über handwerker2go mit dem Button „Angebot zahlungspflichtig annehmen“ annimmst und bezahlst; für diesen
+        Vertrag gelten die Absätze 1, 3 und 4 sowie §§ 5 und 6 entsprechend.
       </p>
       <p>
         (3) Deine Angaben zum Einsatzort und zum Umfang müssen stimmen. Weicht der Aufwand wegen falscher oder unvollständiger
@@ -83,10 +85,19 @@ export default function Page() {
         Buchungsbestätigung.
       </p>
 
+      <h2>§ 4a Geltung für den Vertrag mit dem Betrieb</h2>
+      <p>
+        Die Regelungen in §§ 4 bis 6 sowie die Widerrufsbelehrung gelten auch für deinen Vertrag mit dem Betrieb. Der Betrieb hat
+        diesen Regelungen in den AGB für Betriebe zugestimmt und uns bevollmächtigt, Verträge in seinem Namen zu schließen, soweit er
+        die sofortige Bestätigung aktiviert hat, sowie Erklärungen von dir, insbesondere Widerruf und Stornierung, für ihn
+        entgegenzunehmen.
+      </p>
+
       <h2>§ 5 Preise und Zahlung</h2>
       <p>
-        (1) Die angezeigten Festpreise sind Endpreise des Betriebs einschließlich gesetzlicher Umsatzsteuer, soweit der Betrieb
-        Umsatzsteuer berechnet.
+        (1) Die angezeigten Festpreise sind Endpreise des Betriebs. Bei Betrieben, die Umsatzsteuer berechnen, ist die gesetzliche
+        Umsatzsteuer enthalten („inkl. 19 % MwSt.“). Betriebe, die die Kleinunternehmerregelung anwenden, berechnen keine
+        Umsatzsteuer; das ist am Preis gekennzeichnet („Endpreis, keine USt nach § 19 UStG“). Die Anfahrt ist im Festpreis enthalten.
       </p>
       <p>
         (2) Du bezahlst online über den Zahlungsdienstleister Stripe (Stripe Payments Europe, Ltd., Irland) auf einer Bezahlseite
@@ -105,15 +116,20 @@ export default function Page() {
         Kundenkonto oder per E-Mail an <Email />. Du erhältst den vollen Betrag zurück.
       </p>
       <p>
-        (2) Stornierst du später oder ist bei dem Termin niemand am Einsatzort anzutreffen, kann der Betrieb eine Pauschale
-        verlangen. Sie beträgt {legal.lateCancellationPercent} % des Festpreises, höchstens jedoch die Anfahrtskosten des Betriebs.
-        Der übrige Betrag wird erstattet.
+        (2) Solange deine gesetzliche Widerrufsfrist läuft, behandeln wir jede Stornierung als Widerruf. Hat der Betrieb noch nicht mit
+        der Leistung begonnen, erhältst du den vollen Betrag zurück, auch bei einer Stornierung kurz vor dem Termin. Hat er auf dein
+        ausdrückliches Verlangen schon begonnen, gilt die Regelung zum Wertersatz in der{" "}
+        <Link href="/widerruf" className="underline">Widerrufsbelehrung</Link>.
       </p>
-      <p>(3) Dir bleibt der Nachweis gestattet, dass dem Betrieb kein oder ein wesentlich geringerer Schaden entstanden ist.</p>
       <p>
-        (4) Dein gesetzliches Widerrufsrecht von {legal.withdrawalDays} Tagen bleibt unberührt und geht dieser Regelung vor. Einzelheiten
-        und das Muster-Widerrufsformular stehen in der <Link href="/widerruf" className="underline">Widerrufsbelehrung</Link>.
+        (3) Ist die Widerrufsfrist abgelaufen und stornierst du später als {legal.freeCancellationHours} Stunden vor dem Termin oder ist
+        bei dem Termin niemand am Einsatzort anzutreffen, kann der Betrieb eine Pauschale verlangen. Sie beträgt{" "}
+        {legal.lateCancellationPercent} % des Festpreises, höchstens jedoch die Anfahrtskosten des Betriebs. Den genauen Höchstbetrag in
+        Euro siehst du vor der Buchung und in deiner Buchungsbestätigung. Der übrige Betrag wird erstattet.
       </p>
+      <p>(4) Dir bleibt der Nachweis gestattet, dass dem Betrieb kein oder ein wesentlich geringerer Schaden entstanden ist.</p>
+      <p>(5) Für kostenlose Besichtigungstermine fällt keine Pauschale an.</p>
+      <p>(6) Dein gesetzliches Widerrufsrecht bleibt unberührt und geht dieser Regelung vor.</p>
 
       <h2 id="bewertungen">§ 7 Bewertungen</h2>
       <p>
@@ -125,12 +141,25 @@ export default function Page() {
         dürfen wir entfernen. Kritische, aber zulässige Bewertungen löschen wir nicht. Betriebe können Bewertungen weder kaufen
         noch entfernen oder hervorheben lassen. Unzulässige Inhalte kannst du uns unter <Email /> melden.
       </p>
+      <p>
+        (3) Um eine Bewertung bitten wir dich per E-Mail nur, wenn du bei der Buchung eingewilligt hast. Du kannst die Einwilligung
+        jederzeit über den Link in der E-Mail widerrufen.
+      </p>
 
       <h2>§ 8 Pflichten der Kunden</h2>
       <p>
         Du darfst die Plattform nicht missbräuchlich nutzen, insbesondere keine falschen Angaben machen, keine Rechte Dritter
         verletzen und keine Schadsoftware einbringen. Bei Verstößen können wir Inhalte entfernen und Konten vorübergehend oder
         dauerhaft sperren; die Gründe teilen wir dir per E-Mail mit.
+      </p>
+
+      <h2>§ 8a Inhalte melden</h2>
+      <p>
+        Rechtswidrige Inhalte, etwa in Bewertungen oder Profilen, kannst du uns über den Link „Inhalt melden“ am jeweiligen Inhalt
+        oder per E-Mail an {LEGAL.dsaContactEmail} melden. Wir prüfen jede Meldung zeitnah und sorgfältig und teilen dir das Ergebnis
+        mit, wenn du uns eine E-Mail-Adresse nennst. Entfernen oder beschränken wir einen Inhalt, informieren wir den Betroffenen über
+        die Gründe. Kontaktstelle nach Art. 11 und 12 der Verordnung (EU) 2022/2065 (Digital Services Act): {LEGAL.dsaContactEmail},
+        Sprachen Deutsch und Englisch.
       </p>
 
       <h2>§ 9 Haftung</h2>
