@@ -7,32 +7,36 @@ import { PhotoSlot } from "@/components/ui/photo-slot";
 
 const h2 = "text-[clamp(24px,3.4vw,44px)] font-extrabold leading-tight tracking-[-0.03em] text-brand-dark";
 
+/** Beliebte Projekte im selben Mint-Block wie Suche und Kategorien (Variante A): kleine weiße Karten, „Alle Leistungen“ unten rechts */
 export function PopularProjects({ citySlug, cityName }: { citySlug: string; cityName: string }) {
   return (
-    <section aria-labelledby="projekte-titel" className="py-10 sm:py-[88px]">
-      <Container>
-        <h2 id="projekte-titel" className={`${h2} mb-5 sm:mb-8`}>
-          Beliebte Projekte in {cityName}
-        </h2>
-        <ul className="grid grid-cols-2 gap-x-3 gap-y-4 sm:gap-6 lg:grid-cols-4">
-          {popularProjects.map((x) => (
-            <li key={x.title}>
-              <Link href={`/${citySlug}/${x.category}`} className="group flex flex-col gap-1.5 sm:gap-3">
-                <PhotoSlot tone={x.tone} hint={x.photoHint} src={photoSrc(x.photoFile)} sizes="(min-width: 1024px) 25vw, 50vw" className="aspect-[4/3] rounded-xl sm:rounded-card" />
-                <span className="text-[14px] font-bold leading-snug group-hover:text-brand sm:text-lg">{x.title}</span>
-                <span className="-mt-1.5 hidden text-[15px] text-muted sm:block">Preise auf der Leistungsseite</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+    <div aria-labelledby="projekte-titel" className="mx-auto max-w-[1240px] px-4 pb-10 pt-6 sm:px-7 sm:pb-16 sm:pt-9">
+      <h2 id="projekte-titel" className="mb-4 text-[clamp(22px,2.6vw,32px)] font-extrabold leading-tight tracking-[-0.03em] text-brand-dark sm:mb-6">
+        Beliebte Projekte in {cityName}
+      </h2>
+      <ul className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
+        {popularProjects.map((x) => (
+          <li key={x.title}>
+            <Link
+              href={`/${citySlug}/${x.category}`}
+              className="group flex h-full flex-col gap-2 rounded-2xl bg-white p-1.5 shadow-[0_1px_3px_rgba(11,46,31,0.06)] transition-shadow hover:shadow-[0_10px_28px_rgba(11,46,31,0.10)] sm:p-2"
+            >
+              <PhotoSlot tone={x.tone} hint={x.photoHint} src={photoSrc(x.photoFile)} sizes="(min-width: 1024px) 25vw, 50vw" className="aspect-[4/3] rounded-xl" />
+              <span className="px-1.5 pb-1 text-[13.5px] font-bold leading-snug group-hover:text-brand sm:px-2 sm:pb-1.5 sm:text-[15px]">{x.title}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 flex justify-end sm:mt-6">
         <Link
           href={`/${citySlug}`}
-          className="mt-6 inline-block rounded-full border-[1.5px] border-ink px-5 py-3 text-[15px] font-bold transition-colors hover:bg-ink hover:text-white sm:mt-8 sm:px-[22px] sm:py-[13px] sm:text-base"
+          className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-ink bg-white px-5 py-2.5 text-[14px] font-bold transition-colors hover:bg-ink hover:text-white sm:text-[15px]"
         >
-          Alle Leistungen in {cityName}
+          Alle Leistungen
+          <Icon name="pfeil" size={16} strokeWidth={2.2} />
         </Link>
-      </Container>
-    </section>
+      </div>
+    </div>
   );
 }
 
