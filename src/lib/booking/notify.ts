@@ -1,7 +1,7 @@
 import "server-only";
 import { asSystem } from "@/lib/db";
-import { legal, operatorLine } from "@/config/legal";
 import { earlyStartConfirmationParagraph } from "@/lib/legal/early-start";
+import { withdrawalNoticeForMail } from "@/lib/legal/withdrawal-notice";
 import { sendMail } from "@/lib/mail";
 import { reviewOptOutUrl } from "@/lib/review-optout";
 
@@ -34,13 +34,10 @@ export async function notifyBooking(bookingId: string, event: BookingEvent) {
   ];
   const provider = `Dein Vertragspartner ist ${b.company_name}, ${b.p_street}, ${b.p_postal} ${b.p_city}, Telefon ${b.p_phone}.`;
   const consent = b.early_start_consent_at ? [earlyStartConfirmationParagraph(new Date(b.early_start_consent_at))] : [];
-  // Widerrufsbelehrung auf dauerhaftem Datenträger (Art. 246a § 4 EGBGB), wortgleich mit /widerruf
+  // Widerrufsbelehrung auf dauerhaftem Datenträger (Textform, § 312f BGB): amtliches Muster vollständig im Mailtext (Anhang A)
   const withdrawal = [
-    "WIDERRUFSBELEHRUNG",
-    "Widerrufsrecht: Du hast das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsabschlusses.",
-    `Um dein Widerrufsrecht auszuüben, musst du den Betrieb (${b.company_name}, ${b.p_street}, ${b.p_postal} ${b.p_city}, Telefon ${b.p_phone}, E-Mail ${b.p_email}) oder handwerker2go (${operatorLine()}, E-Mail: ${legal.email}, Telefon: ${legal.phone}) mittels einer eindeutigen Erklärung (z. B. ein mit der Post versandter Brief oder eine E-Mail) über deinen Entschluss, diesen Vertrag zu widerrufen, informieren. Du kannst dafür das Muster-Widerrufsformular unter ${base()}/widerruf verwenden, das jedoch nicht vorgeschrieben ist. Zur Wahrung der Widerrufsfrist reicht es aus, dass du die Mitteilung über die Ausübung des Widerrufsrechts vor Ablauf der Widerrufsfrist absendest.`,
-    "Folgen des Widerrufs: Wenn du diesen Vertrag widerrufst, hat der Betrieb dir alle Zahlungen, die er von dir erhalten hat, unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über deinen Widerruf dieses Vertrags beim Betrieb oder bei handwerker2go eingegangen ist. Für diese Rückzahlung wird dasselbe Zahlungsmittel verwendet, das du bei der ursprünglichen Transaktion eingesetzt hast, es sei denn, mit dir wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden dir wegen dieser Rückzahlung Entgelte berechnet. Hast du verlangt, dass die Dienstleistung während der Widerrufsfrist beginnen soll, so hast du dem Betrieb einen angemessenen Betrag zu zahlen, der dem Anteil der bis zu dem Zeitpunkt, zu dem du den Betrieb oder handwerker2go von der Ausübung des Widerrufsrechts hinsichtlich dieses Vertrags unterrichtest, bereits erbrachten Dienstleistungen im Vergleich zum Gesamtumfang der im Vertrag vorgesehenen Dienstleistungen entspricht.",
-    "Das Widerrufsrecht erlischt, wenn der Betrieb die Dienstleistung vollständig erbracht hat und mit der Ausführung erst begonnen hat, nachdem du dazu deine ausdrückliche Zustimmung gegeben und gleichzeitig deine Kenntnis davon bestätigt hast, dass du dein Widerrufsrecht bei vollständiger Vertragserfüllung verlierst.",
+    ...withdrawalNoticeForMail({ name: b.company_name, address: `${b.p_street}, ${b.p_postal} ${b.p_city}`, phone: b.p_phone, email: b.p_email }),
+    `Vertrag widerrufen: ${base()}/vertrag-widerrufen?b=${encodeURIComponent(b.number)}`,
     `Es gelten die AGB für Kunden (${base()}/agb), Stand ${b.terms_version.split("-").reverse().join(".")}.`,
   ];
   const sends: Promise<unknown>[] = [];
