@@ -56,11 +56,12 @@ export function SeoText({ citySlug }: { citySlug: string }) {
             Von der Entrümpelung über den Elektriker bis zum Maler: Such dir aus, was ansteht. Alle Leistungen mit Festpreis oder
             kostenloser Besichtigung.
           </p>
-          <ul className="flex flex-wrap gap-1.5 sm:gap-2">
+          <ul className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             {categories.map((c) => (
-              <li key={c.slug}>
-                <Link href={`/${citySlug}/${c.slug}`} className="inline-flex rounded-full border border-line-strong bg-white px-3 py-1.5 text-[13px] font-semibold hover:border-brand hover:text-brand sm:px-4 sm:py-2 sm:text-[15px]">
-                  {c.trade} Hamburg
+              <li key={c.slug} className="min-w-0">
+                <Link href={`/${citySlug}/${c.slug}`} className="flex min-h-[44px] items-center justify-between gap-2 rounded-xl border border-line bg-white px-3 text-[14px] font-semibold hover:border-brand hover:text-brand sm:inline-flex sm:min-h-0 sm:rounded-full sm:border-line-strong sm:px-4 sm:py-2 sm:text-[15px]">
+                  <span className="truncate">{c.trade}<span className="hidden sm:inline"> Hamburg</span></span>
+                  <svg aria-hidden viewBox="0 0 16 16" className="h-3.5 w-3.5 shrink-0 text-muted sm:hidden" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3.5 10.5 8 6 12.5" /></svg>
                 </Link>
               </li>
             ))}

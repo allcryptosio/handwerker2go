@@ -96,10 +96,13 @@ export function BookingSearch({
     else router.push(`/termin?${new URLSearchParams(v as unknown as Record<string, string>)}`);
   }
 
-  const seg = "relative flex min-w-0 flex-1 flex-col justify-center rounded-2xl px-3.5 py-2 text-left transition-colors hover:bg-soft sm:rounded-full sm:px-6 sm:py-2.5";
-  const active = "bg-white shadow-[0_6px_24px_rgba(11,46,31,0.12)] hover:bg-white";
-  const label = "text-[12px] font-bold uppercase tracking-[0.04em] text-brand-dark";
-  const value = "truncate text-[15px] text-ink-soft";
+  // Handy: Tabellenzeilen (Bezeichnung links, Wert daneben, Pfeil rechts); ab sm: Pillenleiste wie bisher
+  const seg = "relative flex min-h-[56px] min-w-0 flex-1 items-center px-4 text-left transition-colors hover:bg-soft sm:min-h-0 sm:flex-col sm:items-stretch sm:justify-center sm:rounded-full sm:px-6 sm:py-2.5";
+  const active = "bg-mint/70 hover:bg-mint/70 sm:bg-white sm:shadow-[0_6px_24px_rgba(11,46,31,0.12)] sm:hover:bg-white";
+  const label = "w-[78px] shrink-0 text-[12px] font-bold uppercase tracking-[0.04em] text-brand-dark sm:w-auto";
+  const value = "min-w-0 flex-1 truncate text-[15px] text-ink-soft";
+  const rowBtn = "flex w-full items-center gap-3 py-3 text-left sm:block sm:py-0";
+  const field = "flex w-full items-center gap-3 py-3 sm:block sm:py-0";
 
   return (
     <form
@@ -109,9 +112,10 @@ export function BookingSearch({
       aria-label="Handwerker suchen und buchen"
       className={`relative w-full ${compact ? "max-w-[1040px]" : "max-w-[980px]"}`}
     >
-      <div className="grid grid-cols-2 gap-1 rounded-[24px] border-[1.5px] border-line-strong bg-white p-1.5 text-left shadow-[0_10px_30px_rgba(11,46,31,0.10)] sm:flex sm:flex-row sm:items-stretch sm:gap-0 sm:rounded-full">
+      <div className="flex flex-col divide-y divide-line overflow-hidden rounded-[22px] border-[1.5px] border-line-strong bg-white text-left shadow-[0_10px_30px_rgba(11,46,31,0.10)] sm:flex-row sm:items-stretch sm:divide-y-0 sm:overflow-visible sm:rounded-full sm:p-1.5">
         {/* Leistung */}
-        <div className={`${seg} ${panel === "service" ? active : ""} col-span-2 sm:flex-[1.4]`}>
+        <div className={`${seg} ${panel === "service" ? active : ""} sm:flex-[1.4]`}>
+          <div className={field}>
           <label htmlFor="bs-service" className={label}>Leistung</label>
           <input
             id="bs-service"
@@ -124,8 +128,9 @@ export function BookingSearch({
             onFocus={() => setPanel("service")}
             placeholder="Was soll erledigt werden?"
             autoComplete="off"
-            className="w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-[#6b6e6d] focus-visible:outline-none"
+            className="min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-[#6b6e6d] focus-visible:outline-none sm:w-full"
           />
+          </div>
           {panel === "service" && (
             <ServicePanel
               services={services}
@@ -140,7 +145,8 @@ export function BookingSearch({
         </div>
         <Divider />
         {/* Ort */}
-        <div className={`${seg} ${panel === "place" ? active : ""} col-span-2`}>
+        <div className={`${seg} ${panel === "place" ? active : ""}`}>
+          <div className={field}>
           <label htmlFor="bs-place" className={label}>Wo</label>
           <input
             id="bs-place"
@@ -153,8 +159,9 @@ export function BookingSearch({
             placeholder="PLZ oder Ort"
             autoComplete="postal-code"
             inputMode="text"
-            className="w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-[#6b6e6d] focus-visible:outline-none"
+            className="min-w-0 flex-1 bg-transparent text-[15px] text-ink outline-none placeholder:text-[#6b6e6d] focus-visible:outline-none sm:w-full"
           />
+          </div>
           {panel === "place" && (
             <PlacePanel
               query={ort}
@@ -168,9 +175,10 @@ export function BookingSearch({
         <Divider />
         {/* Tag */}
         <div className={`${seg} ${panel === "date" ? active : ""}`}>
-          <button type="button" onClick={() => setPanel(panel === "date" ? null : "date")} className="text-left" aria-haspopup="dialog" aria-expanded={panel === "date"}>
+          <button type="button" onClick={() => setPanel(panel === "date" ? null : "date")} className={rowBtn} aria-haspopup="dialog" aria-expanded={panel === "date"}>
             <span className={`block ${label}`}>Tag</span>
             <span className={`block ${value} ${datum ? "text-ink" : ""}`}>{datum ? formatDateLong(datum) : "Datum wählen"}</span>
+            <Chevron />
           </button>
           {panel === "date" && (
             <DatePanel
@@ -191,9 +199,10 @@ export function BookingSearch({
         <Divider />
         {/* Uhrzeit */}
         <div className={`${seg} ${panel === "time" ? active : ""}`}>
-          <button type="button" onClick={() => setPanel(panel === "time" ? null : "time")} className="text-left" aria-haspopup="dialog" aria-expanded={panel === "time"}>
+          <button type="button" onClick={() => setPanel(panel === "time" ? null : "time")} className={rowBtn} aria-haspopup="dialog" aria-expanded={panel === "time"}>
             <span className={`block ${label}`}>Uhrzeit</span>
             <span className={`block ${value} ${timeText ? "text-ink" : ""}`}>{timeText || "Zeit wählen"}</span>
+            <Chevron />
           </button>
           {panel === "time" && (
             <TimePanel
@@ -211,7 +220,7 @@ export function BookingSearch({
         </div>
         <button
           type="submit"
-          className="col-span-2 mt-0.5 inline-flex min-h-[48px] shrink-0 items-center justify-center gap-2 rounded-2xl bg-brand px-6 font-bold text-white transition-colors hover:bg-brand-dark sm:mt-0 sm:min-h-[52px] sm:rounded-full"
+          className="m-2 inline-flex min-h-[48px] shrink-0 items-center justify-center gap-2 rounded-2xl !border-0 bg-brand px-6 font-bold text-white transition-colors hover:bg-brand-dark sm:m-0 sm:min-h-[52px] sm:rounded-full"
         >
           <Icon name="suche" size={18} strokeWidth={2.6} />
           <span>Finden</span>
@@ -222,6 +231,14 @@ export function BookingSearch({
         <p className="mt-3 text-center text-[13px] text-muted">„{service.name}“ hat keinen Festpreis: Du buchst einen kostenlosen Termin zur Besichtigung und bekommst danach ein Angebot.</p>
       )}
     </form>
+  );
+}
+
+function Chevron() {
+  return (
+    <svg aria-hidden viewBox="0 0 16 16" className="h-4 w-4 shrink-0 text-muted sm:hidden" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 3.5 10.5 8 6 12.5" />
+    </svg>
   );
 }
 
