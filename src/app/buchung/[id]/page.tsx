@@ -11,6 +11,7 @@ import { providerBookingAction, syncCheckoutReturn } from "@/lib/actions/booking
 import { currentUser } from "@/lib/auth";
 import { cancellationNotice, decideCancellation } from "@/lib/booking/cancellation";
 import { contractConcludedAt } from "@/lib/booking/withdrawal";
+import { priceLine } from "@/lib/booking/price-label";
 import { withDb } from "@/lib/db";
 import { earlyStartConfirmationParagraph } from "@/lib/legal/early-start";
 
@@ -86,7 +87,7 @@ async function Detail({ params, searchParams }: PageProps<"/buchung/[id]">) {
       <section className="grid gap-4 rounded-panel border border-line p-6 sm:grid-cols-2">
         <div><div className="text-[13px] text-muted">Termin</div><div className="font-semibold">{when(start)} Uhr</div></div>
         <div><div className="text-[13px] text-muted">Einsatzort</div><div className="font-semibold">{b.street}, {b.postal_code} {b.city}</div></div>
-        <div><div className="text-[13px] text-muted">Preis</div><div className="font-semibold">{b.price_type === "fixed" ? `${eur(b.price_cents)} Festpreis` : "Besichtigung kostenlos, Preis nach Angebot"}</div></div>
+        <div><div className="text-[13px] text-muted">Preis</div><div className="font-semibold">{b.price_type === "fixed" ? priceLine(b.price_cents, b.provider_tax_status) : "Besichtigung kostenlos und unverbindlich, Preis nach Angebot"}</div></div>
         {isProvider ? (
           <div><div className="text-[13px] text-muted">Kunde</div><div className="font-semibold">{b.contact_name}, <a className="underline" href={`tel:${b.contact_phone}`}>{b.contact_phone}</a></div></div>
         ) : (

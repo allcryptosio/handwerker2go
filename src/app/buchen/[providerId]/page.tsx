@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { BookingForm } from "@/components/booking/booking-form";
 import { ProviderReviews } from "@/components/booking/provider-reviews";
 import { cancellationNotice } from "@/lib/booking/cancellation";
+import { taxNote } from "@/lib/booking/price-label";
 import { formatDateLong } from "@/lib/booking/format";
 import { Container } from "@/components/ui/container";
 import { currentUser } from "@/lib/auth";
@@ -69,6 +70,7 @@ async function Booking({ params, searchParams }: PageProps<"/buchen/[providerId]
             needsConsent={needsEarlyStartConsent(new Date(), new Date(hit.start))}
             fixed={fixed}
             priceText={priceText}
+            taxText={fixed ? `${taxNote(hit.taxStatus)}, Anfahrt inklusive` : "Preis"}
             cancellationText={cancellationNotice(hit.priceType, hit.priceCents, hit.anfahrtskostenCents)}
           />
         )}
@@ -90,9 +92,10 @@ async function Booking({ params, searchParams }: PageProps<"/buchen/[providerId]
             <div className="flex justify-between gap-3"><dt className="text-muted">Bestätigung</dt><dd className="font-semibold">{hit.bookingMode === "instant" ? "sofort" : "durch den Betrieb"}</dd></div>
           </dl>
           <div className="flex items-end justify-between border-t border-line pt-4">
-            <span className="text-[15px] text-muted">{fixed ? "Festpreis (Endpreis)" : "Besichtigung"}</span>
+            <span className="text-[15px] text-muted">{fixed ? `Festpreis, ${taxNote(hit.taxStatus)}` : "Besichtigung"}</span>
             <span className="text-2xl font-extrabold">{priceText}</span>
           </div>
+          {fixed && <p className="-mt-2 text-right text-[13px] text-muted">Anfahrt inklusive</p>}
           {!fixed && <p className="text-[13px] text-muted">Der Betrieb schaut sich den Auftrag vor Ort an und macht dir danach ein Angebot. Du entscheidest dann, ob du es annimmst.</p>}
           <p className="text-[13px] text-muted">{cancellationNotice(hit.priceType, hit.priceCents, hit.anfahrtskostenCents)}</p>
           <Link href={back} className="text-[14px] font-semibold text-brand underline">Andere Zeit oder anderen Betrieb wählen</Link>

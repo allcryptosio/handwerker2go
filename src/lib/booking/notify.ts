@@ -3,6 +3,7 @@ import { asSystem } from "@/lib/db";
 import { earlyStartConfirmationParagraph } from "@/lib/legal/early-start";
 import { withdrawalNoticeForMail } from "@/lib/legal/withdrawal-notice";
 import { cancellationNotice } from "@/lib/booking/cancellation";
+import { priceLine } from "@/lib/booking/price-label";
 import { sendMail } from "@/lib/mail";
 import { reviewOptOutUrl } from "@/lib/review-optout";
 
@@ -25,7 +26,7 @@ export async function notifyBooking(bookingId: string, event: BookingEvent) {
   if (!b) return;
   const start = new Date(b.starts_at);
   const link = `${base()}/buchung/${b.id}`;
-  const price = b.price_type === "fixed" ? `Festpreis ${eur(b.price_cents)} (bezahlt)` : "Besichtigung kostenlos, Preis nach Angebot";
+  const price = b.price_type === "fixed" ? `${priceLine(b.price_cents, b.provider_tax_status)} (bezahlt)` : "Besichtigung kostenlos und unverbindlich, Preis nach Angebot";
   const facts = [
     `Leistung: ${b.service_name}`,
     `Termin: ${when(start)}`,

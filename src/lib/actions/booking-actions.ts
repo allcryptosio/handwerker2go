@@ -92,9 +92,9 @@ export async function createBooking(_: BookingFormState, form: FormData): Promis
       const r = await db.query(
         `insert into bookings (customer_id, provider_id, template_id, service_name, status, starts_at, ends_at, blocked, travel_minutes,
            street, postal_code, city, location, distance_km, contact_name, contact_phone, contact_email, notes,
-           price_type, price_cents, commission_bps, application_fee_cents, early_start_consent_at, terms_version, hold_expires_at, confirmed_at, anfahrtskosten_cents)
+           price_type, price_cents, commission_bps, application_fee_cents, early_start_consent_at, terms_version, hold_expires_at, confirmed_at, anfahrtskosten_cents, provider_tax_status)
          values ($1, $2, $3, $4, $5, $6, $7, tstzrange($8, $9), $10, $11, $12, $13, ST_SetSRID(ST_MakePoint($14, $15), 4326)::geography, $16,
-           $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)
+           $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30)
          returning id, number`,
         [
           u.id, d.providerId, tpl.templateId, tpl.name, status, start, end,
@@ -106,6 +106,7 @@ export async function createBooking(_: BookingFormState, form: FormData): Promis
           fixed ? new Date(now.getTime() + 35 * 60_000) : null,
           status === "confirmed" ? now : null,
           hit.anfahrtskostenCents,
+          hit.taxStatus,
         ],
       );
       const b = r.rows[0] as { id: string; number: string };

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { BookingSearch, type SearchValues, type ServiceChoice } from "@/components/booking/booking-search";
 import { formatDateLong, windowLabel } from "@/lib/booking/format";
+import { taxNote } from "@/lib/booking/price-label";
 
 interface Hit {
   providerId: string;
@@ -18,6 +19,7 @@ interface Hit {
   distanceKm: number;
   priceType: "fixed" | "quote";
   priceCents: number | null;
+  taxStatus?: "regelbesteuert" | "kleinunternehmer_19";
   durationMin: number;
   bookingMode: "instant" | "confirm";
   start: string;
@@ -195,7 +197,8 @@ function ProviderCard({ hit: h, href }: { hit: Hit; href: string }) {
       <dl className="grid grid-cols-3 gap-2 rounded-2xl bg-soft p-3 text-[13px] sm:gap-3">
         <div><dt className="text-muted">Ankunft</dt><dd className="text-[16px] font-bold tabular-nums">{h.arrival} Uhr</dd></div>
         <div><dt className="text-muted">Entfernung</dt><dd className="text-[16px] font-bold tabular-nums">{h.distanceKm < 1 ? "unter 1 km" : `${h.distanceKm.toLocaleString("de-DE")} km`}</dd></div>
-        <div><dt className="text-muted">{h.priceType === "fixed" ? "Festpreis" : "Preis"}</dt><dd className="text-[16px] font-bold tabular-nums">{h.priceType === "fixed" && h.priceCents ? eur(h.priceCents) : "nach Angebot"}</dd></div>
+        <div><dt className="text-muted">{h.priceType === "fixed" ? "Festpreis" : "Preis"}</dt><dd className="text-[16px] font-bold tabular-nums">{h.priceType === "fixed" && h.priceCents ? eur(h.priceCents) : "nach Angebot"}</dd>
+          {h.priceType === "fixed" && h.priceCents ? <dd className="text-[11px] leading-tight text-muted">{taxNote(h.taxStatus)}, Anfahrt inklusive</dd> : null}</div>
       </dl>
       <div className="mt-auto flex flex-wrap items-center justify-between gap-3">
         <span className="text-[13px] text-muted">

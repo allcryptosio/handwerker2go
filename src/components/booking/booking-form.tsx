@@ -12,6 +12,7 @@ export function BookingForm({
   needsConsent,
   fixed,
   priceText,
+  taxText,
   cancellationText,
 }: {
   hidden: { providerId: string; leistung: string; datum: string; zeit: string };
@@ -19,6 +20,7 @@ export function BookingForm({
   needsConsent: boolean;
   fixed: boolean;
   priceText: string;
+  taxText: string;
   cancellationText: string;
 }) {
   const [state, action] = useActionState<BookingFormState, FormData>(createBooking, {});
@@ -76,7 +78,7 @@ export function BookingForm({
 
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="text-[13px] text-muted">{fixed ? "Gesamtpreis inkl. MwSt." : "Preis"}</div>
+          <div className="text-[13px] text-muted">{fixed ? `Festpreis, ${taxText}` : "Preis"}</div>
           <div className="text-2xl font-extrabold">{priceText}</div>
         </div>
         <SubmitButton>{fixed ? "Zahlungspflichtig buchen" : "Termin verbindlich buchen"}</SubmitButton>
