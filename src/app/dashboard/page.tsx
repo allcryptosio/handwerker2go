@@ -81,6 +81,7 @@ async function Dashboard() {
     if (!p) return null;
     const cats = (await db.query("select c.label from provider_categories pc join service_categories c on c.id = pc.category_id where pc.provider_id = $1 order by c.sort", [p.id])).rows.map((r) => r.label as string);
     const area = (await db.query("select label, radius_km from service_areas where provider_id = $1 limit 1", [p.id])).rows[0];
+    const invoices = (await db.query("select id, number, kind, issued_at, net_cents from invoices where provider_id = $1 and status = 'issued' and pdf_key is not null order by issued_at desc limit 24", [p.id])).rows as { id: string; number: string; kind: string; issued_at: Date; net_cents: number }[];
     const pricing = (await db.query("select * from pricing_settings where valid_from <= now() order by valid_from desc limit 1")).rows[0];
     const setup = (await db.query(
       `select (select count(*) from provider_services s where s.provider_id = $1 and s.active)::int services,
@@ -89,10 +90,10 @@ async function Dashboard() {
               (select "emailVerified" from "user" where id = $2) email_verified`,
       [p.id, u.id],
     )).rows[0] as { services: number; fixed_services: number; hours: number; email_verified: boolean };
-    return { p, cats, area, pricing, setup };
+    return { p, cats, area, pricing, setup, invoices };
   });
   if (!data) redirect("/partner/registrieren");
-  const { p, cats, area, pricing, setup } = data;
+  const { p, cats, area, pricing, setup, invoices } = data;
   if (p.stripe_account_id && !(p.stripe_charges_enabled && p.stripe_payouts_enabled) && stripeConfigured()) {
     const f = await syncConnectAccount(p.stripe_account_id).catch(() => null);
     if (f) Object.assign(p, { stripe_charges_enabled: f.charges, stripe_payouts_enabled: f.payouts, stripe_details_submitted: f.details });
@@ -136,6 +137,20 @@ async function Dashboard() {
             <button className="self-start rounded-full bg-brand px-5 py-2.5 font-bold text-white">Speichern</button>
             <p className="text-[13px] text-muted">Ohne Häkchen speichern stellt deinen Modus auf „Ich bestätige selbst“.</p>
           </form>
+        </section>
+      )}
+      {invoices.length > 0 && (
+        <section id="rechnungen" className="flex scroll-mt-6 flex-col gap-3 rounded-panel border border-line p-6">
+          <h2 className="text-lg font-bold">Rechnungen von handwerker2go</h2>
+          <ul className="flex flex-col divide-y divide-line text-[15px]">
+            {invoices.map((i) => (
+              <li key={i.id} className="flex flex-wrap items-center justify-between gap-3 py-2">
+                <span>{i.number}, {i.kind === "commission" ? "Provision" : i.kind === "membership" ? "Mitgliedschaft" : "Gutschrift"}, {new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeZone: "Europe/Berlin" }).format(new Date(i.issued_at))}</span>
+                <span className="flex items-center gap-4"><span className="tabular-nums">{formatCents(i.net_cents)}</span><a href={`/api/rechnung/${i.id}`} className="font-semibold text-brand underline">PDF</a></span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-[13px] text-muted">Reverse Charge: Die Umsatzsteuer schuldest du nach § 13b UStG selbst. Der Beleg von Stripe gilt nur als Zahlungsquittung.</p>
         </section>
       )}
       <section id="steuer" className="flex scroll-mt-6 flex-col gap-3 rounded-panel border border-line p-6">

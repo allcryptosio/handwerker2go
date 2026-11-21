@@ -5,6 +5,7 @@ import { sendMail } from "@/lib/mail";
 import { syncSubscription } from "@/lib/stripe/billing";
 import { syncConnectAccount } from "@/lib/stripe/connect";
 import { expireUnpaid, markPaid } from "@/lib/booking/lifecycle";
+import { issueMembershipInvoice } from "@/lib/invoices/membership";
 
 /** Erinnerung vor der Verlängerung der Jahresmitgliedschaft (AGB für Betriebe § 4 Abs. 2) */
 async function notifyRenewal(invoice: Stripe.Invoice) {
@@ -140,6 +141,10 @@ export async function POST(request: Request) {
       }
       case "invoice.upcoming":
         if (!event.account) await notifyRenewal(event.data.object as Stripe.Invoice);
+        break;
+      case "invoice.paid":
+        // Mitgliedschaft bezahlt: eigene Rechnung (Reverse Charge, Nummernkreis H2G) ausstellen
+        if (!event.account) await issueMembershipInvoice(event.data.object as Stripe.Invoice);
         break;
       case "invoice.payment_failed":
         if (!event.account) await notifyPaymentFailed(event.data.object as Stripe.Invoice);

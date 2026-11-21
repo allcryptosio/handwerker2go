@@ -8,4 +8,4 @@ After=network-online.target postgresql.service
 Type=oneshot
 User=handwerker2go
 WorkingDirectory=/opt/handwerker2go
-ExecStart=/usr/bin/node --env-file=/opt/handwerker2go/.env.local scripts/commission-invoices.mjs
+ExecStart=/usr/bin/node --conditions=react-server --import tsx --env-file=/opt/handwerker2go/.env.local scripts/commission-invoices.mts
