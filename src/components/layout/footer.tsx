@@ -40,6 +40,7 @@ export function Footer() {
             <Link href="/widerruf" className="hover:text-brand">Widerrufsbelehrung</Link>
             <Link href="/datenschutz#cookies" className="hover:text-brand">Hinweise zu Cookies</Link>
             <Link href="/ranking" className="hover:text-brand">So sortieren wir</Link>
+            <Link href="/kontakt-dsa" className="hover:text-brand">Kontaktstelle (DSA)</Link>
           </nav>
         </div>
         <p className="border-t border-line pt-5 text-[13px] text-muted">

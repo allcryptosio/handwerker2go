@@ -38,10 +38,12 @@ export async function ProviderReviews({ providerId }: { providerId: string }) {
                 <span className="text-[13px] text-muted">{r.service_name}, {date(new Date(r.created_at))}</span>
               </div>
               {r.body && <p className="whitespace-pre-line text-[15px] text-ink-soft">{r.body}</p>}
+              <Link href={`/inhalt-melden?typ=bewertung&id=${r.id}&url=${encodeURIComponent(`/buchen/${providerId}#bewertungen`)}`} className="self-start text-[12px] text-muted underline" rel="nofollow">Inhalt melden</Link>
             </li>
           ))}
         </ul>
       )}
+      <Link href={`/inhalt-melden?typ=profil&id=${providerId}&url=${encodeURIComponent(`/buchen/${providerId}`)}`} className="self-start text-[12px] text-muted underline" rel="nofollow">Betriebsprofil melden (Inhalt melden)</Link>
       <p className="text-[12px] text-muted">Bewerten kann nur, wer über handwerker2go gebucht hat und dessen Termin stattgefunden hat. <Link href="/agb#bewertungen" className="underline">So prüfen wir Bewertungen</Link></p>
     </section>
   );

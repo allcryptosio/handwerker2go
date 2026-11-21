@@ -83,6 +83,7 @@ async function Admin({ searchParams }: { searchParams: Promise<Record<string, st
           <Link href="/admin/buchungen" className="font-semibold text-brand underline">Buchungen</Link>
           <Link href="/admin/bewertungen" className="font-semibold text-brand underline">Bewertungen</Link>
           <Link href="/admin/widerrufe" className="font-semibold text-brand underline">Widerrufe</Link>
+          <Link href="/admin/meldungen" className="font-semibold text-brand underline">Meldungen</Link>
           <SignOutButton />
         </div>
       </div>
