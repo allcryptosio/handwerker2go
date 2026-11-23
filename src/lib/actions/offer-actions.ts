@@ -101,7 +101,7 @@ export async function acceptOffer(_: OfferState, form: FormData): Promise<OfferS
 
   const o = await asSystem(async (db) => (await db.query(
     `select o.*, b.template_id, b.street, b.postal_code, b.city, b.location, b.distance_km, b.contact_name, b.contact_phone, b.contact_email, b.service_name,
-            b.travel_minutes, p.stripe_account_id, p.approved_at, p.company_name, p.anfahrtskosten_cents, p.buffer_minutes,
+            b.travel_minutes, p.stripe_account_id, p.approved_at, p.partner_code, p.company_name, p.anfahrtskosten_cents, p.buffer_minutes,
             (p.stripe_charges_enabled and p.stripe_payouts_enabled) payable
        from offers o join bookings b on b.id = o.inspection_booking_id join provider_profiles p on p.id = o.provider_id where o.id = $1`,
     [id.data],
@@ -115,7 +115,7 @@ export async function acceptOffer(_: OfferState, form: FormData): Promise<OfferS
   const consentNeeded = needsEarlyStartConsent(now, start);
   if (consentNeeded && form.get("early_start_consent") !== "on") return { fieldErrors: { early_start_consent: "Bitte bestätige den Beginn vor Ablauf der Widerrufsfrist." } };
   const reviewOptin = form.get("review_optin") === "on";
-  const bps = commissionBpsAt(new Date(o.approved_at), now);
+  const bps = commissionBpsAt(new Date(o.approved_at), now, o.partner_code);
   const fee = applicationFeeCents(o.price_cents, bps);
 
   let booking: { id: string; number: string };
@@ -157,7 +157,7 @@ export async function acceptOffer(_: OfferState, form: FormData): Promise<OfferS
   try {
     const checkout = await createBookingCheckout({
       bookingRef: booking.number, bookingId: booking.id, amountCents: o.price_cents, serviceName: `${o.service_name}, ${o.company_name} (Angebot ${o.number})`,
-      providerAccountId: o.stripe_account_id, providerApprovedAt: new Date(o.approved_at), customerEmail: u.email,
+      providerAccountId: o.stripe_account_id, commissionBps: bps, customerEmail: u.email,
       successUrl: `${base()}/buchung/${booking.id}?bezahlt=1`, cancelUrl: `${base()}/angebot/${o.id}?abgebrochen=1`,
     });
     url = checkout.url;

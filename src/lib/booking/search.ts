@@ -103,6 +103,8 @@ export interface ProviderInfo {
   offeredServices: number;
   avgResponseHours: number | null;
   approvedAt: string;
+  /** Partnercode mit Sonderkonditionen (Provision) */
+  partnerCode: string | null;
   /** Anfahrtskosten des Betriebs (Obergrenze der Stornopauschale, im Festpreis enthalten) */
   anfahrtskostenCents: number;
   /** Steuerstatus für die Preisanzeige */
@@ -122,7 +124,7 @@ async function loadCandidates(opts: { templateId: string; lat: number; lon: numb
     // Bevor gerechnet wird: abgelaufene Zahlungs-Reservierungen freigeben
     await db.query(`update bookings set status = 'expired' where status = 'pending_payment' and hold_expires_at < now()`);
     const rows = (await db.query(
-      `select p.id, p.slug, p.company_name, p.logo_key, p.buffer_minutes, p.stripe_account_id, p.approved_at, p.min_notice_hours, ${EFFECTIVE_BOOKING_MODE_SQL} booking_mode, p.anfahrtskosten_cents, p.tax_status,
+      `select p.id, p.slug, p.company_name, p.logo_key, p.buffer_minutes, p.stripe_account_id, p.approved_at, p.partner_code, p.min_notice_hours, ${EFFECTIVE_BOOKING_MODE_SQL} booking_mode, p.anfahrtskosten_cents, p.tax_status,
               (p.stripe_charges_enabled and p.stripe_payouts_enabled) payable,
               sa.radius_km, case when sa.center is null then null else ST_Distance(sa.center, ST_SetSRID(ST_MakePoint($3, $2), 4326)::geography) / 1000 end distance_km,
               ps.price_type, ps.price_cents, coalesce(ps.duration_min, t.duration_min, 60) duration_min, ps.template_id is not null offers,
@@ -197,6 +199,7 @@ async function loadCandidates(opts: { templateId: string; lat: number; lon: numb
         offeredServices: Number(r.offered_services),
         avgResponseHours: r.avg_response_hours === null ? null : Number(r.avg_response_hours),
         approvedAt: new Date(r.approved_at).toISOString(),
+        partnerCode: r.partner_code ?? null,
         anfahrtskostenCents: Number(r.anfahrtskosten_cents),
         taxStatus: r.tax_status,
       };

@@ -68,6 +68,7 @@ export function ProviderRegisterForm({ categories }: { categories: { slug: strin
         </div>
         <Field name="email" label="E-Mail-Adresse" type="email" autoComplete="email" inputMode="email" error={e.email} />
         <Field name="password" label="Passwort" type="password" autoComplete="new-password" hint="Mindestens 10 Zeichen" error={e.password} />
+        <Field name="partner_code" label="Partnercode" required={false} autoComplete="off" hint="Nur falls du einen Code bekommen hast" error={e.partner_code} />
       </fieldset>
 
       <fieldset className={section}>

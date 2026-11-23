@@ -12,6 +12,7 @@ import { MASTER_REQUIRED_CATEGORIES, findContactData, normalizePhone, normalizeV
 import { legal } from "@/config/legal";
 import { UNTERNEHMER_DECLARATION_TEXT, UNTERNEHMER_DECLARATION_VERSION, isSteuernummer } from "@/lib/legal/unternehmer";
 import { checkVatId, type ViesResult } from "@/lib/tax/vies";
+import { normalizePartnerCode, partnerTerms } from "@/lib/pricing";
 
 export type FormState = { ok?: boolean; error?: string; fieldErrors?: Record<string, string>; message?: string };
 
@@ -104,6 +105,7 @@ const providerSchema = z.object({
   tax_status: z.enum(["regelbesteuert", "kleinunternehmer_19"], { message: "Bitte gib deinen Steuerstatus an" }),
   proof_way: z.enum(["ust_idnr", "gewerbe_nachweis"], { message: "Bitte wähle, wie du dich als Unternehmer ausweist" }),
   steuernummer: z.string().trim().max(30).optional(),
+  partner_code: z.string().trim().max(30).optional(),
   anfahrtskosten: z.string().trim().regex(/^\d{1,3}([.,]\d{1,2})?$/, "Bitte deine Anfahrtskosten in Euro angeben, z. B. 25 oder 25,50"),
   terms,
 });
@@ -148,6 +150,7 @@ export async function registerProvider(_: FormState, form: FormData): Promise<Fo
   }
 
   // Unternehmer-Nachweis (AGB für Betriebe § 6 Abs. 2): Weg A USt-IdNr. (VIES) oder Weg B Gewerbenachweis + Steuernummer + Erklärung
+  if (parsed.success && parsed.data.partner_code && !partnerTerms(parsed.data.partner_code)) errors.partner_code = "Dieser Partnercode ist nicht gültig. Lass das Feld leer, wenn du keinen Code hast.";
   if (parsed.success && parsed.data.proof_way === "ust_idnr" && !parsed.data.vat_id) errors.vat_id = "Bitte gib deine USt-IdNr. an oder wähle den Weg ohne USt-IdNr.";
   if (parsed.success && parsed.data.proof_way === "gewerbe_nachweis") {
     if (!parsed.data.steuernummer || !isSteuernummer(parsed.data.steuernummer)) errors.steuernummer = "Bitte gib deine Steuernummer an (10 bis 13 Ziffern)";
@@ -243,7 +246,10 @@ export async function registerProvider(_: FormState, form: FormData): Promise<Fo
         );
       }
       if (vies) await db.query("update vies_checks set provider_id = $1 where provider_id is null and vat_id = $2", [pid, normalizeVatId(d.vat_id!)]);
-      await audit(db, { actorId: userId, actorRole: "provider", action: "register", entity: "provider_profiles", entityId: pid, after: { company: d.company_name, categories } });
+      await audit(db, { actorId: userId, actorRole: "provider", action: "register", entity: "provider_profiles", entityId: pid, after: { company: d.company_name, categories, partnerCode: partnerTerms(d.partner_code)?.code ?? null } });
+      // Partnercode darf nur das System setzen (Trigger provider_profiles_partner_code_guard)
+      const partner = partnerTerms(d.partner_code);
+      if (partner) await asSystem((sys) => sys.query("update provider_profiles set partner_code = $2, partner_code_at = now() where id = $1", [pid, partner.code]));
     });
   } catch (e) {
     console.error(e);
@@ -431,4 +437,22 @@ export async function openBillingPortal() {
   if (!p.stripe_account_id) throw new Error("Noch keine Mitgliedschaft");
   const { createPortalSession } = await import("@/lib/stripe/billing");
   redirect(await createPortalSession(p.stripe_account_id));
+}
+
+/** Admin: Partnercode eines Betriebs setzen oder entfernen (leeres Feld = entfernen) */
+export async function setPartnerCode(form: FormData) {
+  const admin = await currentUser();
+  if (!admin || admin.role !== "admin") throw new Error("Nicht berechtigt");
+  const providerId = z.string().uuid().parse(form.get("providerId"));
+  const raw = normalizePartnerCode(String(form.get("partner_code") ?? ""));
+  const partner = raw ? partnerTerms(raw) : null;
+  if (raw && !partner) redirect("/admin?fehler=partnercode");
+  await withDb({ userId: admin.id, role: "admin" }, async (db) => {
+    const before = (await db.query("select partner_code from provider_profiles where id = $1", [providerId])).rows[0];
+    if (!before) throw new Error("Betrieb nicht gefunden");
+    await db.query("update provider_profiles set partner_code = $2, partner_code_at = case when $2::text is null then null else now() end where id = $1", [providerId, partner?.code ?? null]);
+    await audit(db, { actorId: admin.id, actorRole: "admin", action: "provider.partner_code", entity: "provider_profiles", entityId: providerId,
+      before: { partnerCode: before.partner_code }, after: { partnerCode: partner?.code ?? null } });
+  });
+  redirect("/admin");
 }

@@ -31,3 +31,16 @@ export const yearlyPerMonthCents = () => Math.round(providerPricing.yearly.feeCe
 /** Ersparnis des Jahresabos gegenüber zwölf Monatszahlungen in Prozent (gerundet). */
 export const yearlySavingsPercent = () =>
   Math.round((1 - providerPricing.yearly.feeCents / (providerPricing.monthly.feeCents * 12)) * 100);
+
+/**
+ * Partnercodes: dauerhafte Sonderkonditionen (z. B. für Freunde). Gilt ab Freischaltung für die gesamte
+ * Laufzeit: fester Provisionssatz, keine Grundgebühr, keine Mitgliedschaft nötig.
+ */
+export const partnerCodes: Record<string, { label: string; commissionBps: number; monthlyFeeCents: 0 }> = {
+  FCKSTP: { label: "Freundes-Konditionen", commissionBps: 1000, monthlyFeeCents: 0 }, // dauerhaft 10 %, kein Monatsbeitrag
+};
+export const normalizePartnerCode = (raw: string | null | undefined) => (raw ?? "").trim().toUpperCase().replace(/\s+/g, "");
+export const partnerTerms = (code: string | null | undefined) => {
+  const c = normalizePartnerCode(code);
+  return c && partnerCodes[c] ? { code: c, ...partnerCodes[c] } : null;
+};

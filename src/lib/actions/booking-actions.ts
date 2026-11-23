@@ -83,7 +83,7 @@ export async function createBooking(_: BookingFormState, form: FormData): Promis
   const reviewOptin = form.get("review_optin") === "on";
   const fixed = hit.priceType === "fixed";
   if (fixed && (!hit.priceCents || !hit.stripeAccountId)) return { error: "Dieser Betrieb kann gerade keine Zahlungen annehmen." };
-  const bps = fixed ? commissionBpsAt(new Date(hit.approvedAt), now) : null;
+  const bps = fixed ? commissionBpsAt(new Date(hit.approvedAt), now, hit.partnerCode) : null;
   const fee = fixed && bps !== null ? applicationFeeCents(hit.priceCents!, bps) : null;
   const status = fixed ? "pending_payment" : hit.bookingMode === "confirm" ? "requested" : "confirmed";
 
@@ -155,7 +155,7 @@ export async function createBooking(_: BookingFormState, form: FormData): Promis
       amountCents: hit.priceCents!,
       serviceName: `${tpl.name}, ${hit.name}`,
       providerAccountId: hit.stripeAccountId!,
-      providerApprovedAt: new Date(hit.approvedAt),
+      commissionBps: bps!,
       customerEmail: u.email,
       successUrl: `${base}/buchung/${booking.id}?bezahlt=1`,
       cancelUrl: `${base}/buchung/${booking.id}?abgebrochen=1`,

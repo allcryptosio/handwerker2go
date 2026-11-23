@@ -4,7 +4,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { SignOutButton } from "@/components/layout/sign-out-button";
 import { Container } from "@/components/ui/container";
-import { decideProvider } from "@/lib/actions/auth-actions";
+import { decideProvider, setPartnerCode } from "@/lib/actions/auth-actions";
+import { formatPercent, partnerTerms } from "@/lib/pricing";
 import { MASTER_REQUIRED_CATEGORIES, findContactData } from "@/lib/partner/guard";
 import { currentUser } from "@/lib/auth";
 import { withDb } from "@/lib/db";
@@ -103,6 +104,9 @@ async function Admin({ searchParams }: { searchParams: Promise<Record<string, st
           Freischaltung nicht möglich: Der Betrieb hat noch keine Anfahrtskosten eingetragen (Pflichtangabe, Obergrenze der Stornopauschale).
         </p>
       )}
+      {sp.fehler === "partnercode" && (
+        <p role="alert" className="rounded-card border-[1.5px] border-[#b42318] bg-[#fef3f2] p-4 text-[15px]">Dieser Partnercode existiert nicht.</p>
+      )}
       {sp.fehler === "begruendung" && (
         <p role="alert" className="rounded-card border-[1.5px] border-[#b42318] bg-[#fef3f2] p-4 text-[15px]">
           Bitte gib bei Ablehnung oder Sperre eine Begründung an (mindestens 5 Zeichen). Sie geht per E-Mail an den Betrieb (AGB für Betriebe § 10).
@@ -115,7 +119,14 @@ async function Admin({ searchParams }: { searchParams: Promise<Record<string, st
           <li key={p.id} className="rounded-panel border border-line p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h3 className="text-xl font-bold">{p.company_name}</h3>
-              <span className="rounded-full bg-soft px-3 py-1 text-sm font-semibold">{label[p.status]}</span>
+              <span className="flex flex-wrap gap-2">
+                {partnerTerms(p.partner_code) && (
+                  <span className="rounded-full bg-mint px-3 py-1 text-sm font-semibold text-brand-dark">
+                    Code {p.partner_code}: dauerhaft {formatPercent(partnerTerms(p.partner_code)!.commissionBps)}, kein Monatsbeitrag
+                  </span>
+                )}
+                <span className="rounded-full bg-soft px-3 py-1 text-sm font-semibold">{label[p.status]}</span>
+              </span>
             </div>
             <dl className="mt-4 grid gap-3 text-[14px] sm:grid-cols-2">
               <div><dt className="text-muted">Kontakt</dt><dd>{p.contact_name}, {p.email} {p.email_verified ? "(bestätigt)" : "(E-Mail noch nicht bestätigt)"}, {p.phone}</dd></div>
@@ -143,6 +154,13 @@ async function Admin({ searchParams }: { searchParams: Promise<Record<string, st
               {p.status !== "approved" && <button name="decision" value="approve" className="min-h-11 rounded-full bg-brand px-5 font-bold text-white hover:bg-brand-dark">Freischalten</button>}
               {p.status === "pending" && <button name="decision" value="reject" className="min-h-11 rounded-full border-[1.5px] border-[#b42318] px-5 font-bold text-[#b42318]">Ablehnen</button>}
               {p.status === "approved" && <button name="decision" value="suspend" className="min-h-11 rounded-full border-[1.5px] border-[#b42318] px-5 font-bold text-[#b42318]">Sperren</button>}
+            </form>
+            <form action={setPartnerCode} className="mt-3 flex flex-wrap items-end gap-3">
+              <input type="hidden" name="providerId" value={p.id} />
+              <label className="flex flex-col gap-1 text-sm font-semibold">Partnercode (leer = Standardkonditionen)
+                <input name="partner_code" defaultValue={p.partner_code ?? ""} maxLength={30} className="min-h-11 w-[200px] rounded-xl border-[1.5px] border-line-strong px-3 font-normal uppercase" />
+              </label>
+              <button className="min-h-11 rounded-full border-[1.5px] border-brand px-5 font-bold text-brand hover:bg-mint">Code speichern</button>
             </form>
           </li>
         ))}

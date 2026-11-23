@@ -1,7 +1,7 @@
 import "server-only";
 import { getStripe } from "@/lib/stripe/client";
 import { bookingCheckoutBranding } from "@/lib/stripe/branding";
-import { applicationFeeCents, commissionBpsAt } from "@/lib/stripe/commission";
+import { applicationFeeCents } from "@/lib/stripe/commission";
 
 /**
  * Zahlung einer Buchung als Direct Charge auf dem Stripe-Konto des Betriebs (Variante A, Managed Risk).
@@ -14,14 +14,15 @@ export async function createBookingCheckout(input: {
   amountCents: number;
   serviceName: string;
   providerAccountId: string;
-  providerApprovedAt: Date;
+  /** Provisionssatz der Buchung (bereits mit commissionBpsAt berechnet) */
+  commissionBps: number;
   customerEmail: string;
   successUrl: string;
   cancelUrl: string;
 }) {
   const stripe = getStripe();
   if (!stripe) throw new Error("Stripe ist nicht konfiguriert");
-  const bps = commissionBpsAt(input.providerApprovedAt);
+  const bps = input.commissionBps;
   const fee = applicationFeeCents(input.amountCents, bps);
   const session = await stripe.checkout.sessions.create(
     {

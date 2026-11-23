@@ -42,7 +42,7 @@ const intro = (await db.query(
   `select p.id, p.company_name, u.email, p.approved_at + make_interval(months => ps.intro_months) intro_end
      from provider_profiles p join "user" u on u.id = p.user_id,
           lateral (select intro_months from pricing_settings where valid_from <= now() order by valid_from desc limit 1) ps
-    where p.status = 'approved' and p.intro_reminder_sent_at is null and p.membership_status in ('none', 'canceled')
+    where p.status = 'approved' and p.intro_reminder_sent_at is null and p.membership_status in ('none', 'canceled') and p.partner_code is null
       and p.approved_at + make_interval(months => ps.intro_months) between now() and now() + interval '14 days'`,
 )).rows;
 for (const p of intro) {

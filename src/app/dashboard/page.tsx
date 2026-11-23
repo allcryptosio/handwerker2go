@@ -7,7 +7,7 @@ import { SignOutButton } from "@/components/layout/sign-out-button";
 import { Container } from "@/components/ui/container";
 import { currentUser } from "@/lib/auth";
 import { withDb } from "@/lib/db";
-import { formatCents, formatPercent, providerPricing, yearlyPerMonthCents, yearlySavingsPercent } from "@/lib/pricing";
+import { formatCents, formatPercent, partnerTerms, providerPricing, yearlyPerMonthCents, yearlySavingsPercent } from "@/lib/pricing";
 import { openBillingPortal, startMembership, startStripeOnboarding } from "@/lib/actions/auth-actions";
 import { stripeConfigured, stripeIsTestMode } from "@/lib/stripe/client";
 import { isBookable, syncConnectAccount } from "@/lib/stripe/connect";
@@ -101,6 +101,7 @@ async function Dashboard() {
   const s = statusText[p.status];
   const introEnd = p.approved_at ? new Date(new Date(p.approved_at).setMonth(new Date(p.approved_at).getMonth() + pricing.intro_months)) : null;
   const fmt = new Intl.DateTimeFormat("de-DE", { dateStyle: "long", timeZone: "Europe/Berlin" });
+  const partner = partnerTerms(p.partner_code);
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -162,7 +163,15 @@ async function Dashboard() {
         <h2 className="text-lg font-bold">Status: {s.label}</h2>
         <p className="mt-2 text-[15px]">{s.text}{p.status_reason ? ` Grund: ${p.status_reason}` : ""}</p>
       </section>
-      {p.status === "approved" && introEnd && (
+      {partner && (
+        <section className="grid gap-4 rounded-panel border-[1.5px] border-brand bg-mint p-6 sm:grid-cols-3">
+          <div><div className="text-xs font-semibold uppercase tracking-[0.06em] text-brand-dark">Deine Konditionen</div><div className="mt-1 text-lg font-extrabold">{partner.label}</div></div>
+          <div><div className="text-xs font-semibold uppercase tracking-[0.06em] text-brand-dark">Grundgebühr</div><div className="mt-1 text-lg font-extrabold">0 € dauerhaft</div></div>
+          <div><div className="text-xs font-semibold uppercase tracking-[0.06em] text-brand-dark">Provision</div><div className="mt-1 text-lg font-extrabold">{formatPercent(partner.commissionBps)} dauerhaft</div></div>
+          <p className="text-[14px] text-brand-dark sm:col-span-3">Mit deinem Partnercode {partner.code} brauchst du keine Mitgliedschaft. Dein Profil bleibt ohne Monatsbeitrag in der Suche.</p>
+        </section>
+      )}
+      {!partner && p.status === "approved" && introEnd && (
         <section className="grid gap-4 rounded-panel border border-line p-6 sm:grid-cols-3">
           <div><div className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">Einführungsphase bis</div><div className="mt-1 text-lg font-extrabold">{fmt.format(introEnd)}</div></div>
           <div><div className="text-xs font-semibold uppercase tracking-[0.06em] text-muted">Grundgebühr</div><div className="mt-1 text-lg font-extrabold">{formatCents(pricing.intro_fee_cents)}</div></div>
@@ -193,7 +202,7 @@ async function Dashboard() {
           {stripeConfigured() && stripeIsTestMode() && <p className="text-[13px] text-muted">Testmodus: Es fließt kein echtes Geld.</p>}
         </section>
       )}
-      {p.status === "approved" && stripeConfigured() && (
+      {!partner && p.status === "approved" && stripeConfigured() && (
         <section className="flex flex-col gap-4 rounded-panel border border-line p-6">
           <h2 className="text-lg font-bold">Mitgliedschaft</h2>
           {["trialing", "active", "past_due", "unpaid", "paused"].includes(p.membership_status) ? (

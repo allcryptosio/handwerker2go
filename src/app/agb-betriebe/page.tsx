@@ -133,6 +133,11 @@ export default function Page() {
         (5) Der Betrieb kündigt die Mitgliedschaft im Dashboard unter „Mitgliedschaft und Rechnungen verwalten“ oder per E-Mail an{" "}
         <Email />, jeweils zum Ende der laufenden Laufzeit. Das Recht zur Kündigung aus wichtigem Grund bleibt unberührt.
       </p>
+      <p>
+        (6) Abweichend von Abs. 1 bis 3 und § 5 Abs. 2 gelten für Betriebe, die sich mit einem von uns ausgegebenen Partnercode
+        registriert haben oder denen wir einen solchen Code zugeordnet haben, die zu diesem Code vereinbarten Konditionen. Diese
+        werden im Dashboard angezeigt.
+      </p>
 
       <h2>§ 5 Zahlungsabwicklung und Provision</h2>
       <p>
