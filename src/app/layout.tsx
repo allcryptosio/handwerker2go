@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Suspense } from "react";
+import { SectionScroller, SmartLink } from "@/components/ui/smart-link";
 import { Header, HeaderView } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ChromeSwitch } from "@/components/layout/chrome-switch";
@@ -57,13 +58,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="de" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-white focus:px-4 focus:py-2">
+        <SmartLink href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-white focus:px-4 focus:py-2">
           Zum Inhalt springen
-        </a>
+        </SmartLink>
+        <Suspense fallback={null}><SectionScroller /></Suspense>
         <Suspense fallback={<HeaderView pathname="" />}>
           <ChromeSwitch customer={<Header />} partner={<PartnerHeader />} />
         </Suspense>
-        <main id="main" className="flex-1">
+        <main id="main" tabIndex={-1} className="flex-1 outline-none">
           {children}
         </main>
         <Suspense fallback={<Footer />}>

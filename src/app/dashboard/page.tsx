@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { SmartLink as Link } from "@/components/ui/smart-link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";

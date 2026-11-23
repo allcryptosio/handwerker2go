@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SmartLink as Link } from "@/components/ui/smart-link";
 import { WithdrawButton } from "@/components/legal/withdraw-button";
 import { LEGAL } from "@/config/legal";
 

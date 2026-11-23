@@ -100,7 +100,7 @@ export async function notifyBooking(bookingId: string, event: BookingEvent) {
           "Bewerten können nur Kunden, die über handwerker2go gebucht haben. Öffentlich sichtbar sind nur Sterne, Text und Datum, nicht dein Name.",
           reviewMailFooter(reviewOptOutUrl(b.contact_email)),
         ],
-        button: { label: "Jetzt bewerten", url: `${link}#bewerten` },
+        button: { label: "Jetzt bewerten", url: `${link}${link.includes("?") ? "&" : "?"}zu=bewerten` },
       }));
       break;
     case "cancelled_by_provider":

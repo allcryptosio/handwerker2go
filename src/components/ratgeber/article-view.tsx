@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SmartLink } from "@/components/ui/smart-link";
 import { ArticleCard } from "@/components/ratgeber/article-card";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Container } from "@/components/ui/container";
@@ -72,8 +73,8 @@ export function ArticleView({ a, others, basePath, crumbs, cta }: { a: Article; 
         <nav aria-label="Inhalt" className="rounded-panel border border-line p-6">
           <div className="mb-2 text-[13px] font-bold uppercase tracking-[0.06em] text-muted">Inhalt</div>
           <ol className="flex list-decimal flex-col gap-1 pl-5 text-[16px]">
-            {a.sections.map((s) => <li key={s.h2}><a href={`#${anchor(s.h2)}`} className="text-brand hover:underline">{s.h2}</a></li>)}
-            <li><a href="#fragen" className="text-brand hover:underline">Häufige Fragen</a></li>
+            {a.sections.map((s) => <li key={s.h2}><SmartLink href={`#${anchor(s.h2)}`} className="text-left text-brand hover:underline">{s.h2}</SmartLink></li>)}
+            <li><SmartLink href="#fragen" className="text-left text-brand hover:underline">Häufige Fragen</SmartLink></li>
           </ol>
         </nav>
 

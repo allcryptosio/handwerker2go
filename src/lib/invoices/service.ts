@@ -127,7 +127,7 @@ export async function finalizePdfAndSend(invoiceId: string) {
       inv.payment_note,
       "Die Umsatzsteuer darauf schuldest du nach § 13b UStG selbst, auch als Kleinunternehmer (AGB für Betriebe § 6). Die Rechnung findest du auch im Dashboard.",
     ],
-    button: { label: "Rechnungen im Dashboard", url: `${base()}/dashboard#rechnungen` },
+    button: { label: "Rechnungen im Dashboard", url: `${base()}/dashboard?zu=rechnungen` },
     attachments: [{ filename: `${inv.number}.pdf`, content: pdf, contentType: "application/pdf" }],
   }).catch(console.error);
   await asSystem((db) => db.query("update invoices set sent_at = now() where id = $1", [invoiceId]));

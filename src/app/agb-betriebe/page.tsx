@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { pageMeta } from "@/lib/seo";
-import Link from "next/link";
+import { SmartLink as Link } from "@/components/ui/smart-link";
 import { Email } from "@/components/legal/email";
 import { LegalPage } from "@/components/legal/legal-page";
 import { LEGAL, legal, operatorLine, termsDate } from "@/config/legal";

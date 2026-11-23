@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SmartLink as Link } from "@/components/ui/smart-link";
 import { asSystem } from "@/lib/db";
 
 const date = (d: Date) => new Intl.DateTimeFormat("de-DE", { month: "long", year: "numeric", timeZone: "Europe/Berlin" }).format(d);
@@ -38,7 +38,7 @@ export async function ProviderReviews({ providerId }: { providerId: string }) {
                 <span className="text-[13px] text-muted">{r.service_name}, {date(new Date(r.created_at))}</span>
               </div>
               {r.body && <p className="whitespace-pre-line text-[15px] text-ink-soft">{r.body}</p>}
-              <Link href={`/inhalt-melden?typ=bewertung&id=${r.id}&url=${encodeURIComponent(`/buchen/${providerId}#bewertungen`)}`} className="self-start text-[12px] text-muted underline" rel="nofollow">Inhalt melden</Link>
+              <Link href={`/inhalt-melden?typ=bewertung&id=${r.id}&url=${encodeURIComponent(`/buchen/${providerId}`)}`} className="self-start text-[12px] text-muted underline" rel="nofollow">Inhalt melden</Link>
             </li>
           ))}
         </ul>
